@@ -1,15 +1,57 @@
+import { User } from "../entities/User";
 import { 
     Arg,
     Mutation, 
-    Resolver 
+    Query, 
+    Resolver,
+    ObjectType, 
+    Field
 } from "type-graphql";
+import { getConnection } from "typeorm";
 
-@Resolver()
+@ObjectType()
+class UserList{
+    @Field(()=>User)
+    users: User[]
+}
+
+@Resolver(User)
 export class UserResolver {
     @Mutation(() => Boolean)
-    createDummyUser(
+    async createDummyUser(
         @Arg('username') username: string
-    ) : boolean {
-        return username.length === 3;
+    ) : Promise<boolean> {
+        await getConnection().query(
+            `
+            insert into "user" (username) values ('${username}')
+            `
+        );
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async deleteUser(
+        @Arg('username') username: string
+    ): Promise<boolean>{
+         await getConnection().query(
+            `
+            delete from "user" where username = $1
+            `,
+            [username]
+        );
+        return true;
+    }
+
+
+
+    @Query(()=>[User])
+    async getUsers() : Promise<[User]>{
+        const users = await getConnection().query(
+            `
+            select * from "user"
+            `
+        );
+        return users;
+        
     }
 }
