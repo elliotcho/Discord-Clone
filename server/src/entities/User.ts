@@ -15,15 +15,16 @@ export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id! : number;
 
-     @Column()
-     email!: string;
+    @Field()
+    @Column({ unique: true })
+    email!: string;
 
     @Field()
-    @Column()
+    @Column({ unique: true })
     username!: string;
 
-     @Column()
-     password!: string;
+    @Column()
+    password!: string;
 
     @Field()
     @CreateDateColumn()
