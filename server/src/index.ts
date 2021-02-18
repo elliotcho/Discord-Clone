@@ -19,6 +19,7 @@ const main = async () => {
             User
         ] 
     });
+    await User.delete({});
 
     const schema = await createSchema();
 
