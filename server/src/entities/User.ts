@@ -6,10 +6,10 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {Field, ObjectType} from 'type-graphql'
+import { Field, ObjectType } from 'type-graphql';
 
-@Entity()
 @ObjectType()
+@Entity()
 export class User extends BaseEntity {
     @Field()
     @PrimaryGeneratedColumn()
