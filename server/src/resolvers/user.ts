@@ -54,4 +54,18 @@ export class UserResolver {
         return users;
         
     }
+
+    @Mutation(()=>Boolean)
+    async register(
+        @Arg('username') username: string,
+        @Arg('password') password: string,
+        @Arg('email') email: string    
+    ): Promise<boolean>{
+        await getConnection().query(
+            `
+            insert into "user" (username, password, email) values ('${username}', '${password}', '${email}')
+            `
+        );
+        return true;
+    }
 }

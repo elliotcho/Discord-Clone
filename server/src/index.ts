@@ -19,6 +19,7 @@ const main = async () => {
             User
         ] 
     });
+   
 
     const schema = await createSchema();
 
