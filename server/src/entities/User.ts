@@ -7,6 +7,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
+import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Entity()
@@ -15,8 +16,9 @@ export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id! : number;
 
-    @Column()
-    email!: string;
+     @Field()
+     @Column()
+     email!: string;
 
     @Field()
     @Column()
@@ -29,6 +31,7 @@ export class User extends BaseEntity {
     @CreateDateColumn()
     createdAt: Date;
 
+    @Field()
     @UpdateDateColumn()
     updatedAt: Date;
 }
