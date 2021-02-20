@@ -1,18 +1,21 @@
 import { 
     Arg,
+    Ctx,
     Mutation,  
     Resolver,
 } from "type-graphql";
 import argon2 from 'argon2';
 import { getConnection } from "typeorm";
 import { User } from "../entities/User";
+import { MyContext } from "src/types";
 
 @Resolver(User)
 export class UserResolver {
     @Mutation(() => Boolean)
     async login(
         @Arg('username') username: string,
-        @Arg('password') password: string
+        @Arg('password') password: string,
+        @Ctx() { req } : MyContext
     ): Promise<boolean> {
         const user = await User.findOne({ where: { username } });
 
@@ -26,6 +29,7 @@ export class UserResolver {
             return false;
         }
 
+        req.session.uid = user.id;
         return true;
     }
 
@@ -33,7 +37,8 @@ export class UserResolver {
     async register(
         @Arg('username') username: string,
         @Arg('password') password: string,
-        @Arg('email') email: string    
+        @Arg('email') email: string,
+        @Ctx() { req } : MyContext 
     ): Promise<User | undefined>{
         const hashedPassword = await argon2.hash(password);
 
@@ -46,6 +51,9 @@ export class UserResolver {
         );
         
         const user = await User.findOne({ where : { username } });
+
+        req.session.uid = user?.id;
+        
         return user;
     }
 
@@ -55,7 +63,8 @@ export class UserResolver {
         @Arg('newPassword') newPassword: string,
         @Arg('username') username: string
     ): Promise<boolean>{
-        const user = await User.findOne({where: {username}});
+        const user = await User.findOne({ where: { username } });
+
         if(!user){
             return false;
         }
@@ -67,6 +76,7 @@ export class UserResolver {
         }
 
         const hashedNewPassword = await argon2.hash(newPassword);
+
         await getConnection().query(
             `
             update "user" 
@@ -76,6 +86,6 @@ export class UserResolver {
             [hashedNewPassword, username]
         );
 
-            return true;
+        return true;
     }
 }
