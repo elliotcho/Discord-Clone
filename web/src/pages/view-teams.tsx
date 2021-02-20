@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { withApollo } from '../utils/withApollo';
 import Teams from '../components/view-teams/Teams';
 import Channels from '../components/view-teams/Channels';
 import ChatHeader from '../components/view-teams/ChatHeader';
@@ -36,4 +37,4 @@ const ViewTeams: React.FC<{}> = () => {
     )
 }
 
-export default ViewTeams;
+export default withApollo({ ssr: false })(ViewTeams);
