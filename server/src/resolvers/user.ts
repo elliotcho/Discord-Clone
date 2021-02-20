@@ -2,16 +2,24 @@ import {
     Arg,
     Ctx,
     Mutation,  
+    Query,  
     Resolver,
 } from "type-graphql";
 import argon2 from 'argon2';
 import { getConnection } from "typeorm";
 import { User } from "../entities/User";
 import { MyContext } from "src/types";
-import {sendEmail} from "../utils/sendEmail"
+import { sendEmail } from "../utils/sendEmail"
 
 @Resolver(User)
 export class UserResolver {
+    @Query(() => User)
+    async me(
+        @Ctx() { req } : MyContext
+    ) : Promise<User | undefined> {
+        return User.findOne(req.session.uid);
+    }
+
     @Mutation(() => Boolean)
     async login(
         @Arg('username') username: string,

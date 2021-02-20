@@ -17,13 +17,37 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
+  me: User;
+  teams: Array<Team>;
   hello: Scalars['String'];
+};
+
+export type User = {
+  __typename?: 'User';
+  id: Scalars['Float'];
+  email: Scalars['String'];
+  username: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
+
+export type Team = {
+  __typename?: 'Team';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   login: Scalars['Boolean'];
   register: User;
+  changePassword: Scalars['Boolean'];
+  forgotPassword: Scalars['Boolean'];
+  sendForgotPasswordEmail: Scalars['String'];
+  createTeam: Scalars['Boolean'];
 };
 
 
@@ -39,15 +63,28 @@ export type MutationRegisterArgs = {
   username: Scalars['String'];
 };
 
-export type User = {
-  __typename?: 'User';
-  id: Scalars['Float'];
-  email: Scalars['String'];
+
+export type MutationChangePasswordArgs = {
   username: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+  newPassword: Scalars['String'];
+  currentPassword: Scalars['String'];
 };
 
+
+export type MutationForgotPasswordArgs = {
+  username: Scalars['String'];
+  newPassword: Scalars['String'];
+};
+
+
+export type MutationSendForgotPasswordEmailArgs = {
+  username: Scalars['String'];
+};
+
+
+export type MutationCreateTeamArgs = {
+  name: Scalars['String'];
+};
 
 export type RegisterMutationVariables = Exact<{
   username: Scalars['String'];
@@ -61,6 +98,17 @@ export type RegisterMutation = (
   & { register: (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'email' | 'username' | 'createdAt' | 'updatedAt'>
+  ) }
+);
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = (
+  { __typename?: 'Query' }
+  & { me: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'username'>
   ) }
 );
 
@@ -103,3 +151,36 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const MeDocument = gql`
+    query Me {
+  me {
+    id
+    username
+  }
+}
+    `;
+
+/**
+ * __useMeQuery__
+ *
+ * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+      }
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+        }
+export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
+export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
+export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
