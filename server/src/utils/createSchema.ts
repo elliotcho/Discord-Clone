@@ -1,5 +1,6 @@
 import { buildSchema } from 'type-graphql';
 import { UserResolver } from '../resolvers/user';
+import { TeamResolver } from '../resolvers/team';
 import { HelloResolver } from '../resolvers/hello'; 
 
 export const createSchema = async () => (
@@ -7,6 +8,7 @@ export const createSchema = async () => (
         validate: false,
         resolvers: [
             HelloResolver,
+            TeamResolver,
             UserResolver
         ]
     })

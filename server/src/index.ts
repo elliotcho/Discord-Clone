@@ -2,6 +2,8 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import { createConnection } from 'typeorm';
 import { createSchema } from './utils/createSchema';
+import { Member } from './entities/Member';
+import { Team } from './entities/Team';
 import { User } from './entities/User';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
@@ -17,7 +19,9 @@ const main = async () => {
         synchronize: true,
         logging: true,
         entities: [
-            User
+            User,
+            Member,
+            Team
         ] 
     });
    
