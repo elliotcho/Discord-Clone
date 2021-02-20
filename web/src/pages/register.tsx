@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Form, Formik } from 'formik';
 import { useRegisterMutation } from '../generated/graphql';
-import { withApollo } from '../utils/withApollo';
+import { withApollo } from '../utils/withApollo'; 
 
 const Input = styled.input``;
 
@@ -24,7 +24,7 @@ const Register: React.FC<{}> = () => {
         >
             {({ values, handleChange }) => (
                 <Form>
-                    <Input
+                    <input
                         type = 'text'
                         placeholder = 'Email'
                         onChange = {handleChange}
