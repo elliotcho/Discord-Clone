@@ -4,10 +4,11 @@ import {
     Mutation,  
     Resolver,
 } from "type-graphql";
-import argon2 from 'argon2';
+import argon2, { hash } from 'argon2';
 import { getConnection } from "typeorm";
 import { User } from "../entities/User";
 import { MyContext } from "src/types";
+import {sendEmail} from "../utils/sendEmail"
 
 @Resolver(User)
 export class UserResolver {
@@ -87,5 +88,36 @@ export class UserResolver {
         );
 
         return true;
+    }
+
+    @Mutation(()=>Boolean)
+    async forgotPassword(
+        @Arg('newPassword') newPassword: string,
+        @Arg('username') username: string,
+    ): Promise<boolean>{
+        const hashedPassword = await argon2.hash(newPassword);
+
+        await getConnection().query(
+            `
+            update "user"
+            set password = $1
+            where username = $2
+            `,
+            [hashedPassword, username ]
+        );
+        return true;
+    }
+
+    @Mutation(() => String)
+    async sendForgotPasswordEmail(
+        @Arg('username') username: string,
+    ): Promise<boolean>{
+        const user = await User.findOne({where: {username}});
+         if(!user){
+             return false;
+         }
+         //send the email using user.email
+         sendEmail(user.email, "PLEASE CLICK HERE TO RESET");
+         return true;
     }
 }
