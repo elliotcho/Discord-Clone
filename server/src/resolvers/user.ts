@@ -48,4 +48,34 @@ export class UserResolver {
         const user = await User.findOne({ where : { username } });
         return user;
     }
+
+    @Mutation(()=> Boolean)
+    async changePassword(
+        @Arg('currentPassword') currPassword: string,
+        @Arg('newPassword') newPassword: string,
+        @Arg('username') username: string
+    ): Promise<boolean>{
+        const user = await User.findOne({where: {username}});
+        if(!user){
+            return false;
+        }
+
+        const comparePassword = await argon2.verify(user.password, currPassword);
+
+        if(!comparePassword){
+            return false;
+        }
+
+        const hashedNewPassword = await argon2.hash(newPassword);
+        await getConnection().query(
+            `
+            update "user" 
+            set password = $1
+            where username = $2
+            `,
+            [hashedNewPassword, username]
+        );
+
+            return true;
+    }
 }
