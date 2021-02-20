@@ -1,61 +1,52 @@
 import { 
     Arg,
-    Mutation, 
+    Mutation,  
     Resolver,
-    Query
 } from "type-graphql";
+import argon2 from 'argon2';
 import { getConnection } from "typeorm";
 import { User } from "../entities/User";
 
-
-@Resolver()
+@Resolver(User)
 export class UserResolver {
     @Mutation(() => Boolean)
-    async createDummyUser(
-        @Arg('username') username: string
-    ) : Promise<boolean> {
-        await getConnection().query(
-            `
-                insert into "user" (username) values ('${username}')
-            `
-        );
-
-        return true; 
-    }
-
-    @Query(() => [User])
-    async users(): Promise<User[]> {
-        const users = await getConnection().query(
-            `select * from "user"`
-        );
-
-        return users; 
-    }
-    
-    @Mutation(() => Boolean)
-    async deleteUser(
-        @Arg('username') username: string
-    ): Promise<boolean> {
-        await getConnection().query(
-            `
-                delete from "user" where username =$1
-            `,
-            [username]
-        )
-        return true;
-    } 
-
-    @Mutation(() => Boolean)
-    async signIn(
+    async login(
         @Arg('username') username: string,
         @Arg('password') password: string
     ): Promise<boolean> {
-        const user = await User.findOne({ where: { username: username } });
-        if(user?.password === password){
-            return true;
-        } else{
+        const user = await User.findOne({ where: { username } });
+
+        if(!user) {
             return false;
         }
+        
+        const valid = await argon2.verify(user.password, password);
+
+        if(!valid) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Mutation(() => User)
+    async register(
+        @Arg('username') username: string,
+        @Arg('password') password: string,
+        @Arg('email') email: string    
+    ): Promise<User | undefined>{
+        const hashedPassword = await argon2.hash(password);
+
+        await getConnection().query(
+            `
+             insert into "user" (username, password, email) 
+             values ($1, $2, $3)
+            `,
+            [username, hashedPassword, email]
+        );
+        
+        const user = await User.findOne({ where : { username } });
+        return user;
     }
 
 }

@@ -8,6 +8,7 @@ import {
     UpdateDateColumn
 } from "typeorm";
 
+
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {
@@ -15,11 +16,12 @@ export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id! : number;
 
-    @Column()
+    @Field()
+    @Column({ unique: true })
     email!: string;
 
     @Field()
-    @Column()
+    @Column({ unique: true })
     username!: string;
 
     @Column()
@@ -29,6 +31,7 @@ export class User extends BaseEntity {
     @CreateDateColumn()
     createdAt: Date;
 
+    @Field()
     @UpdateDateColumn()
     updatedAt: Date;
 }

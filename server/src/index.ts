@@ -8,6 +8,7 @@ import express from 'express';
 import Redis from 'ioredis';
 import connectRedis from 'connect-redis';
 import session from 'express-session';
+import cors from 'cors';
 
 const main = async () => {
     await createConnection({
@@ -19,7 +20,7 @@ const main = async () => {
             User
         ] 
     });
-    await User.delete({});
+   
 
     const schema = await createSchema();
 
@@ -31,6 +32,13 @@ const main = async () => {
     const app = express();
     const RedisStore = connectRedis(session);
     const redis = new Redis();
+
+    app.use(
+        cors({
+            origin: 'http://localhost:3000',
+            credentials: true
+        })
+    );
 
     app.use(
         session({
@@ -51,7 +59,7 @@ const main = async () => {
         })
     );
 
-    apolloServer.applyMiddleware({ app });
+    apolloServer.applyMiddleware({ app, cors: false });
 
     const port = process.env.PORT;
 
