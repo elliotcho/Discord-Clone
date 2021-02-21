@@ -6,6 +6,7 @@ import {
     Resolver,
 } from "type-graphql";
 import argon2 from 'argon2';
+import { v4 } from 'uuid';
 import { getConnection } from "typeorm";
 import { User } from "../entities/User";
 import { MyContext } from "src/types";
@@ -98,34 +99,24 @@ export class UserResolver {
         return true;
     }
 
-    @Mutation(()=>Boolean)
+    @Mutation(() => Boolean)
     async forgotPassword(
-        @Arg('newPassword') newPassword: string,
-        @Arg('username') username: string,
-    ): Promise<boolean>{
-        const hashedPassword = await argon2.hash(newPassword);
+        @Arg('email') email: string,
+        @Ctx() { redis } : MyContext
+    ) : Promise<boolean> {
+        const user = await User.findOne({ where : { email }});
 
-        await getConnection().query(
-            `
-            update "user"
-            set password = $1
-            where username = $2
-            `,
-            [hashedPassword, username ]
-        );
+        if(!user){
+            return true;
+        }
+
+        const token = v4();
+        const href = `<a href="http://localhost:3000/change-password/${token}">Reset Password</a>`;
+        const expiresIn = 1000 * 60 * 60 * 24 * 3; //3 days
+
+        await redis.set(token, user.id, 'ex', expiresIn);
+        await sendEmail(email, href);
+
         return true;
-    }
-
-    @Mutation(() => String)
-    async sendForgotPasswordEmail(
-        @Arg('username') username: string,
-    ): Promise<boolean>{
-        const user = await User.findOne({where: {username}});
-         if(!user){
-             return false;
-         }
-         //send the email using user.email
-         sendEmail(user.email, "PLEASE CLICK HERE TO RESET");
-         return true;
     }
 }
