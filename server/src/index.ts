@@ -24,7 +24,6 @@ const main = async () => {
             Team
         ] 
     });
-   
 
     const schema = await createSchema();
 

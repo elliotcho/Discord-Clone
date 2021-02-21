@@ -1,17 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 import { useTeamsQuery } from '../../generated/graphql';
+import CreateTeamModal from './CreateTeamModal';
+
+const Container = styled.div`
+    background: #4d4d4d;
+    padding: 20px 20px;
+`;
+
+const TeamIcon = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: #737373;
+    color: #fff;
+    font-size: 24px;
+    border-radius: 11px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    &:hover {
+       background: #a6a6a6;
+    }
+`;
 
 const Teams: React.FC<{}> = () => {
+    const [isOpen, setIsOpen] = useState(false);
     const { data } = useTeamsQuery();
 
     return (
-        <div style={{background: '#8ec6c5'}}>
+        <Container>
             {data?.teams?.map(t => 
-                <div>
+                <TeamIcon>
                     {t.name[0].toUpperCase()}
-                </div>    
+                </TeamIcon>    
             )}
-        </div>
+
+            <TeamIcon onClick={() => setIsOpen(true)}>
+                +
+            </TeamIcon>
+
+            <CreateTeamModal
+                isOpen = {isOpen}
+                onClose = {() => setIsOpen(false)}
+                onSave = {() => {
+
+                }}
+            />
+        </Container>
     )
 }
 
