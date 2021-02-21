@@ -46,7 +46,6 @@ export type Mutation = {
   register: User;
   changePassword: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
-  sendForgotPasswordEmail: Scalars['String'];
   createTeam: Scalars['Boolean'];
 };
 
@@ -72,19 +71,23 @@ export type MutationChangePasswordArgs = {
 
 
 export type MutationForgotPasswordArgs = {
-  username: Scalars['String'];
-  newPassword: Scalars['String'];
-};
-
-
-export type MutationSendForgotPasswordEmailArgs = {
-  username: Scalars['String'];
+  email: Scalars['String'];
 };
 
 
 export type MutationCreateTeamArgs = {
-  name: Scalars['String'];
+  teamName: Scalars['String'];
 };
+
+export type CreateTeamMutationVariables = Exact<{
+  teamName: Scalars['String'];
+}>;
+
+
+export type CreateTeamMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'createTeam'>
+);
 
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
@@ -135,6 +138,36 @@ export type TeamsQuery = (
 );
 
 
+export const CreateTeamDocument = gql`
+    mutation CreateTeam($teamName: String!) {
+  createTeam(teamName: $teamName)
+}
+    `;
+export type CreateTeamMutationFn = Apollo.MutationFunction<CreateTeamMutation, CreateTeamMutationVariables>;
+
+/**
+ * __useCreateTeamMutation__
+ *
+ * To run a mutation, you first call `useCreateTeamMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTeamMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTeamMutation, { data, loading, error }] = useCreateTeamMutation({
+ *   variables: {
+ *      teamName: // value for 'teamName'
+ *   },
+ * });
+ */
+export function useCreateTeamMutation(baseOptions?: Apollo.MutationHookOptions<CreateTeamMutation, CreateTeamMutationVariables>) {
+        return Apollo.useMutation<CreateTeamMutation, CreateTeamMutationVariables>(CreateTeamDocument, baseOptions);
+      }
+export type CreateTeamMutationHookResult = ReturnType<typeof useCreateTeamMutation>;
+export type CreateTeamMutationResult = Apollo.MutationResult<CreateTeamMutation>;
+export type CreateTeamMutationOptions = Apollo.BaseMutationOptions<CreateTeamMutation, CreateTeamMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($username: String!, $password: String!) {
   login(username: $username, password: $password)

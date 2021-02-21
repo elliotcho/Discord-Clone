@@ -14,7 +14,7 @@ const TeamIcon = styled.div`
     justify-content: center;
     width: 50px;
     height: 50px;
-    background: #737373;
+    background: #333;
     color: #fff;
     font-size: 24px;
     border-radius: 11px;
@@ -42,11 +42,8 @@ const Teams: React.FC<{}> = () => {
             </TeamIcon>
 
             <CreateTeamModal
-                isOpen = {isOpen}
+                isOpen={isOpen}
                 onClose = {() => setIsOpen(false)}
-                onSave = {() => {
-
-                }}
             />
         </Container>
     )

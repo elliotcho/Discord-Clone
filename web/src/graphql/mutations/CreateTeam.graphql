@@ -1,0 +1,3 @@
+mutation CreateTeam($teamName: String!) {
+    createTeam(teamName: $teamName)
+}

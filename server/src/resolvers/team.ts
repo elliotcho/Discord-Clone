@@ -20,6 +20,7 @@ export class TeamResolver {
                 select * from team 
                 inner join member on team.id = member."teamId"
                 where member."userId" = $1 
+                order by team."createdAt" DESC
             `, [req.session.uid]
         );
 
@@ -28,14 +29,14 @@ export class TeamResolver {
 
     @Mutation(() => Boolean)
     async createTeam(
-        @Arg('name') name: string,
+        @Arg('teamName') teamName: string,
         @Ctx() { req } : MyContext
     ) : Promise<boolean> {
         await getConnection().transaction(async (tm) => {
             const result = await tm.createQueryBuilder()
                                   .insert()
                                   .into(Team)
-                                  .values({ name })
+                                  .values({ name: teamName })
                                   .returning('*')
                                   .execute();
 
