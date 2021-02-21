@@ -64,6 +64,7 @@ const Login : React.FC<{}> = () => {
                 <Form>
                     <Container>
                         <h1>Sign in to get started</h1>
+                      
                         <Input
                             type='text'
                             placeholder='username'
@@ -71,6 +72,7 @@ const Login : React.FC<{}> = () => {
                             value= {values.username}
                             name='username'
                         />
+                      
                         <Input 
                             type='password'
                             placeholder='password'
@@ -78,10 +80,11 @@ const Login : React.FC<{}> = () => {
                             value= {values.password}
                             name='password'
                         />
+                      
                         <Button type='submit'>
                             Login
                         </Button>    
-
+                      
                         <NextLink href='forgot-password'>
                             <p> Forgot password? </p>
                         </NextLink> 

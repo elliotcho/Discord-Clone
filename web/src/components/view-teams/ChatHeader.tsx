@@ -1,10 +1,25 @@
 import React from 'react';
+import styled from 'styled-components';
+
+const Header = styled.h2`
+    display: flex;
+    align-items: center;
+    background: #595959;
+    color: white;
+    margin: 0;
+`;
+
+const Span = styled.span`
+    margin-left: 20px;
+`;
 
 const ChatHeader: React.FC<{}> = () => {
     return (
-        <h2 style={{background: 'orangered', padding: 0, margin: 0}}>
-            General
-        </h2>
+        <Header>
+            <Span>
+                # general
+            </Span>
+        </Header>
     )
 }
 
