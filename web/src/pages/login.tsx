@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Form, Formik } from 'formik';
+import { useLoginMutation } from '../generated/graphql';
 import { withApollo } from '../utils/withApollo';
 
 const Container = styled.div`
@@ -20,8 +21,12 @@ const Input = styled.input`
     display: block;
     width: 70%;
     margin: 3px auto;
-    font-size: 16px;
-    font-family: 'Gill Sans'
+    font-size: 17px;
+    font-family: 'Shadows Into Light', cursive;
+    font-weight: 900;
+    letter-spacing: 3px;
+    border-radius: 10px;
+    outline: none;
 `;
 const Button = styled.button`
     width: 40%;
@@ -32,10 +37,12 @@ const Button = styled.button`
     letter-spacing: 3px;
     background: #99bbad;
     border-radius: 19px;
+    outline: none;
 `;
 
 
 const Login : React.FC<{}> = () => {
+    const [login] = useLoginMutation();
    
     return(
         <Formik
@@ -43,6 +50,12 @@ const Login : React.FC<{}> = () => {
             onSubmit = {async (values) => {
                 const { username, password } = values;
 
+                const response = await login({
+                    variables: { username, password }
+                })
+
+                console.log(response);
+                
             }}
         >
             {({ values, handleChange }) => (
