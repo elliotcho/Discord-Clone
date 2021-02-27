@@ -12,7 +12,7 @@ import { getConnection } from "typeorm";
 import { User } from "../entities/User";
 import { MyContext, Upload } from "../types";
 import { sendEmail } from "../utils/sendEmail"
-import { createWriteStream } from 'fs';
+import fs, { createWriteStream } from 'fs';
 import path from 'path';
 
 @Resolver(User)
@@ -22,6 +22,28 @@ export class UserResolver {
         @Ctx() { req } : MyContext
     ) : Promise<User | undefined> {
         return User.findOne(req.session.uid);
+    }
+
+    @Mutation(() => Boolean)
+    async removeProfilePic(
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const { uid } = req.session;
+        const user = await User.findOne(uid);
+        
+        if(user?.profilePic) {
+            const location = path.join(__dirname, `../../images/${user.profilePic}`);
+
+            fs.unlink(location, err => {
+                if(err) {
+                    console.log(err);
+                }
+            });
+
+            await User.update({ id: uid }, { profilePic: '' });
+        }
+
+        return true;
     }
 
     @Mutation(() => Boolean)

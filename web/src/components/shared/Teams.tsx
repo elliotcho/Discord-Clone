@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useTeamsQuery } from '../../generated/graphql';
 import CreateTeamModal from './CreateTeamModal';
+import NextLink from 'next/link';
 
 const Container = styled.div`
     background: #4d4d4d;
@@ -31,11 +32,23 @@ const Teams: React.FC<{}> = () => {
 
     return (
         <Container>
-            {data?.teams?.map(t => 
+            <NextLink href='/profile'>
                 <TeamIcon>
-                    {t.name[0].toUpperCase()}
-                </TeamIcon>    
-            )}
+                   
+                </TeamIcon>
+            </NextLink>
+
+            {data?.teams?.map(t => {
+                const route = `/view-team/${t.id}`;
+
+                return (
+                    <NextLink key={t.id} href={route}>
+                        <TeamIcon>
+                            {t.name[0].toUpperCase()}
+                        </TeamIcon>
+                    </NextLink>   
+                )
+            })}
 
             <TeamIcon onClick={() => setIsOpen(true)}>
                 +
