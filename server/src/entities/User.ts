@@ -28,6 +28,10 @@ export class User extends BaseEntity {
     password: string;
 
     @Field()
+    @Column({ default: '' })
+    profilePic: string;
+
+    @Field()
     @CreateDateColumn()
     createdAt: Date;
 

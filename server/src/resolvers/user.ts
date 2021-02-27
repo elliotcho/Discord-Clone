@@ -5,12 +5,15 @@ import {
     Query,  
     Resolver,
 } from "type-graphql";
+import { GraphQLUpload } from 'graphql-upload';
 import argon2 from 'argon2';
 import { v4 } from 'uuid';
 import { getConnection } from "typeorm";
 import { User } from "../entities/User";
-import { MyContext } from "src/types";
+import { MyContext, Upload } from "../types";
 import { sendEmail } from "../utils/sendEmail"
+import { createWriteStream } from 'fs';
+import path from 'path';
 
 @Resolver(User)
 export class UserResolver {
@@ -19,6 +22,23 @@ export class UserResolver {
         @Ctx() { req } : MyContext
     ) : Promise<User | undefined> {
         return User.findOne(req.session.uid);
+    }
+
+    @Mutation(() => Boolean)
+    async updateProfilePic(
+        @Arg('file', () => GraphQLUpload) { createReadStream, filename } : Upload,
+        @Ctx() { req } : MyContext
+    ): Promise<boolean> {
+        const name = 'PROFILE-' + v4() + path.extname(filename);
+
+        await User.update({ id: req.session.uid }, { profilePic: name });
+
+        return new Promise(async (resolve, reject) =>
+            createReadStream()
+           .pipe(createWriteStream(path.join(__dirname, `../../images/${name}`)))
+           .on('finish', () => resolve(true))
+           .on('error', () => reject(false))
+        )
     }
 
     @Mutation(() => Boolean)
