@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { createConnection } from 'typeorm';
 import { createSchema } from './utils/createSchema';
 import { Member } from './entities/Member';
+import { Channel } from './entities/Channel';
 import { Team } from './entities/Team';
 import { User } from './entities/User';
 import { ApolloServer } from 'apollo-server-express';
@@ -21,6 +22,7 @@ const main = async () => {
         entities: [
             User,
             Member,
+            Channel,
             Team
         ] 
     });

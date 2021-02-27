@@ -14,18 +14,18 @@ import {
 export class User extends BaseEntity {
     @Field()
     @PrimaryGeneratedColumn()
-    id! : number;
+    id: number;
 
     @Field()
     @Column({ unique: true })
-    email!: string;
+    email: string;
 
     @Field()
     @Column({ unique: true })
-    username!: string;
+    username: string;
 
     @Column()
-    password!: string;
+    password: string;
 
     @Field()
     @CreateDateColumn()

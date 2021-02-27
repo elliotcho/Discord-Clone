@@ -1,28 +1,34 @@
+import { Field, ObjectType } from "type-graphql";
 import { 
     BaseEntity, 
     Column, 
     CreateDateColumn, 
     Entity, 
-    OneToMany, 
+    ManyToOne, 
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import { Field, ObjectType } from 'type-graphql';
-import { Channel } from '../entities/Channel';
+import { Team } from '../entities/Team';
 
 @ObjectType()
 @Entity()
-export class Team extends BaseEntity {
+export class Channel extends BaseEntity {
     @Field()
     @PrimaryGeneratedColumn()
     id: number;
 
     @Field()
-    @Column()
+    @Column({ unique: true })
     name: string;
 
-    @OneToMany(() => Channel, (channel) => channel.team)
-    channels: Channel[];
+    @Field()
+    @Column()
+    teamId: number;
+
+    @ManyToOne(() => Team, (team) => team.channels, {
+        onDelete: 'CASCADE'
+    })
+    team: Team;
 
     @Field()
     @CreateDateColumn()

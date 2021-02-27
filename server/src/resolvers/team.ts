@@ -48,6 +48,13 @@ export class TeamResolver {
                   values ($1, $2)
                 `, [req.session.uid, teamId]
             );
+
+            await tm.query(
+                `
+                    insert into channel (name, "teamId")
+                    values  ($1, $2)
+                `, ["general", teamId]
+            );
         });
 
         return true;
