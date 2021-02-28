@@ -2,8 +2,10 @@ import {
     Resolver,
     Query, 
     Arg,
-    Int
+    Int,
+    Mutation
 } from "type-graphql";
+import { getConnection } from "typeorm";
 import { Channel } from "../entities/Channel";
 
 @Resolver(Channel)
@@ -14,4 +16,23 @@ export class ChannelResolver {
     ) : Promise<Channel[]> {
         return Channel.find({ teamId });
     }
+
+    @Mutation(() => Boolean)
+    async createChannel(
+        @Arg('channelName') channelName: string,
+        @Arg('teamId', () => Int) teamId: number
+    ): Promise<Boolean> {
+        
+        await getConnection().query(
+            `
+                insert into channel (name, "teamId")
+                values ($1, $2)
+            `,
+            [channelName, teamId]
+        );
+        
+        return true;
+    }
+
 }
+

@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { withApollo } from '../../utils/withApollo';
-import Teams from '../../components/shared/Teams';
-import Channels from '../../components/view-teams/Channels';
-import ChatHeader from '../../components/view-teams/ChatHeader';
-import ChatContainer from '../../components/view-teams/ChatContainer';
-import SendMessage from '../../components/view-teams/SendMessage';
+import { withApollo } from '../../../utils/withApollo';
+import Teams from '../../../components/shared/Teams';
+import Channels from '../../../components/view-team/Channels';
+import ChatHeader from '../../../components/view-team/ChatHeader';
+import ChatContainer from '../../../components/view-team/ChatContainer';
+import SendMessage from '../../../components/view-team/SendMessage';
 import { useRouter } from 'next/router';
 
 const Container = styled.div`
@@ -21,18 +21,24 @@ const Chat = styled.div`
 `;
 
 const ViewTeams: React.FC<{}> = () => {
-    const { query: { id } } = useRouter();
+    const { query: { team, channel } } = useRouter();
+    
     let teamId = -1;
+    let channelId = -1;
 
-    if(typeof id === 'string') {
-        teamId = parseInt(id);
+    if(typeof team === 'string') {
+        teamId = parseInt(team);
+    }
+
+    if(typeof channel === 'string') {
+        channelId = parseInt(channel);
     }
 
     return (
         <Container>
             <Teams />
 
-            <Channels teamId={teamId} />
+            <Channels teamId={teamId} channelId={channelId}/>
 
             <Chat>
                 <ChatHeader />
