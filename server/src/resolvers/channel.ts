@@ -34,5 +34,21 @@ export class ChannelResolver {
         return true;
     }
 
+    @Mutation(() => Boolean)
+    async deleteChannel(
+        @Arg('channelId', () => Int) channelId: number
+    ) : Promise<Boolean> {
+        
+        await getConnection().query(
+            `
+                delete from channel where
+                channel.id = $1 
+            `,
+            [channelId]
+        )
+
+        return true;
+    }
+
 }
 
