@@ -1,6 +1,7 @@
 import {
     Arg,
     Ctx,
+    Int,
     Mutation,
     Query,
     Resolver,
@@ -16,7 +17,7 @@ export class MessageResolver {
     @Mutation(() => Boolean)
     async sendMessage(
         @Arg('message') message: string,
-        @Arg('channelID') channelID: number,
+        @Arg('channelID', ()=>Int) channelID: number,
         @Ctx() { req } : MyContext 
     ): Promise<boolean>{
         const senderID = req.session.uid;
@@ -33,7 +34,7 @@ export class MessageResolver {
 
     @Query(() => [Message])
     async getMessages(
-        @Arg('channelID') channelID: number,
+        @Arg('channelID', () => Int) channelID: number,
     ): Promise<Message | undefined> {
         const messages = await getConnection().query(
             `
