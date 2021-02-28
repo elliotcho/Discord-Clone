@@ -4,7 +4,7 @@ import {
     Mutation,  
     Resolver,
 } from "type-graphql";
-import argon2, { hash } from 'argon2';
+import argon2, { hash} from 'argon2';
 import { getConnection } from "typeorm";
 import { User } from "../entities/User";
 import { MyContext } from "src/types";
