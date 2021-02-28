@@ -41,8 +41,8 @@ export class ChannelResolver {
         
         await getConnection().query(
             `
-                delete from channel ("id")
-                values ($1)
+                delete from channel where
+                channel.id = $1 
             `,
             [channelId]
         )
