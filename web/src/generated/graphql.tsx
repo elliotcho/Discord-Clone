@@ -59,12 +59,14 @@ export type Channel = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  removeProfilePic: Scalars['Boolean'];
   updateProfilePic: Scalars['Boolean'];
   login: Scalars['Boolean'];
   register: User;
   changePassword: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
+  createChannel: Scalars['Boolean'];
 };
 
 
@@ -102,6 +104,23 @@ export type MutationCreateTeamArgs = {
   teamName: Scalars['String'];
 };
 
+
+export type MutationCreateChannelArgs = {
+  teamId: Scalars['Int'];
+  channelName: Scalars['String'];
+};
+
+
+export type CreateChannelMutationVariables = Exact<{
+  channelName: Scalars['String'];
+  teamId: Scalars['Int'];
+}>;
+
+
+export type CreateChannelMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'createChannel'>
+);
 
 export type CreateTeamMutationVariables = Exact<{
   teamName: Scalars['String'];
@@ -185,6 +204,37 @@ export type TeamsQuery = (
 );
 
 
+export const CreateChannelDocument = gql`
+    mutation CreateChannel($channelName: String!, $teamId: Int!) {
+  createChannel(channelName: $channelName, teamId: $teamId)
+}
+    `;
+export type CreateChannelMutationFn = Apollo.MutationFunction<CreateChannelMutation, CreateChannelMutationVariables>;
+
+/**
+ * __useCreateChannelMutation__
+ *
+ * To run a mutation, you first call `useCreateChannelMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateChannelMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createChannelMutation, { data, loading, error }] = useCreateChannelMutation({
+ *   variables: {
+ *      channelName: // value for 'channelName'
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useCreateChannelMutation(baseOptions?: Apollo.MutationHookOptions<CreateChannelMutation, CreateChannelMutationVariables>) {
+        return Apollo.useMutation<CreateChannelMutation, CreateChannelMutationVariables>(CreateChannelDocument, baseOptions);
+      }
+export type CreateChannelMutationHookResult = ReturnType<typeof useCreateChannelMutation>;
+export type CreateChannelMutationResult = Apollo.MutationResult<CreateChannelMutation>;
+export type CreateChannelMutationOptions = Apollo.BaseMutationOptions<CreateChannelMutation, CreateChannelMutationVariables>;
 export const CreateTeamDocument = gql`
     mutation CreateTeam($teamName: String!) {
   createTeam(teamName: $teamName)

@@ -17,21 +17,21 @@ export class ChannelResolver {
         return Channel.find({ teamId });
     }
 
-    @Mutation(() => Channel)
+    @Mutation(() => Boolean)
     async createChannel(
-        @Arg('name') name: string
-
-    ): Promise<Channel | undefined> {
+        @Arg('channelName') channelName: string,
+        @Arg('teamId', () => Int) teamId: number
+    ): Promise<Boolean> {
         
         await getConnection().query(
             `
-                insert into "name" (name)
-                values($1)
+                insert into channel (name, "teamId")
+                values ($1, $2)
             `,
-            [name]
-        )
+            [channelName, teamId]
+        );
         
-        return Channel.create({ name });
+        return true;
     }
 
 }

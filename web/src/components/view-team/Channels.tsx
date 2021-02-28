@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useChannelsQuery } from '../../generated/graphql';
+import CreateChannelModal from '../../components/view-team/CreateChannelModal';
 import NextLink from 'next/link';
 
 const Container = styled.div`
@@ -45,6 +46,8 @@ interface ChannelsProps {
 }
 
 const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
     const { data } = useChannelsQuery({
         variables: { teamId }
     });
@@ -56,7 +59,11 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
             <Flex>
                 <Title>Text Channels</Title>
 
-                <Box>
+                <Box 
+                    onClick = {() => {
+                        setIsOpen(true);
+                    }}
+                >
                     +
                 </Box>
             </Flex>
@@ -76,7 +83,13 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                         </Channel> 
                     </NextLink>
                 )   
-            })}
+            })} 
+
+            <CreateChannelModal
+                isOpen = {isOpen}
+                onClose = {() => setIsOpen(false)}
+                teamId = {teamId}
+            />
         </Container>
     )
 }
