@@ -1,28 +1,22 @@
 import { 
     BaseEntity, 
-    Column, 
     CreateDateColumn, 
     Entity, 
-    OneToMany, 
-    PrimaryGeneratedColumn,
+    PrimaryColumn, 
     UpdateDateColumn
 } from "typeorm";
 import { Field, ObjectType } from 'type-graphql';
-import { Channel } from '../entities/Channel';
 
 @ObjectType()
 @Entity()
-export class Team extends BaseEntity {
+export class Member extends BaseEntity {
     @Field()
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn()
+    userId: number;
 
     @Field()
-    @Column()
-    name: string;
-
-    @OneToMany(() => Channel, (channel) => channel.team)
-    channels: Channel[];
+    @PrimaryColumn()
+    teamId: number;
 
     @Field()
     @CreateDateColumn()

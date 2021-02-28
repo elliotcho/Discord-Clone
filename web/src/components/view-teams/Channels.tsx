@@ -1,10 +1,30 @@
 import React from 'react';
+import styled from 'styled-components';
+import { useChannelsQuery } from '../../generated/graphql';
 
-const Channels: React.FC<{}> = () => {
+const Container = styled.div`
+    background #333;
+`;
+
+interface ChannelsProps {
+    teamId: number;
+}
+
+const Channels: React.FC<ChannelsProps> = ({ teamId }) => {
+    const { data } = useChannelsQuery({
+        variables: { teamId }
+    });
+
     return (
-        <div style={{background: 'purple'}}>
+        <Container>
+            Text Channels
 
-        </div>
+            {data?.channels?.map(c => 
+                <h1 key={c.id}>
+                    {c.name}
+                </h1>    
+            )}
+        </Container>
     )
 }
 

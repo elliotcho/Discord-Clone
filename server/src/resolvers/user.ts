@@ -2,16 +2,67 @@ import {
     Arg,
     Ctx,
     Mutation,  
+    Query,  
     Resolver,
 } from "type-graphql";
-import argon2, { hash} from 'argon2';
+import { GraphQLUpload } from 'graphql-upload';
+import argon2 from 'argon2';
+import { v4 } from 'uuid';
 import { getConnection } from "typeorm";
 import { User } from "../entities/User";
-import { MyContext } from "src/types";
-import {sendEmail} from "../utils/sendEmail"
+import { MyContext, Upload } from "../types";
+import { sendEmail } from "../utils/sendEmail"
+import fs, { createWriteStream } from 'fs';
+import path from 'path';
 
 @Resolver(User)
 export class UserResolver {
+    @Query(() => User)
+    async me(
+        @Ctx() { req } : MyContext
+    ) : Promise<User | undefined> {
+        return User.findOne(req.session.uid);
+    }
+
+    @Mutation(() => Boolean)
+    async removeProfilePic(
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const { uid } = req.session;
+        const user = await User.findOne(uid);
+        
+        if(user?.profilePic) {
+            const location = path.join(__dirname, `../../images/${user.profilePic}`);
+
+            fs.unlink(location, err => {
+                if(err) {
+                    console.log(err);
+                }
+            });
+
+            await User.update({ id: uid }, { profilePic: '' });
+        }
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async updateProfilePic(
+        @Arg('file', () => GraphQLUpload) { createReadStream, filename } : Upload,
+        @Ctx() { req } : MyContext
+    ): Promise<boolean> {
+        const name = 'PROFILE-' + v4() + path.extname(filename);
+
+        await User.update({ id: req.session.uid }, { profilePic: name });
+
+        return new Promise(async (resolve, reject) =>
+            createReadStream()
+           .pipe(createWriteStream(path.join(__dirname, `../../images/${name}`)))
+           .on('finish', () => resolve(true))
+           .on('error', () => reject(false))
+        )
+    }
+
     @Mutation(() => Boolean)
     async login(
         @Arg('username') username: string,
@@ -90,34 +141,24 @@ export class UserResolver {
         return true;
     }
 
-    @Mutation(()=>Boolean)
+    @Mutation(() => Boolean)
     async forgotPassword(
-        @Arg('newPassword') newPassword: string,
-        @Arg('username') username: string,
-    ): Promise<boolean>{
-        const hashedPassword = await argon2.hash(newPassword);
+        @Arg('email') email: string,
+        @Ctx() { redis } : MyContext
+    ) : Promise<boolean> {
+        const user = await User.findOne({ where : { email }});
 
-        await getConnection().query(
-            `
-            update "user"
-            set password = $1
-            where username = $2
-            `,
-            [hashedPassword, username ]
-        );
+        if(!user){
+            return true;
+        }
+
+        const token = v4();
+        const href = `<a href="http://localhost:3000/change-password/${token}">Reset Password</a>`;
+        const expiresIn = 1000 * 60 * 60 * 24 * 3; //3 days
+
+        await redis.set(token, user.id, 'ex', expiresIn);
+        await sendEmail(email, href);
+
         return true;
-    }
-
-    @Mutation(() => String)
-    async sendForgotPasswordEmail(
-        @Arg('username') username: string,
-    ): Promise<boolean>{
-        const user = await User.findOne({where: {username}});
-         if(!user){
-             return false;
-         }
-         //send the email using user.email
-         sendEmail(user.email, "PLEASE CLICK HERE TO RESET");
-         return true;
     }
 }
