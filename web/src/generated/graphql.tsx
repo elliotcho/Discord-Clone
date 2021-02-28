@@ -13,13 +13,20 @@ export type Scalars = {
   Float: number;
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: any;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type Query = {
   __typename?: 'Query';
   me: User;
   teams: Array<Team>;
-  hello: Scalars['String'];
+  channels: Array<Channel>;
+};
+
+
+export type QueryChannelsArgs = {
+  teamId: Scalars['Int'];
 };
 
 export type User = {
@@ -27,6 +34,7 @@ export type User = {
   id: Scalars['Float'];
   email: Scalars['String'];
   username: Scalars['String'];
+  profilePic: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
 };
@@ -40,13 +48,28 @@ export type Team = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type Channel = {
+  __typename?: 'Channel';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  teamId: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  updateProfilePic: Scalars['Boolean'];
   login: Scalars['Boolean'];
   register: User;
   changePassword: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
+};
+
+
+export type MutationUpdateProfilePicArgs = {
+  file: Scalars['Upload'];
 };
 
 
@@ -78,6 +101,7 @@ export type MutationForgotPasswordArgs = {
 export type MutationCreateTeamArgs = {
   teamName: Scalars['String'];
 };
+
 
 export type CreateTeamMutationVariables = Exact<{
   teamName: Scalars['String'];
@@ -123,6 +147,19 @@ export type RegisterMutation = (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'email' | 'username' | 'createdAt' | 'updatedAt'>
   ) }
+);
+
+export type ChannelsQueryVariables = Exact<{
+  teamId: Scalars['Int'];
+}>;
+
+
+export type ChannelsQuery = (
+  { __typename?: 'Query' }
+  & { channels: Array<(
+    { __typename?: 'Channel' }
+    & Pick<Channel, 'id' | 'name'>
+  )> }
 );
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
@@ -277,6 +314,40 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const ChannelsDocument = gql`
+    query Channels($teamId: Int!) {
+  channels(teamId: $teamId) {
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useChannelsQuery__
+ *
+ * To run a query within a React component, call `useChannelsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useChannelsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useChannelsQuery({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useChannelsQuery(baseOptions: Apollo.QueryHookOptions<ChannelsQuery, ChannelsQueryVariables>) {
+        return Apollo.useQuery<ChannelsQuery, ChannelsQueryVariables>(ChannelsDocument, baseOptions);
+      }
+export function useChannelsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ChannelsQuery, ChannelsQueryVariables>) {
+          return Apollo.useLazyQuery<ChannelsQuery, ChannelsQueryVariables>(ChannelsDocument, baseOptions);
+        }
+export type ChannelsQueryHookResult = ReturnType<typeof useChannelsQuery>;
+export type ChannelsLazyQueryHookResult = ReturnType<typeof useChannelsLazyQuery>;
+export type ChannelsQueryResult = Apollo.QueryResult<ChannelsQuery, ChannelsQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {

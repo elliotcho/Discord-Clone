@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { withApollo } from '../utils/withApollo';
-import Teams from '../components/view-teams/Teams';
-import Channels from '../components/view-teams/Channels';
-import ChatHeader from '../components/view-teams/ChatHeader';
-import ChatContainer from '../components/view-teams/ChatContainer';
-import SendMessage from '../components/view-teams/SendMessage';
+import { withApollo } from '../../utils/withApollo';
+import Teams from '../../components/shared/Teams';
+import Channels from '../../components/view-teams/Channels';
+import ChatHeader from '../../components/view-teams/ChatHeader';
+import ChatContainer from '../../components/view-teams/ChatContainer';
+import SendMessage from '../../components/view-teams/SendMessage';
+import { useRouter } from 'next/router';
 
 const Container = styled.div`
     height: 100vh;
@@ -20,11 +21,18 @@ const Chat = styled.div`
 `;
 
 const ViewTeams: React.FC<{}> = () => {
+    const { query: { id } } = useRouter();
+    let teamId = -1;
+
+    if(typeof id === 'string') {
+        teamId = parseInt(id);
+    }
+
     return (
         <Container>
             <Teams />
 
-            <Channels />
+            <Channels teamId={teamId} />
 
             <Chat>
                 <ChatHeader />
