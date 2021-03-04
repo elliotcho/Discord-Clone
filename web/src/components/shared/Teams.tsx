@@ -63,9 +63,7 @@ const Teams: React.FC<{}> = () => {
             <TeamIcon 
                 onClick = {async () => {
                     await logout();
-                    await apolloClient.resetStore();
-
-                    router.push('/login');
+                    window.location.reload();
                 }}
             >
                 x

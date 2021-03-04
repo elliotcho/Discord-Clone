@@ -6,6 +6,7 @@ import Channels from '../../components/view-team/Channels';
 import ChatHeader from '../../components/view-team/ChatHeader';
 import ChatContainer from '../../components/view-team/ChatContainer';
 import SendMessage from '../../components/view-team/SendMessage';
+import AuthWrapper from '../../components/shared/AuthWrapper';
 import { useRouter } from 'next/router';
 
 const Container = styled.div`
@@ -35,19 +36,21 @@ const ViewTeams: React.FC<{}> = () => {
     }
 
     return (
-        <Container>
-            <Teams />
+        <AuthWrapper requiresAuth>
+            <Container>
+                <Teams />
 
-            <Channels teamId={teamId} channelId={channelId}/>
+                <Channels teamId={teamId} channelId={channelId}/>
 
-            <Chat>
-                <ChatHeader />
+                <Chat>
+                    <ChatHeader />
 
-                <ChatContainer />
+                    <ChatContainer />
 
-                <SendMessage />
-            </Chat>
-        </Container>
+                    <SendMessage />
+                </Chat>
+            </Container>
+        </AuthWrapper>
     )
 }
 
