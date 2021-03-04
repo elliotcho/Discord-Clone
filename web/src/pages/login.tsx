@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { Form, Formik } from 'formik';
 import { useLoginMutation } from '../generated/graphql';
 import { withApollo } from '../utils/withApollo';
+import AuthWrapper from '../components/shared/AuthWrapper';
+import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 
 const Container = styled.div`
@@ -44,55 +46,59 @@ const Button = styled.button`
 
 
 const Login : React.FC<{}> = () => {
+    const router = useRouter();
     const [login] = useLoginMutation();
    
     return(
-        <Formik
-            initialValues = {{ username: '', password: ''}}
-            onSubmit = {async (values) => {
-                const { username, password } = values;
+        <AuthWrapper>
+            <Formik
+                initialValues = {{ username: '', password: ''}}
+                onSubmit = {async (values) => {
+                    const { username, password } = values;
 
-                const response = await login({
-                    variables: { username, password }
-                })
+                    const response = await login({
+                        variables: { username, password }
+                    })
 
-                console.log(response);
-                
-            }}
-        >
-            {({ values, handleChange }) => (
-                <Form>
-                    <Container>
-                        <h1>Sign in to get started</h1>
-                      
-                        <Input
-                            type='text'
-                            placeholder='username'
-                            onChange= {handleChange}
-                            value= {values.username}
-                            name='username'
-                        />
-                      
-                        <Input 
-                            type='password'
-                            placeholder='password'
-                            onChange= {handleChange}
-                            value= {values.password}
-                            name='password'
-                        />
-                      
-                        <Button type='submit'>
-                            Login
-                        </Button>    
-                      
-                        <NextLink href='forgot-password'>
-                            <p> Forgot password? </p>
-                        </NextLink> 
-                    </Container>
-                </Form>
-            )}  
+                    if(response?.data?.login) {
+                        router.push('/profile');
+                    }   
+                }}
+            >
+                {({ values, handleChange }) => (
+                    <Form>
+                        <Container>
+                            <h1>Sign in to get started</h1>
+                        
+                            <Input
+                                type='text'
+                                placeholder='username'
+                                onChange= {handleChange}
+                                value= {values.username}
+                                name='username'
+                            />
+                        
+                            <Input 
+                                type='password'
+                                placeholder='password'
+                                onChange= {handleChange}
+                                value= {values.password}
+                                name='password'
+                            />
+                        
+                            <Button type='submit'>
+                                Login
+                            </Button>    
+                        
+                            <NextLink href='forgot-password'>
+                                <p> Forgot password? </p>
+                            </NextLink> 
+                        </Container>
+                    </Form>
+                )}  
 
-        </Formik>
+            </Formik>
+        </AuthWrapper>
     )
 }
 

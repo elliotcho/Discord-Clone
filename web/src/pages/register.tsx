@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Form, Formik } from 'formik';
 import { useRegisterMutation } from '../generated/graphql';
 import { withApollo } from '../utils/withApollo'; 
+import AuthWrapper from '../components/shared/AuthWrapper';
 
 const Container = styled.div`
     width: 40%;
@@ -47,53 +48,53 @@ const Register: React.FC<{}> = () => {
     const [register] = useRegisterMutation();
 
     return (
-        <Formik
-            initialValues = {{ username: '', password: '', email: '' }}
-            onSubmit = {async (values) => {
-                const { username, password, email } = values;
+        <AuthWrapper>
+            <Formik
+                initialValues = {{ username: '', password: '', email: '' }}
+                onSubmit = {async (values) => {
+                    const { username, password, email } = values;
 
-                const response = await register({
-                    variables: { username, password, email }
-                });
+                    await register({
+                        variables: { username, password, email }
+                    });
+                }}
+            >
+                {({ values, handleChange }) => (
+                    <Form>
+                        <Container>
+                            <h1>Sign up</h1>
+                            <Input
+                                type = 'text'
+                                placeholder = 'Email'
+                                onChange = {handleChange}
+                                value = {values.email}
+                                name = 'email'
+                            />
 
-                console.log(response);
-            }}
-        >
-            {({ values, handleChange }) => (
-                <Form>
-                    <Container>
-                        <h1>Sign up</h1>
-                        <Input
-                            type = 'text'
-                            placeholder = 'Email'
-                            onChange = {handleChange}
-                            value = {values.email}
-                            name = 'email'
-                        />
+                            <Input
+                                type = 'text'
+                                placeholder = 'Username'
+                                onChange = {handleChange}
+                                value = {values.username}
+                                name = 'username'
+                            />
 
-                        <Input
-                            type = 'text'
-                            placeholder = 'Username'
-                            onChange = {handleChange}
-                            value = {values.username}
-                            name = 'username'
-                        />
+                            <Input
+                                type = 'password'
+                                placeholder = 'Password'
+                                onChange = {handleChange}
+                                value = {values.password}
+                                name = 'password'
+                            />
 
-                        <Input
-                            type = 'password'
-                            placeholder = 'Password'
-                            onChange = {handleChange}
-                            value = {values.password}
-                            name = 'password'
-                        />
-
-                        <Button type='submit'>
-                            Register
-                        </Button>
-                    </Container>
-                </Form>
-            )}
-        </Formik>
+                            <Button type='submit'>
+                                Register
+                            </Button>
+                        </Container>
+                    </Form>
+                )}
+            </Formik>
+        </AuthWrapper>
     )   
 }
 
