@@ -21,13 +21,17 @@ const Chat = styled.div`
 `;
 
 const ViewTeams: React.FC<{}> = () => {
-    const { query: { team } } = useRouter();
+    const { query: { team, channel } } = useRouter();
     
     let teamId = -1;
     let channelId = -1;
 
     if(typeof team === 'string') {
         teamId = parseInt(team);
+    }
+
+    if(typeof channel === 'string') {
+        channelId = parseInt(channel);
     }
 
     return (
