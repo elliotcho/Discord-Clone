@@ -40,7 +40,7 @@ const Teams: React.FC<{}> = () => {
 
             {data?.teams?.map(t => {
                 const route = `/view-team/${t.id}`;
-
+                
                 return (
                     <NextLink key={t.id} href={route}>
                         <TeamIcon>

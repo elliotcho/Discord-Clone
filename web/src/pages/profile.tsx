@@ -20,6 +20,7 @@ const Profile: React.FC<{}> = () => {
             </div>
 
             <ProfileContainer />
+            
         </Container>
     )
 }
