@@ -1,9 +1,10 @@
 import { 
     Arg,
     Ctx,
+    FieldResolver,
     Mutation,  
     Query,  
-    Resolver,
+    Resolver
 } from "type-graphql";
 import { GraphQLUpload } from 'graphql-upload';
 import argon2 from 'argon2';
@@ -17,6 +18,19 @@ import path from 'path';
 
 @Resolver(User)
 export class UserResolver {
+    @FieldResolver(() => String)
+    async profileURL (
+        @Ctx() { req } : MyContext
+    ) : Promise<string> {
+        const user = await User.findOne(req.session.uid);
+
+        if(user && user.profilePic) {
+            return `http://localhost:4000/images/${user.profilePic}`;
+        }
+
+        return 'http://localhost:4000/images/default.png';
+    }
+
     @Query(() => User)
     async me(
         @Ctx() { req } : MyContext
@@ -84,7 +98,6 @@ export class UserResolver {
            .on('error', () => reject(false))
         )
     }
-
 
     @Mutation(() => Boolean)
     async login(

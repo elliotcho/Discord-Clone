@@ -1,12 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useMeQuery } from '../../generated/graphql';
-import { isServer } from '../../utils/isServer';
 
 const Container = styled.div`
     background: #222831;
     color: #e6e6e6;
     padding: 3%;
+`;
+
+const Image = styled.img`
+    width: 6rem;
+    height: 6rem;
 `;
 
 const Edit = styled.div`
@@ -33,15 +37,21 @@ const Button = styled.button`
     border: solid;
 `;
 
-
-
 const ProfileContainer: React.FC<{}> = () => {
     const { data } = useMeQuery();
 
     let username = data?.me?.username || 'Loading...';
+    let imgURL = data?.me?.profileURL;
 
     return (
         <Container>
+            {(
+                <Image 
+                    src = {imgURL}
+                    alt = 'Profile Pic'
+                />
+            )}
+
             <h2> Whagwan, {username} </h2>
             
             <Edit>

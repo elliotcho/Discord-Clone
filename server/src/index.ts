@@ -12,6 +12,7 @@ import express from 'express';
 import Redis from 'ioredis';
 import connectRedis from 'connect-redis';
 import session from 'express-session';
+import path from 'path';
 import cors from 'cors';
 
 const main = async () => {
@@ -65,6 +66,8 @@ const main = async () => {
             resave: false
         })
     );
+
+    app.use('/images', express.static(path.join(__dirname, '../images')));
 
     apolloServer.applyMiddleware({ app, cors: false });
 

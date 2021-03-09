@@ -49,6 +49,7 @@ export type User = {
   profilePic: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  profileURL: Scalars['String'];
 };
 
 
@@ -264,7 +265,7 @@ export type MeQuery = (
   { __typename?: 'Query' }
   & { me: (
     { __typename?: 'User' }
-    & Pick<User, 'id' | 'username'>
+    & Pick<User, 'id' | 'username' | 'profileURL'>
   ) }
 );
 
@@ -629,6 +630,7 @@ export const MeDocument = gql`
   me {
     id
     username
+    profileURL
   }
 }
     `;
