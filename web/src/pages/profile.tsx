@@ -21,7 +21,7 @@ const Profile: React.FC<{}> = () => {
                     HELLO
                 </div>
 
-                <ProfileContainer />
+                <ProfileContainer /> 
             </Container>
         </AuthWrapper>
     )
