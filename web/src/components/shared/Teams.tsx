@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useApolloClient } from '@apollo/client';
 import styled from 'styled-components';
-import { useTeamsQuery } from '../../generated/graphql';
+import { useTeamsQuery, useLogoutMutation } from '../../generated/graphql';
 import CreateTeamModal from './CreateTeamModal';
+import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 
 const Container = styled.div`
@@ -27,6 +29,10 @@ const TeamIcon = styled.div`
 `;
 
 const Teams: React.FC<{}> = () => {
+    const router = useRouter();
+    const apolloClient = useApolloClient();
+
+    const [logout] = useLogoutMutation();
     const [isOpen, setIsOpen] = useState(false);
     const { data } = useTeamsQuery();
 
@@ -40,7 +46,7 @@ const Teams: React.FC<{}> = () => {
 
             {data?.teams?.map(t => {
                 const route = `/view-team/${t.id}`;
-
+                
                 return (
                     <NextLink key={t.id} href={route}>
                         <TeamIcon>
@@ -52,6 +58,15 @@ const Teams: React.FC<{}> = () => {
 
             <TeamIcon onClick={() => setIsOpen(true)}>
                 +
+            </TeamIcon>
+
+            <TeamIcon 
+                onClick = {async () => {
+                    await logout();
+                    window.location.reload();
+                }}
+            >
+                x
             </TeamIcon>
 
             <CreateTeamModal

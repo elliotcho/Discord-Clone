@@ -21,7 +21,29 @@ export class UserResolver {
     async me(
         @Ctx() { req } : MyContext
     ) : Promise<User | undefined> {
+        if(!req.session.uid) {
+            return undefined;
+        }
+
         return User.findOne(req.session.uid);
+    }
+
+    @Mutation(() => Boolean)
+    async logout (
+        @Ctx() { req, res } : MyContext
+    ) : Promise<boolean> {
+        return new Promise(resolve => {
+            req.session.destroy(err => {
+                res.clearCookie('cid');
+
+                if(err) {
+                    resolve(false);
+                    return;
+                }
+
+                resolve(true);
+            });
+        });
     }
 
     @Mutation(() => Boolean)
