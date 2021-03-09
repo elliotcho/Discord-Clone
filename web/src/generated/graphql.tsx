@@ -67,6 +67,7 @@ export type Mutation = {
   forgotPassword: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
+  deleteChannel: Scalars['Boolean'];
 };
 
 
@@ -111,6 +112,11 @@ export type MutationCreateChannelArgs = {
 };
 
 
+export type MutationDeleteChannelArgs = {
+  channelId: Scalars['Int'];
+};
+
+
 export type CreateChannelMutationVariables = Exact<{
   channelName: Scalars['String'];
   teamId: Scalars['Int'];
@@ -130,6 +136,16 @@ export type CreateTeamMutationVariables = Exact<{
 export type CreateTeamMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'createTeam'>
+);
+
+export type DeleteChannelMutationVariables = Exact<{
+  channelId: Scalars['Int'];
+}>;
+
+
+export type DeleteChannelMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteChannel'>
 );
 
 export type ForgotPasswordMutationVariables = Exact<{
@@ -265,6 +281,36 @@ export function useCreateTeamMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateTeamMutationHookResult = ReturnType<typeof useCreateTeamMutation>;
 export type CreateTeamMutationResult = Apollo.MutationResult<CreateTeamMutation>;
 export type CreateTeamMutationOptions = Apollo.BaseMutationOptions<CreateTeamMutation, CreateTeamMutationVariables>;
+export const DeleteChannelDocument = gql`
+    mutation DeleteChannel($channelId: Int!) {
+  deleteChannel(channelId: $channelId)
+}
+    `;
+export type DeleteChannelMutationFn = Apollo.MutationFunction<DeleteChannelMutation, DeleteChannelMutationVariables>;
+
+/**
+ * __useDeleteChannelMutation__
+ *
+ * To run a mutation, you first call `useDeleteChannelMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteChannelMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteChannelMutation, { data, loading, error }] = useDeleteChannelMutation({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useDeleteChannelMutation(baseOptions?: Apollo.MutationHookOptions<DeleteChannelMutation, DeleteChannelMutationVariables>) {
+        return Apollo.useMutation<DeleteChannelMutation, DeleteChannelMutationVariables>(DeleteChannelDocument, baseOptions);
+      }
+export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannelMutation>;
+export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
+export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
   forgotPassword(email: $email)
