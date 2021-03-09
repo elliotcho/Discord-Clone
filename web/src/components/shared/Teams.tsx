@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useApolloClient } from '@apollo/client';
 import styled from 'styled-components';
 import { useTeamsQuery, useLogoutMutation } from '../../generated/graphql';
 import CreateTeamModal from './CreateTeamModal';
-import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 
 const Container = styled.div`
@@ -29,9 +27,6 @@ const TeamIcon = styled.div`
 `;
 
 const Teams: React.FC<{}> = () => {
-    const router = useRouter();
-    const apolloClient = useApolloClient();
-
     const [logout] = useLogoutMutation();
     const [isOpen, setIsOpen] = useState(false);
     const { data } = useTeamsQuery();

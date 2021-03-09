@@ -73,7 +73,10 @@ const CreateChannelModal : React.FC<CreateChannelModalProps> = ({ isOpen, teamId
                         }
 
                         await createChannel({ 
-                            variables: { channelName, teamId }
+                            variables: { channelName, teamId },
+                            update: (cache) => {
+                                cache.evict({ fieldName: "channels" });
+                            }
                         });
 
                         onClose();

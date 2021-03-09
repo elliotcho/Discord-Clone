@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import { createConnection } from 'typeorm';
 import { createSchema } from './utils/createSchema';
+import { Message } from './entities/Message';
 import { Member } from './entities/Member';
 import { Channel } from './entities/Channel';
 import { Team } from './entities/Team';
@@ -22,6 +23,7 @@ const main = async () => {
         entities: [
             User,
             Member,
+            Message,
             Channel,
             Team
         ] 

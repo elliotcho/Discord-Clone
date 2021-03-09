@@ -1,7 +1,0 @@
-query GetMessages($channelID: Int!){
-    getMessages(channelID: $channelID){
-        message
-        createdAt
-        edited
-    }
-}

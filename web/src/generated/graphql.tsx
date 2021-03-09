@@ -20,14 +20,20 @@ export type Scalars = {
 export type Query = {
   __typename?: 'Query';
   me: User;
+  team: Team;
   teams: Array<Team>;
-  getMessages: Array<Message>;
+  messages: Array<Message>;
   channels: Array<Channel>;
 };
 
 
-export type QueryGetMessagesArgs = {
-  channelID: Scalars['Int'];
+export type QueryTeamArgs = {
+  teamId: Scalars['Int'];
+};
+
+
+export type QueryMessagesArgs = {
+  channelId: Scalars['Int'];
 };
 
 
@@ -52,16 +58,7 @@ export type Team = {
   name: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-};
-
-export type Message = {
-  __typename?: 'Message';
-  id: Scalars['Float'];
-  message: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  edited: Scalars['DateTime'];
-  senderID: Scalars['Float'];
-  channelID: Scalars['Float'];
+  channels: Array<Channel>;
 };
 
 export type Channel = {
@@ -69,6 +66,16 @@ export type Channel = {
   id: Scalars['Float'];
   name: Scalars['String'];
   teamId: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type Message = {
+  __typename?: 'Message';
+  id: Scalars['Float'];
+  text: Scalars['String'];
+  senderId: Scalars['Float'];
+  channelId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
 };
@@ -125,8 +132,8 @@ export type MutationCreateTeamArgs = {
 
 
 export type MutationSendMessageArgs = {
-  channelID: Scalars['Int'];
-  message: Scalars['String'];
+  channelId: Scalars['Int'];
+  text: Scalars['String'];
 };
 
 
@@ -207,8 +214,8 @@ export type RegisterMutation = (
 );
 
 export type SendMessageMutationVariables = Exact<{
-  message: Scalars['String'];
-  channelID: Scalars['Int'];
+  text: Scalars['String'];
+  channelId: Scalars['Int'];
 }>;
 
 
@@ -240,19 +247,6 @@ export type ChannelsQuery = (
   )> }
 );
 
-export type GetMessagesQueryVariables = Exact<{
-  channelID: Scalars['Int'];
-}>;
-
-
-export type GetMessagesQuery = (
-  { __typename?: 'Query' }
-  & { getMessages: Array<(
-    { __typename?: 'Message' }
-    & Pick<Message, 'message' | 'createdAt' | 'edited'>
-  )> }
-);
-
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -261,6 +255,36 @@ export type MeQuery = (
   & { me: (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'username'>
+  ) }
+);
+
+export type MessagesQueryVariables = Exact<{
+  channelId: Scalars['Int'];
+}>;
+
+
+export type MessagesQuery = (
+  { __typename?: 'Query' }
+  & { messages: Array<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'text' | 'senderId' | 'createdAt' | 'channelId'>
+  )> }
+);
+
+export type TeamQueryVariables = Exact<{
+  teamId: Scalars['Int'];
+}>;
+
+
+export type TeamQuery = (
+  { __typename?: 'Query' }
+  & { team: (
+    { __typename?: 'Team' }
+    & Pick<Team, 'id' | 'name'>
+    & { channels: Array<(
+      { __typename?: 'Channel' }
+      & Pick<Channel, 'id'>
+    )> }
   ) }
 );
 
@@ -466,8 +490,8 @@ export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const SendMessageDocument = gql`
-    mutation SendMessage($message: String!, $channelID: Int!) {
-  sendMessage(message: $message, channelID: $channelID)
+    mutation SendMessage($text: String!, $channelId: Int!) {
+  sendMessage(text: $text, channelId: $channelId)
 }
     `;
 export type SendMessageMutationFn = Apollo.MutationFunction<SendMessageMutation, SendMessageMutationVariables>;
@@ -485,8 +509,8 @@ export type SendMessageMutationFn = Apollo.MutationFunction<SendMessageMutation,
  * @example
  * const [sendMessageMutation, { data, loading, error }] = useSendMessageMutation({
  *   variables: {
- *      message: // value for 'message'
- *      channelID: // value for 'channelID'
+ *      text: // value for 'text'
+ *      channelId: // value for 'channelId'
  *   },
  * });
  */
@@ -560,41 +584,6 @@ export function useChannelsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<C
 export type ChannelsQueryHookResult = ReturnType<typeof useChannelsQuery>;
 export type ChannelsLazyQueryHookResult = ReturnType<typeof useChannelsLazyQuery>;
 export type ChannelsQueryResult = Apollo.QueryResult<ChannelsQuery, ChannelsQueryVariables>;
-export const GetMessagesDocument = gql`
-    query GetMessages($channelID: Int!) {
-  getMessages(channelID: $channelID) {
-    message
-    createdAt
-    edited
-  }
-}
-    `;
-
-/**
- * __useGetMessagesQuery__
- *
- * To run a query within a React component, call `useGetMessagesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetMessagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetMessagesQuery({
- *   variables: {
- *      channelID: // value for 'channelID'
- *   },
- * });
- */
-export function useGetMessagesQuery(baseOptions: Apollo.QueryHookOptions<GetMessagesQuery, GetMessagesQueryVariables>) {
-        return Apollo.useQuery<GetMessagesQuery, GetMessagesQueryVariables>(GetMessagesDocument, baseOptions);
-      }
-export function useGetMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMessagesQuery, GetMessagesQueryVariables>) {
-          return Apollo.useLazyQuery<GetMessagesQuery, GetMessagesQueryVariables>(GetMessagesDocument, baseOptions);
-        }
-export type GetMessagesQueryHookResult = ReturnType<typeof useGetMessagesQuery>;
-export type GetMessagesLazyQueryHookResult = ReturnType<typeof useGetMessagesLazyQuery>;
-export type GetMessagesQueryResult = Apollo.QueryResult<GetMessagesQuery, GetMessagesQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {
@@ -628,6 +617,79 @@ export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const MessagesDocument = gql`
+    query Messages($channelId: Int!) {
+  messages(channelId: $channelId) {
+    text
+    senderId
+    createdAt
+    channelId
+  }
+}
+    `;
+
+/**
+ * __useMessagesQuery__
+ *
+ * To run a query within a React component, call `useMessagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMessagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMessagesQuery({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useMessagesQuery(baseOptions: Apollo.QueryHookOptions<MessagesQuery, MessagesQueryVariables>) {
+        return Apollo.useQuery<MessagesQuery, MessagesQueryVariables>(MessagesDocument, baseOptions);
+      }
+export function useMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MessagesQuery, MessagesQueryVariables>) {
+          return Apollo.useLazyQuery<MessagesQuery, MessagesQueryVariables>(MessagesDocument, baseOptions);
+        }
+export type MessagesQueryHookResult = ReturnType<typeof useMessagesQuery>;
+export type MessagesLazyQueryHookResult = ReturnType<typeof useMessagesLazyQuery>;
+export type MessagesQueryResult = Apollo.QueryResult<MessagesQuery, MessagesQueryVariables>;
+export const TeamDocument = gql`
+    query Team($teamId: Int!) {
+  team(teamId: $teamId) {
+    id
+    name
+    channels {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useTeamQuery__
+ *
+ * To run a query within a React component, call `useTeamQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTeamQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTeamQuery({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useTeamQuery(baseOptions: Apollo.QueryHookOptions<TeamQuery, TeamQueryVariables>) {
+        return Apollo.useQuery<TeamQuery, TeamQueryVariables>(TeamDocument, baseOptions);
+      }
+export function useTeamLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TeamQuery, TeamQueryVariables>) {
+          return Apollo.useLazyQuery<TeamQuery, TeamQueryVariables>(TeamDocument, baseOptions);
+        }
+export type TeamQueryHookResult = ReturnType<typeof useTeamQuery>;
+export type TeamLazyQueryHookResult = ReturnType<typeof useTeamLazyQuery>;
+export type TeamQueryResult = Apollo.QueryResult<TeamQuery, TeamQueryVariables>;
 export const TeamsDocument = gql`
     query Teams {
   teams {

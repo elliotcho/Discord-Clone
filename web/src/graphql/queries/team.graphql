@@ -1,0 +1,9 @@
+query Team($teamId: Int!) {
+    team(teamId: $teamId) {
+        id
+        name
+        channels {
+            id
+        }
+    }
+}

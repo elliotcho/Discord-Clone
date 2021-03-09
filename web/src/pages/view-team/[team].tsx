@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { withApollo } from '../../utils/withApollo';
+import { useTeamQuery } from '../../generated/graphql';
 import Teams from '../../components/shared/Teams';
 import Channels from '../../components/view-team/Channels';
 import ChatHeader from '../../components/view-team/ChatHeader';
@@ -22,16 +23,20 @@ const Chat = styled.div`
 `;
 
 const ViewTeams: React.FC<{}> = () => {
-    const { query: { team, channel } } = useRouter();
+    const router = useRouter();
     
-    let teamId = -1;
+    let team = router.query.team as string;
+    let channel = router.query.channel as string;
+    let teamId = parseInt(team);
     let channelId = -1;
 
-    if(typeof team === 'string') {
-        teamId = parseInt(team);
-    }
+    const { data } = useTeamQuery({
+        variables: { teamId }
+    });
 
-    if(typeof channel === 'string') {
+    if(!channel) {
+        channelId = data?.team?.channels[0].id;
+    } else {
         channelId = parseInt(channel);
     }
 
@@ -45,9 +50,9 @@ const ViewTeams: React.FC<{}> = () => {
                 <Chat>
                     <ChatHeader />
 
-                    <ChatContainer />
+                    <ChatContainer channelId={channelId}/>
 
-                    <SendMessage />
+                    <SendMessage channelId={channelId}/>
                 </Chat>
             </Container>
         </AuthWrapper>
