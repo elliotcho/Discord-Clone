@@ -6,12 +6,11 @@ import {
     Query,  
     Resolver
 } from "type-graphql";
-import { GraphQLUpload } from 'graphql-upload';
 import argon2 from 'argon2';
 import { v4 } from 'uuid';
 import { getConnection } from "typeorm";
 import { User } from "../entities/User";
-import { MyContext, Upload } from "../types";
+import { MyContext, GraphQLUpload, Upload } from "../types";
 import { sendEmail } from "../utils/sendEmail"
 import fs, { createWriteStream } from 'fs';
 import path from 'path';

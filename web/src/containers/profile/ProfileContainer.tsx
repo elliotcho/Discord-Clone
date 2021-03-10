@@ -1,6 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useMeQuery } from '../../generated/graphql';
+import { 
+    MeDocument, 
+    useMeQuery, 
+    useUpdateProfilePicMutation 
+} from '../../generated/graphql';
 
 const Container = styled.div`
     background: #222831;
@@ -60,12 +64,12 @@ const ChangePassword = styled.form`
     font-family: 'Nunito', sans-serif;
 `;
 
-
 const Label = styled.label`
     display: inline-block;
     width: 150px;
     text-align: left;
 `;
+
 const Input = styled.input`
     margin-left: 20px;
 `;
@@ -78,29 +82,41 @@ const Button = styled.button`
     margin-left: 4px;
 `;
 
-
-
 const ProfileContainer: React.FC<{}> = () => {
     const { data } = useMeQuery();
+    
+    const [updatePic] = useUpdateProfilePicMutation({
+        refetchQueries: [
+            { query: MeDocument }
+        ]
+    });
 
     let username = data?.me?.username || 'Loading...';
     let imgURL = data?.me?.profileURL;
 
     return (
         <Container>
-            {(
-                <Image 
-                    src = {imgURL}
-                    alt = 'Profile Pic'
-                />
-            )}
+            <Image src={imgURL} alt='profile pic' />
 
-            <Intro> Whagwan, {username} </Intro>
+            <Intro> Whagwan, {username}</Intro>
 
             <Edit>
                 <UpdatePic>
-                    <Label htmlFor="myFile">Update Profile Picture</Label>
-                    <Input type="file" id="myFile" name="myFile" />
+                    <Label>
+                        Update Profile Picture
+                    </Label>
+
+                    <Input
+                        id = 'myFile' 
+                        type = 'file'
+                        onChange = {async (e) => {
+                            const file = e.target.files[0];
+                            
+                            await updatePic({
+                                variables: { file }
+                            });
+                        }}
+                    />
                 </UpdatePic>
                 
                 <ChangeUsername>
@@ -121,9 +137,6 @@ const ProfileContainer: React.FC<{}> = () => {
                     <Button type='submit'>✔️</Button>
                 </ChangePassword>
             </Edit>
-
-
-        
         </Container>
     )
 }
