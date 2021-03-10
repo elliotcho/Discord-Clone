@@ -1,6 +1,5 @@
 query Teams {
     teams {
-        id
-        name
+        ...RegularTeam
     }
 }

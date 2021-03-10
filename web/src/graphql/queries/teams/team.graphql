@@ -1,0 +1,5 @@
+query Team($teamId: Int!) {
+    team(teamId: $teamId) {
+        ...RegularTeam
+    }
+}

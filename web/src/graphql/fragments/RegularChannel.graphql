@@ -1,0 +1,4 @@
+fragment RegularChannel on Channel {
+    id
+    name
+}

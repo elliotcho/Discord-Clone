@@ -1,17 +1,27 @@
 import {
     Arg,
     Ctx,
+    FieldResolver,
     Int,
     Mutation,
     Query,
     Resolver,
+    Root,
 } from "type-graphql";
 import { MyContext } from "../types";
 import { getConnection } from "typeorm";
 import { Message } from "../entities/Message";
+import { User } from '../entities/User';
 
 @Resolver(Message)
 export class MessageResolver {
+    @FieldResolver(() => User)
+    async user (
+        @Root() message: Message
+    ) : Promise<User | undefined> {
+        return User.findOne(message.senderId);
+    }
+
     @Mutation(() => Boolean)
     async sendMessage(
         @Arg('text') text: string,
@@ -39,6 +49,7 @@ export class MessageResolver {
             `
                 select * from message
                 where message."channelId" = $1
+                order by message."createdAt"
             `, [channelId]
         );
 

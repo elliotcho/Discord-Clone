@@ -1,6 +1,5 @@
 query Channels($teamId: Int!) {
     channels(teamId: $teamId) {
-        id 
-        name
+        ...RegularChannel
     }
 }
