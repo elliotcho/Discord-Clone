@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { withApollo } from '../utils/withApollo';
 import ProfileContainer from '../containers/profile/ProfileContainer';
 import Teams from '../components/shared/Teams';
-import AuthWrapper from '../components/shared/AuthWrapper';
+import AuthWrapper from '../containers/shared/AuthWrapper';
 
 const Container = styled.div`
     height: 100vh;
