@@ -1,8 +1,10 @@
 import { 
     Arg,
     Ctx,
+    Field,
     FieldResolver,
     Mutation,  
+    ObjectType,  
     Query,  
     Resolver
 } from "type-graphql";
@@ -15,6 +17,22 @@ import { sendEmail } from "../utils/sendEmail"
 import fs, { createWriteStream } from 'fs';
 import path from 'path';
 
+@ObjectType()
+class FieldError {
+    @Field()
+    field: string;
+    @Field()
+    message: string;
+}
+
+@ObjectType()
+class UserResponse {
+    @Field(() => [FieldError], { nullable: true })
+    errors? : FieldError[];
+    @Field(() => User, { nullable: true })
+    user? : User;
+}
+
 @Resolver(User)
 export class UserResolver {
     @FieldResolver(() => String)
@@ -24,10 +42,10 @@ export class UserResolver {
         const user = await User.findOne(req.session.uid);
 
         if(user && user.profilePic) {
-            return `http://localhost:4000/images/${user.profilePic}`;
+            return `${process.env.SERVER_URL}/images/${user.profilePic}`;
         }
 
-        return 'http://localhost:4000/images/default.png';
+        return `${process.env.SERVER_URL}/images/default.png`;
     }
 
     @Query(() => User)
@@ -98,50 +116,75 @@ export class UserResolver {
         )
     }
 
-    @Mutation(() => Boolean)
+    @Mutation(() => UserResponse)
     async login(
         @Arg('username') username: string,
         @Arg('password') password: string,
         @Ctx() { req } : MyContext
-    ): Promise<boolean> {
+    ): Promise<UserResponse> {
         const user = await User.findOne({ where: { username } });
 
         if(!user) {
-            return false;
+            return {
+                errors: [{
+                    field: 'username',
+                    message: 'Username is not registred'
+                }]
+            };
         }
         
         const valid = await argon2.verify(user.password, password);
 
         if(!valid) {
-            return false;
+            return {
+                errors: [{
+                    field: 'password',
+                    message: 'Incorrect password'
+                }]
+            };
         }
 
         req.session.uid = user.id;
-        return true;
+        return { user };
     }
 
-    @Mutation(() => User)
+    @Mutation(() => UserResponse)
     async register(
         @Arg('username') username: string,
         @Arg('password') password: string,
         @Arg('email') email: string,
         @Ctx() { req } : MyContext 
-    ): Promise<User | undefined>{
+    ): Promise<UserResponse>{
         const hashedPassword = await argon2.hash(password);
-
-        await getConnection().query(
-            `
-             insert into "user" (username, password, email) 
-             values ($1, $2, $3)
-            `,
-            [username, hashedPassword, email]
-        );
+        let user;
         
-        const user = await User.findOne({ where : { username } });
+        try { 
+            const result = await getConnection()
+            .createQueryBuilder()
+            .insert()
+            .into(User)
+            .values({
+                username,
+                password: hashedPassword,
+                email   
+            })
+            .returning('*')
+            .execute();
 
-        req.session.uid = user?.id;
-        
-        return user;
+            user = result.raw[0];
+        } catch (err) {
+            if(err.code === '23505') {
+                return {
+                    errors: [{
+                        field: 'email',
+                        message: 'email or username already exists'
+                    }]
+                }
+            }
+        }
+  
+        req.session.uid = user.id;
+        return { user };
     }
 
     @Mutation(()=> Boolean)
