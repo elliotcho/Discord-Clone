@@ -72,7 +72,10 @@ const CreateTeamModal : React.FC<CreateTeamModalProps> = ({ isOpen, onClose }) =
                         }
 
                         await createTeam({ 
-                            variables: { teamName }
+                            variables: { teamName },
+                            update: (cache) => {
+                                cache.evict({ fieldName: "teams" });
+                            }
                         });
 
                         onClose();

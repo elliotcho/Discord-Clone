@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import { createConnection } from 'typeorm';
 import { createSchema } from './utils/createSchema';
+import { Message } from './entities/Message';
 import { Member } from './entities/Member';
 import { Channel } from './entities/Channel';
 import { Team } from './entities/Team';
@@ -11,6 +12,7 @@ import express from 'express';
 import Redis from 'ioredis';
 import connectRedis from 'connect-redis';
 import session from 'express-session';
+import path from 'path';
 import cors from 'cors';
 
 const main = async () => {
@@ -22,6 +24,7 @@ const main = async () => {
         entities: [
             User,
             Member,
+            Message,
             Channel,
             Team
         ] 
@@ -30,6 +33,7 @@ const main = async () => {
     const schema = await createSchema();
 
     const apolloServer = new ApolloServer({
+        uploads: { maxFileSize: 10000000, maxFiles: 10 },
         context: ({ req, res }) => ({ req, res, redis }),
         schema
     });
@@ -63,6 +67,8 @@ const main = async () => {
             resave: false
         })
     );
+
+    app.use('/images', express.static(path.join(__dirname, '../images')));
 
     apolloServer.applyMiddleware({ app, cors: false });
 

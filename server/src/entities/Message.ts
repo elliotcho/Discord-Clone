@@ -1,4 +1,4 @@
-import {Field, ObjectType} from "type-graphql";
+import { Field, ObjectType } from "type-graphql";
 import{
     BaseEntity,
     Column,
@@ -17,7 +17,15 @@ export class Message extends BaseEntity{
 
     @Field()
     @Column()
-    message: string;
+    text: string;
+
+    @Field()
+    @Column()
+    senderId: number;
+
+    @Field()
+    @Column()
+    channelId: number;
 
     @Field()
     @CreateDateColumn()
@@ -25,13 +33,5 @@ export class Message extends BaseEntity{
 
     @Field()
     @UpdateDateColumn()
-    edited: Date;
-
-    @Field()
-    @Column()
-    senderID: number;
-
-    @Field()
-    @Column()
-    channelID: number;
+    updatedAt: Date;
 }

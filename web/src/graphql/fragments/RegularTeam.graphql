@@ -1,0 +1,7 @@
+fragment RegularTeam on Team {
+    id
+    name
+    channels {
+        id
+    }
+}

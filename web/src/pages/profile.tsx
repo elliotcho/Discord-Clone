@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { withApollo } from '../utils/withApollo';
 import ProfileContainer from '../containers/profile/ProfileContainer';
 import Teams from '../components/shared/Teams';
+import AuthWrapper from '../containers/shared/AuthWrapper';
 
 const Container = styled.div`
     height: 100vh;
@@ -12,16 +13,17 @@ const Container = styled.div`
 
 const Profile: React.FC<{}> = () => {
     return (
-        <Container>
-            <Teams />
+        <AuthWrapper requiresAuth>
+            <Container>
+                <Teams />
 
-            <div style={{background: 'pink'}}>
-                HELLO
-            </div>
+                <div style={{background: '#1a1c20'}}>
+                    HELLO
+                </div>
 
-            <ProfileContainer />
-            
-        </Container>
+                <ProfileContainer /> 
+            </Container>
+        </AuthWrapper>
     )
 }
 

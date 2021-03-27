@@ -1,3 +1,0 @@
-mutation UpdateProfilePic($file: Upload! ){
-    updateProfilePic(file: $file)
-}

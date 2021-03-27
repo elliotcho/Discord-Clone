@@ -1,11 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import { withApollo } from '../../utils/withApollo';
+import { useTeamQuery } from '../../generated/graphql';
 import Teams from '../../components/shared/Teams';
-import Channels from '../../components/view-team/Channels';
+import Channels from '../../containers/view-team/Channels';
 import ChatHeader from '../../components/view-team/ChatHeader';
-import ChatContainer from '../../components/view-team/ChatContainer';
+import ChatContainer from '../../containers/view-team/ChatContainer';
 import SendMessage from '../../components/view-team/SendMessage';
+import AuthWrapper from '../../containers/shared/AuthWrapper';
 import { useRouter } from 'next/router';
 
 const Container = styled.div`
@@ -21,29 +23,39 @@ const Chat = styled.div`
 `;
 
 const ViewTeams: React.FC<{}> = () => {
-    const { query: { team } } = useRouter();
+    const router = useRouter();
     
-    let teamId = -1;
+    let team = router.query.team as string;
+    let channel = router.query.channel as string;
+    let teamId = parseInt(team);
     let channelId = -1;
 
-    if(typeof team === 'string') {
-        teamId = parseInt(team);
+    const { data } = useTeamQuery({
+        variables: { teamId }
+    });
+
+    if(!channel) {
+        channelId = data?.team?.channels[0].id;
+    } else {
+        channelId = parseInt(channel);
     }
 
     return (
-        <Container>
-            <Teams />
+        <AuthWrapper requiresAuth>
+            <Container>
+                <Teams />
 
-            <Channels teamId={teamId} channelId={channelId}/>
+                <Channels teamId={teamId} channelId={channelId}/>
 
-            <Chat>
-                <ChatHeader />
+                <Chat>
+                    <ChatHeader />
 
-                <ChatContainer />
+                    <ChatContainer channelId={channelId}/>
 
-                <SendMessage />
-            </Chat>
-        </Container>
+                    <SendMessage channelId={channelId}/>
+                </Chat>
+            </Container>
+        </AuthWrapper>
     )
 }
 

@@ -18,7 +18,7 @@ export class Channel extends BaseEntity {
     id: number;
 
     @Field()
-    @Column({ unique: true })
+    @Column()
     name: string;
 
     @Field()

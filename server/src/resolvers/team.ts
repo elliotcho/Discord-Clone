@@ -1,16 +1,34 @@
 import { 
     Arg,
     Ctx,
+    FieldResolver,
+    Int,
     Mutation, 
     Query, 
-    Resolver 
+    Resolver, 
+    Root
 } from "type-graphql";
 import { getConnection } from "typeorm";
+import { Channel } from '../entities/Channel';
 import { Team } from "../entities/Team";
 import { MyContext } from "../types";
 
 @Resolver(Team)
 export class TeamResolver {
+    @FieldResolver(() => [Channel])
+    async channels(
+        @Root() team: Team
+    ) : Promise<Channel[]> {
+        return Channel.find({ teamId: team.id });
+    }
+
+    @Query(() => Team)
+    async team(
+        @Arg('teamId', () => Int) teamId: number
+    ) : Promise<Team | undefined> {
+        return Team.findOne(teamId);
+    }
+
     @Query(() => [Team])
     async teams(
         @Ctx() { req } : MyContext

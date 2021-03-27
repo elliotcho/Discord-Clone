@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useChannelsQuery } from '../../generated/graphql';
+import { useChannelsQuery, useDeleteChannelMutation } from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
 import NextLink from 'next/link';
 
@@ -47,6 +47,7 @@ interface ChannelsProps {
 
 const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [deleteChannel] = useDeleteChannelMutation();
 
     const { data } = useChannelsQuery({
         variables: { teamId }

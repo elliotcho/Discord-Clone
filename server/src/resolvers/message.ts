@@ -1,45 +1,58 @@
 import {
     Arg,
     Ctx,
+    FieldResolver,
     Int,
     Mutation,
     Query,
     Resolver,
+    Root,
 } from "type-graphql";
-import {MyContext} from "../types";
-import {getConnection} from "typeorm";
-import {Message} from "../entities/Message";
+import { MyContext } from "../types";
+import { getConnection } from "typeorm";
+import { Message } from "../entities/Message";
+import { User } from '../entities/User';
 
 @Resolver(Message)
 export class MessageResolver {
+    @FieldResolver(() => User)
+    async user (
+        @Root() message: Message
+    ) : Promise<User | undefined> {
+        return User.findOne(message.senderId);
+    }
+
     @Mutation(() => Boolean)
     async sendMessage(
-        @Arg('message') message: string,
-        @Arg('channelID', () => Int) channelID: number,
+        @Arg('text') text: string,
+        @Arg('channelId', () => Int) channelId: number,
         @Ctx() { req } : MyContext 
     ): Promise<boolean>{
-        const senderID = req.session.uid;
+        const senderId = req.session.uid; 
+
         await getConnection().query(
             `
-             insert into "message" (message, "senderID", "channelID")
-             values($1,$2,$3)
+             insert into message (text, "channelId", "senderId")
+             values ($1, $2, $3)
             `, 
-            [message, senderID, channelID]
+            [text, channelId, senderId]
         );
-        return true;
 
+        return true;
     }
 
     @Query(() => [Message])
-    async getMessages(
-        @Arg('channelID', () => Int) channelID: number,
+    async messages(
+        @Arg('channelId', () => Int) channelId: number,
     ): Promise<Message | undefined> {
         const messages = await getConnection().query(
             `
-            select (message, "createdAt", edited) from message
-            where message."channelID" = $1
-            `, [channelID]
+                select * from message
+                where message."channelId" = $1
+                order by message."createdAt"
+            `, [channelId]
         );
+
         return messages;
     }
 }

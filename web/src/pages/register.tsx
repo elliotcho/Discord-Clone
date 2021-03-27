@@ -3,10 +3,13 @@ import styled from 'styled-components';
 import { Form, Formik } from 'formik';
 import { useRegisterMutation } from '../generated/graphql';
 import { withApollo } from '../utils/withApollo'; 
+import AuthWrapper from '../containers/shared/AuthWrapper';
+import Layout from '../containers/shared/Layout';
+import { useRouter } from 'next/router';
 
 const Container = styled.div`
     width: 40%;
-    margin: 11% auto;
+    margin: 60px auto;
     padding: 1.2rem;
     background: #709fb0;
     border: 3px outset #91091e;
@@ -42,58 +45,64 @@ const Button = styled.button`
     outline: none;
 `;
 
-
 const Register: React.FC<{}> = () => {
+    const router = useRouter();
     const [register] = useRegisterMutation();
 
     return (
-        <Formik
-            initialValues = {{ username: '', password: '', email: '' }}
-            onSubmit = {async (values) => {
-                const { username, password, email } = values;
+        <AuthWrapper>
+            <Layout>
+                <Formik
+                    initialValues = {{ username: '', password: '', email: '' }}
+                    onSubmit = {async (values) => {
+                        const { username, password, email } = values;
 
-                const response = await register({
-                    variables: { username, password, email }
-                });
+                        const response = await register({
+                            variables: { username, password, email }
+                        });
 
-                console.log(response);
-            }}
-        >
-            {({ values, handleChange }) => (
-                <Form>
-                    <Container>
-                        <h1>Sign up</h1>
-                        <Input
-                            type = 'text'
-                            placeholder = 'Email'
-                            onChange = {handleChange}
-                            value = {values.email}
-                            name = 'email'
-                        />
+                        if(response?.data?.register) {
+                            router.push('/profile');
+                        }
+                    }}
+                >
+                    {({ values, handleChange }) => (
+                        <Form>
+                            <Container>
+                                <h1>Sign up</h1>
+                                <Input
+                                    type = 'text'
+                                    placeholder = 'Email'
+                                    onChange = {handleChange}
+                                    value = {values.email}
+                                    name = 'email'
+                                />
 
-                        <Input
-                            type = 'text'
-                            placeholder = 'Username'
-                            onChange = {handleChange}
-                            value = {values.username}
-                            name = 'username'
-                        />
+                                <Input
+                                    type = 'text'
+                                    placeholder = 'Username'
+                                    onChange = {handleChange}
+                                    value = {values.username}
+                                    name = 'username'
+                                />
 
-                        <Input
-                            type = 'password'
-                            placeholder = 'Password'
-                            onChange = {handleChange}
-                            value = {values.password}
-                            name = 'password'
-                        />
+                                <Input
+                                    type = 'password'
+                                    placeholder = 'Password'
+                                    onChange = {handleChange}
+                                    value = {values.password}
+                                    name = 'password'
+                                />
 
-                        <Button type='submit'>
-                            Register
-                        </Button>
-                    </Container>
-                </Form>
-            )}
-        </Formik>
+                                <Button type='submit'>
+                                    Register
+                                </Button>
+                            </Container>
+                        </Form>
+                    )}
+                </Formik>
+            </Layout>
+        </AuthWrapper>
     )   
 }
 
