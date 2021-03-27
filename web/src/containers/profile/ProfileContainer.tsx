@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useChangeUsernameMutation } from '../../generated/graphql';
 import { useMeQuery } from '../../generated/graphql';
 
 const Container = styled.div`
@@ -60,7 +61,6 @@ const ChangePassword = styled.form`
     font-family: 'Nunito', sans-serif;
 `;
 
-
 const Label = styled.label`
     display: inline-block;
     width: 150px;
@@ -86,6 +86,9 @@ const ProfileContainer: React.FC<{}> = () => {
     let username = data?.me?.username || 'Loading...';
     let imgURL = data?.me?.profileURL;
 
+    const [newName] = useChangeUsernameMutation();
+
+
     return (
         <Container>
             {(
@@ -105,8 +108,21 @@ const ProfileContainer: React.FC<{}> = () => {
                 
                 <ChangeUsername>
                     <Label htmlFor="usernane">Change Username</Label>
-                    <Input type='username' id='username' name='username' />
-                    <Button type='submit'>✔️</Button>
+                    <Input 
+                        type='username' 
+                        id='username' 
+                        onChange={(e) => {
+                            
+
+                        }}
+                        // value={}
+                        name='username' 
+                    />
+                    <Button onClick={async (e) => {
+
+                        
+                    }}>✔️</Button>
+        
                 </ChangeUsername>
 
                 <ChangeEmail>
