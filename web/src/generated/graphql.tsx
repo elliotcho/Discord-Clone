@@ -87,8 +87,8 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   removeProfilePic: Scalars['Boolean'];
   updateProfilePic: Scalars['Boolean'];
-  login: Scalars['Boolean'];
-  register: User;
+  login: UserResponse;
+  register: UserResponse;
   changePassword: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
   changeUsername: Scalars['Boolean'];
@@ -156,6 +156,18 @@ export type MutationDeleteChannelArgs = {
 };
 
 
+export type UserResponse = {
+  __typename?: 'UserResponse';
+  errors?: Maybe<Array<FieldError>>;
+  user?: Maybe<User>;
+};
+
+export type FieldError = {
+  __typename?: 'FieldError';
+  field: Scalars['String'];
+  message: Scalars['String'];
+};
+
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
   & Pick<Channel, 'id' | 'name'>
@@ -179,9 +191,25 @@ export type RegularTeamFragment = (
   )> }
 );
 
+export type RegularErrorFragment = (
+  { __typename?: 'FieldError' }
+  & Pick<FieldError, 'field' | 'message'>
+);
+
 export type RegularUserFragment = (
   { __typename?: 'User' }
   & Pick<User, 'id' | 'email' | 'username' | 'profileURL' | 'createdAt' | 'updatedAt'>
+);
+
+export type RegularUserResponseFragment = (
+  { __typename?: 'UserResponse' }
+  & { user?: Maybe<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )>, errors?: Maybe<Array<(
+    { __typename?: 'FieldError' }
+    & RegularErrorFragment
+  )>> }
 );
 
 export type CreateChannelMutationVariables = Exact<{
@@ -244,7 +272,10 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'login'>
+  & { login: (
+    { __typename?: 'UserResponse' }
+    & RegularUserResponseFragment
+  ) }
 );
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
@@ -265,8 +296,8 @@ export type RegisterMutationVariables = Exact<{
 export type RegisterMutation = (
   { __typename?: 'Mutation' }
   & { register: (
-    { __typename?: 'User' }
-    & RegularUserFragment
+    { __typename?: 'UserResponse' }
+    & RegularUserResponseFragment
   ) }
 );
 
@@ -378,6 +409,23 @@ export const RegularUserFragmentDoc = gql`
   updatedAt
 }
     `;
+export const RegularErrorFragmentDoc = gql`
+    fragment RegularError on FieldError {
+  field
+  message
+}
+    `;
+export const RegularUserResponseFragmentDoc = gql`
+    fragment RegularUserResponse on UserResponse {
+  user {
+    ...RegularUser
+  }
+  errors {
+    ...RegularError
+  }
+}
+    ${RegularUserFragmentDoc}
+${RegularErrorFragmentDoc}`;
 export const CreateChannelDocument = gql`
     mutation CreateChannel($channelName: String!, $teamId: Int!) {
   createChannel(channelName: $channelName, teamId: $teamId)
@@ -532,9 +580,11 @@ export type ForgotPasswordMutationResult = Apollo.MutationResult<ForgotPasswordM
 export type ForgotPasswordMutationOptions = Apollo.BaseMutationOptions<ForgotPasswordMutation, ForgotPasswordMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($username: String!, $password: String!) {
-  login(username: $username, password: $password)
+  login(username: $username, password: $password) {
+    ...RegularUserResponse
+  }
 }
-    `;
+    ${RegularUserResponseFragmentDoc}`;
 export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
@@ -593,10 +643,10 @@ export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, L
 export const RegisterDocument = gql`
     mutation Register($username: String!, $password: String!, $email: String!) {
   register(username: $username, password: $password, email: $email) {
-    ...RegularUser
+    ...RegularUserResponse
   }
 }
-    ${RegularUserFragmentDoc}`;
+    ${RegularUserResponseFragmentDoc}`;
 export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
 
 /**
