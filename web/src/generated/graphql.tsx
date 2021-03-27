@@ -91,6 +91,7 @@ export type Mutation = {
   register: UserResponse;
   changePassword: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
+  changeUsername: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
   sendMessage: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
@@ -125,6 +126,11 @@ export type MutationChangePasswordArgs = {
 
 export type MutationForgotPasswordArgs = {
   email: Scalars['String'];
+};
+
+
+export type MutationChangeUsernameArgs = {
+  username: Scalars['String'];
 };
 
 
@@ -204,6 +210,16 @@ export type RegularUserResponseFragment = (
     { __typename?: 'FieldError' }
     & RegularErrorFragment
   )>> }
+);
+
+export type ChangeUsernameMutationVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type ChangeUsernameMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changeUsername'>
 );
 
 export type CreateChannelMutationVariables = Exact<{
@@ -420,6 +436,36 @@ export const RegularUserResponseFragmentDoc = gql`
 }
     ${RegularUserFragmentDoc}
 ${RegularErrorFragmentDoc}`;
+export const ChangeUsernameDocument = gql`
+    mutation ChangeUsername($username: String!) {
+  changeUsername(username: $username)
+}
+    `;
+export type ChangeUsernameMutationFn = Apollo.MutationFunction<ChangeUsernameMutation, ChangeUsernameMutationVariables>;
+
+/**
+ * __useChangeUsernameMutation__
+ *
+ * To run a mutation, you first call `useChangeUsernameMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeUsernameMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeUsernameMutation, { data, loading, error }] = useChangeUsernameMutation({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useChangeUsernameMutation(baseOptions?: Apollo.MutationHookOptions<ChangeUsernameMutation, ChangeUsernameMutationVariables>) {
+        return Apollo.useMutation<ChangeUsernameMutation, ChangeUsernameMutationVariables>(ChangeUsernameDocument, baseOptions);
+      }
+export type ChangeUsernameMutationHookResult = ReturnType<typeof useChangeUsernameMutation>;
+export type ChangeUsernameMutationResult = Apollo.MutationResult<ChangeUsernameMutation>;
+export type ChangeUsernameMutationOptions = Apollo.BaseMutationOptions<ChangeUsernameMutation, ChangeUsernameMutationVariables>;
 export const CreateChannelDocument = gql`
     mutation CreateChannel($channelName: String!, $teamId: Int!) {
   createChannel(channelName: $channelName, teamId: $teamId)

@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { 
     MeDocument, 
     useMeQuery, 
-    useUpdateProfilePicMutation 
+    useUpdateProfilePicMutation,
+    useChangeUsernameMutation
 } from '../../generated/graphql';
 
 const Container = styled.div`
@@ -94,6 +95,9 @@ const ProfileContainer: React.FC<{}> = () => {
     let username = data?.me?.username || 'Loading...';
     let imgURL = data?.me?.profileURL;
 
+    const [newName] = useChangeUsernameMutation();
+
+
     return (
         <Container>
             <Image src={imgURL} alt='profile pic' />
@@ -121,8 +125,21 @@ const ProfileContainer: React.FC<{}> = () => {
                 
                 <ChangeUsername>
                     <Label htmlFor="usernane">Change Username</Label>
-                    <Input type='username' id='username' name='username' />
-                    <Button type='submit'>✔️</Button>
+                    <Input 
+                        type='username' 
+                        id='username' 
+                        onChange={(e) => {
+                            
+
+                        }}
+                        // value={}
+                        name='username' 
+                    />
+                    <Button onClick={async (e) => {
+
+                        
+                    }}>✔️</Button>
+        
                 </ChangeUsername>
 
                 <ChangeEmail>

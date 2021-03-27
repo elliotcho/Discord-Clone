@@ -239,4 +239,27 @@ export class UserResolver {
 
         return true;
     }
+
+    @Mutation(() => Boolean)
+    async changeUsername(
+        @Arg('username') username: string,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const user = await User.findOne({ where: { username }});
+
+        if(user){
+            return false;
+        }
+
+        await getConnection().query(
+            `
+                update 'user'
+                set username = $1
+                where id = $2
+            `,
+            [username, req.session.uid]
+        );
+        
+       return true;
+    }
 }
