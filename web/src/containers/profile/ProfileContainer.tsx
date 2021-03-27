@@ -1,15 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-<<<<<<< HEAD
-import { useChangeUsernameMutation } from '../../generated/graphql';
-import { useMeQuery } from '../../generated/graphql';
-=======
 import { 
     MeDocument, 
     useMeQuery, 
-    useUpdateProfilePicMutation 
+    useUpdateProfilePicMutation,
+    useChangeUsernameMutation
 } from '../../generated/graphql';
->>>>>>> upstream/master
 
 const Container = styled.div`
     background: #222831;

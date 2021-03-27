@@ -1,3 +1,3 @@
-mutation changeUsername($username: String!){
+mutation ChangeUsername($username: String!){
     changeUsername(username: $username)
 }
