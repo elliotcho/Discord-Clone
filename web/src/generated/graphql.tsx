@@ -80,20 +80,12 @@ export type Channel = {
 export type Message = {
   __typename?: 'Message';
   id: Scalars['Float'];
-<<<<<<< HEAD
-  message: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  edited: Scalars['DateTime'];
-  senderID: Scalars['Float'];
-  channelID: Scalars['Float'];
-=======
   text: Scalars['String'];
   senderId: Scalars['Float'];
   channelId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   user: User;
->>>>>>> upstream/master
 };
 
 export type Mutation = {
@@ -109,10 +101,6 @@ export type Mutation = {
   sendMessage: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
-<<<<<<< HEAD
-  sendMessage: Scalars['Boolean'];
-=======
->>>>>>> upstream/master
 };
 
 
@@ -282,20 +270,6 @@ export type RegisterMutation = (
   ) }
 );
 
-<<<<<<< HEAD
-export type SendMessageMutationVariables = Exact<{
-  message: Scalars['String'];
-  channelID: Scalars['Int'];
-}>;
-
-
-export type SendMessageMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'sendMessage'>
-);
-
-=======
->>>>>>> upstream/master
 export type UpdateProfilePicMutationVariables = Exact<{
   file: Scalars['Upload'];
 }>;
@@ -319,26 +293,9 @@ export type ChannelsQuery = (
   )> }
 );
 
-<<<<<<< HEAD
-export type GetMessagesQueryVariables = Exact<{
-  channelID: Scalars['Int'];
-}>;
-
-
-export type GetMessagesQuery = (
-  { __typename?: 'Query' }
-  & { getMessages: Array<(
-    { __typename?: 'Message' }
-    & Pick<Message, 'message' | 'createdAt' | 'edited'>
-  )> }
-);
-
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
-=======
 export type MessagesQueryVariables = Exact<{
   channelId: Scalars['Int'];
 }>;
->>>>>>> upstream/master
 
 
 export type MessagesQuery = (
@@ -667,40 +624,6 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
-<<<<<<< HEAD
-export const SendMessageDocument = gql`
-    mutation SendMessage($message: String!, $channelID: Int!) {
-  sendMessage(message: $message, channelID: $channelID)
-}
-    `;
-export type SendMessageMutationFn = Apollo.MutationFunction<SendMessageMutation, SendMessageMutationVariables>;
-
-/**
- * __useSendMessageMutation__
- *
- * To run a mutation, you first call `useSendMessageMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSendMessageMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [sendMessageMutation, { data, loading, error }] = useSendMessageMutation({
- *   variables: {
- *      message: // value for 'message'
- *      channelID: // value for 'channelID'
- *   },
- * });
- */
-export function useSendMessageMutation(baseOptions?: Apollo.MutationHookOptions<SendMessageMutation, SendMessageMutationVariables>) {
-        return Apollo.useMutation<SendMessageMutation, SendMessageMutationVariables>(SendMessageDocument, baseOptions);
-      }
-export type SendMessageMutationHookResult = ReturnType<typeof useSendMessageMutation>;
-export type SendMessageMutationResult = Apollo.MutationResult<SendMessageMutation>;
-export type SendMessageMutationOptions = Apollo.BaseMutationOptions<SendMessageMutation, SendMessageMutationVariables>;
-=======
->>>>>>> upstream/master
 export const UpdateProfilePicDocument = gql`
     mutation UpdateProfilePic($file: Upload!) {
   updateProfilePic(file: $file)
@@ -764,53 +687,10 @@ export function useChannelsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<C
 export type ChannelsQueryHookResult = ReturnType<typeof useChannelsQuery>;
 export type ChannelsLazyQueryHookResult = ReturnType<typeof useChannelsLazyQuery>;
 export type ChannelsQueryResult = Apollo.QueryResult<ChannelsQuery, ChannelsQueryVariables>;
-<<<<<<< HEAD
-export const GetMessagesDocument = gql`
-    query GetMessages($channelID: Int!) {
-  getMessages(channelID: $channelID) {
-    message
-    createdAt
-    edited
-  }
-}
-    `;
-
-/**
- * __useGetMessagesQuery__
- *
- * To run a query within a React component, call `useGetMessagesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetMessagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetMessagesQuery({
- *   variables: {
- *      channelID: // value for 'channelID'
- *   },
- * });
- */
-export function useGetMessagesQuery(baseOptions: Apollo.QueryHookOptions<GetMessagesQuery, GetMessagesQueryVariables>) {
-        return Apollo.useQuery<GetMessagesQuery, GetMessagesQueryVariables>(GetMessagesDocument, baseOptions);
-      }
-export function useGetMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMessagesQuery, GetMessagesQueryVariables>) {
-          return Apollo.useLazyQuery<GetMessagesQuery, GetMessagesQueryVariables>(GetMessagesDocument, baseOptions);
-        }
-export type GetMessagesQueryHookResult = ReturnType<typeof useGetMessagesQuery>;
-export type GetMessagesLazyQueryHookResult = ReturnType<typeof useGetMessagesLazyQuery>;
-export type GetMessagesQueryResult = Apollo.QueryResult<GetMessagesQuery, GetMessagesQueryVariables>;
-export const MeDocument = gql`
-    query Me {
-  me {
-    id
-    username
-=======
 export const MessagesDocument = gql`
     query Messages($channelId: Int!) {
   messages(channelId: $channelId) {
     ...RegularMessage
->>>>>>> upstream/master
   }
 }
     ${RegularMessageFragmentDoc}`;

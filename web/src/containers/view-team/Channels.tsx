@@ -60,6 +60,8 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
             <Flex>
                 <Title>Text Channels</Title>
 
+                
+
                 <Box 
                     onClick = {() => {
                         setIsOpen(true);
