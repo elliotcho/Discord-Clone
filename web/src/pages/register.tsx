@@ -1,49 +1,16 @@
 import React from 'react';
-import styled from 'styled-components';
 import { Form, Formik } from 'formik';
 import { useRegisterMutation } from '../generated/graphql';
 import { withApollo } from '../utils/withApollo'; 
+import { toErrorMap } from '../utils/toErrorMap';
 import AuthWrapper from '../containers/shared/AuthWrapper';
 import Layout from '../containers/shared/Layout';
+import FormContainer from '../containers/auth/FormContainer';
+import InputField from '../components/auth/InputField';
+import ErrorText from '../components/auth/ErrorText';
+import Button from '../components/auth/Button';
+import Title from '../components/auth/Title';
 import { useRouter } from 'next/router';
-
-const Container = styled.div`
-    width: 40%;
-    margin: 60px auto;
-    padding: 1.2rem;
-    background: #709fb0;
-    border: 3px outset #91091e;
-    border-radius: 16px;
-    text-align: center;
-    font-family: 'Caveat', cursive;
-    font-size: 23px;
-    word-spacing: 2px;
-    color: #000000;
-`;
-
-const Input = styled.input`
-    display: block;
-    width: 70%;
-    margin: 5px auto;
-    font-size: 17px;
-    font-family: 'Shadows Into Light', cursive;
-    font-weight: 900;
-    letter-spacing: 3px;
-    border-radius: 10px;
-    outline: none;
-`;
-
-const Button = styled.button`
-    width: 40%;
-    padding: 1%;
-    margin: 14px auto 4px;
-    font-size: 20px;
-    font-family: 'Permanent Marker', cursive;
-    letter-spacing: 3px;
-    background: #5aa469;
-    border-radius: 19px;
-    outline: none;
-`;
 
 const Register: React.FC<{}> = () => {
     const router = useRouter();
@@ -54,23 +21,31 @@ const Register: React.FC<{}> = () => {
             <Layout>
                 <Formik
                     initialValues = {{ username: '', password: '', email: '' }}
-                    onSubmit = {async (values) => {
+                    onSubmit = {async (values, { setErrors }) => {
                         const { username, password, email } = values;
 
                         const response = await register({
                             variables: { username, password, email }
                         });
 
-                        if(response?.data?.register) {
+                        if(!response.data.register.user) {
+                            setErrors(toErrorMap(response.data.register.errors));
+                        } else {
                             router.push('/profile');
                         }
                     }}
                 >
-                    {({ values, handleChange }) => (
-                        <Form>
-                            <Container>
-                                <h1>Sign up</h1>
-                                <Input
+                    {({ values, handleChange, errors }) => (
+                        <FormContainer
+                            borderColor = '#91091e'
+                            bg = '#709fb0'
+                        >
+                            <Form>
+                                <Title>
+                                    Sign up
+                                </Title>
+                                
+                                <InputField
                                     type = 'text'
                                     placeholder = 'Email'
                                     onChange = {handleChange}
@@ -78,7 +53,7 @@ const Register: React.FC<{}> = () => {
                                     name = 'email'
                                 />
 
-                                <Input
+                                <InputField
                                     type = 'text'
                                     placeholder = 'Username'
                                     onChange = {handleChange}
@@ -86,7 +61,7 @@ const Register: React.FC<{}> = () => {
                                     name = 'username'
                                 />
 
-                                <Input
+                                <InputField
                                     type = 'password'
                                     placeholder = 'Password'
                                     onChange = {handleChange}
@@ -94,11 +69,17 @@ const Register: React.FC<{}> = () => {
                                     name = 'password'
                                 />
 
-                                <Button type='submit'>
+                                <Button bg='#5aa469'>
                                     Register
                                 </Button>
-                            </Container>
-                        </Form>
+
+                                {Object.keys(errors).map(key => 
+                                    <ErrorText>
+                                        {`${key} error: ${errors[key]}`}
+                                    </ErrorText>
+                                )}
+                            </Form>
+                        </FormContainer>
                     )}
                 </Formik>
             </Layout>
