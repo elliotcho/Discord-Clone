@@ -1,7 +1,7 @@
-import { setUncaughtExceptionCaptureCallback } from 'node:process';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { MessagesDocument, useSendMessageMutation } from '../../generated/graphql';
+import { handleEnterPress } from '../../utils/handleEnterPress';
 
 const Container = styled.div`
     display: grid;
@@ -56,7 +56,9 @@ const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
                 placeholder = 'Text Here'
                 onChange = {(e) => setText(e.target.value)}
                 onKeyDown = {async (e: any) => {
-                    if(e.keyCode === 13 && e.shiftKey === false) {
+                    const submit = handleEnterPress(e);
+
+                    if(submit) {
                         e.preventDefault();
 
                         await sendMessage({
@@ -65,19 +67,6 @@ const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
 
                         setText('');
                         return;
-                    }
-
-                    const { style } = e.target;
-
-                    setTimeout(() => {
-                        style.height = '';
-                        style.height = e.target.scrollHeight + 'px';
-                    }, 0);
-
-                    if(e.target.scrollHeight <= 200) {
-                        style.overflow = 'hidden';
-                    } else {
-                        style.overflow = 'auto';
                     }
                 }}
             />

@@ -4,7 +4,7 @@ import {
     MeDocument, 
     useMeQuery, 
     useUpdateProfilePicMutation,
-    useChangeUsernameMutation
+    useRemoveProfilePicMutation
 } from '../../generated/graphql';
 import NextLink from 'next/link';
 
@@ -23,6 +23,8 @@ const Image = styled.img`
     width: 6rem;
     height: 6rem;
 `;
+
+const Remove = styled.button``;
 
 const Edit = styled.div`
     margin-top: 60px;
@@ -94,15 +96,26 @@ const ProfileContainer: React.FC<{}> = () => {
         ]
     });
 
+    const [removePic] = useRemoveProfilePicMutation({
+        refetchQueries: [
+            { query: MeDocument }
+        ]
+    });
+
     let username = data?.me?.username || 'Loading...';
     let imgURL = data?.me?.profileURL;
-
-    const [newName] = useChangeUsernameMutation();
-
 
     return (
         <Container>
             <Image src={imgURL} alt='profile pic' />
+            
+            <Remove
+                onClick = {async () => {
+                    await removePic();
+                }}
+            >
+                X
+            </Remove>
 
             <Intro> Whagwan, {username}</Intro>
 

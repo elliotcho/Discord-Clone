@@ -42,7 +42,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ channelId }) => {
                 const { username } = m.user;
 
                 return (
-                    <Card>
+                    <Card key={m.id}>
                         <Header>{username}</Header>
 
                         <Body>

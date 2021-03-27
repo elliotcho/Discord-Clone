@@ -174,7 +174,7 @@ export type RegularChannelFragment = (
 
 export type RegularMessageFragment = (
   { __typename?: 'Message' }
-  & Pick<Message, 'text' | 'senderId' | 'createdAt' | 'channelId'>
+  & Pick<Message, 'id' | 'text' | 'senderId' | 'createdAt' | 'channelId'>
   & { user: (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'username'>
@@ -324,6 +324,14 @@ export type RegisterMutation = (
   ) }
 );
 
+export type RemoveProfilePicMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RemoveProfilePicMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'removeProfilePic'>
+);
+
 export type UpdateProfilePicMutationVariables = Exact<{
   file: Scalars['Upload'];
 }>;
@@ -403,6 +411,7 @@ export const RegularChannelFragmentDoc = gql`
     `;
 export const RegularMessageFragmentDoc = gql`
     fragment RegularMessage on Message {
+  id
   text
   senderId
   createdAt
@@ -760,6 +769,35 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const RemoveProfilePicDocument = gql`
+    mutation RemoveProfilePic {
+  removeProfilePic
+}
+    `;
+export type RemoveProfilePicMutationFn = Apollo.MutationFunction<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>;
+
+/**
+ * __useRemoveProfilePicMutation__
+ *
+ * To run a mutation, you first call `useRemoveProfilePicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveProfilePicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeProfilePicMutation, { data, loading, error }] = useRemoveProfilePicMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRemoveProfilePicMutation(baseOptions?: Apollo.MutationHookOptions<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>) {
+        return Apollo.useMutation<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>(RemoveProfilePicDocument, baseOptions);
+      }
+export type RemoveProfilePicMutationHookResult = ReturnType<typeof useRemoveProfilePicMutation>;
+export type RemoveProfilePicMutationResult = Apollo.MutationResult<RemoveProfilePicMutation>;
+export type RemoveProfilePicMutationOptions = Apollo.BaseMutationOptions<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>;
 export const UpdateProfilePicDocument = gql`
     mutation UpdateProfilePic($file: Upload!) {
   updateProfilePic(file: $file)
