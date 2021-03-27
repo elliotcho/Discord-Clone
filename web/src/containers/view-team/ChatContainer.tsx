@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useMessagesQuery } from '../../generated/graphql';
+import { useMessagesQuery, useDeleteMessageMutation } from '../../generated/graphql';
 
 const Container = styled.div`
     display: flex;
@@ -36,18 +36,25 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ channelId }) => {
         variables: { channelId }
     })
 
+    const [deleteMessage] = useDeleteMessageMutation();
+
     return (
         <Container>
             {data?.messages.map(m => {
                 const { username } = m.user;
 
                 return (
-                    <Card>
+                    <Card key={m.id}>
                         <Header>{username}</Header>
 
                         <Body>
                             {m.text}
                         </Body>
+                        <button onClick={ async () => {
+                            await deleteMessage({
+                                variables: {messageId: m.id}
+                            })
+                        }}>X</button>
                     </Card>
                 )
             })}

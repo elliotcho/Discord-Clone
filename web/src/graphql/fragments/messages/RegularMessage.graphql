@@ -1,4 +1,5 @@
 fragment RegularMessage on Message {
+    id
     text
     senderId
     createdAt

@@ -45,6 +45,7 @@ const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
         ]
     });
 
+
     return (
         <Container>
             <Button>

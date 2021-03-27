@@ -94,6 +94,7 @@ export type Mutation = {
   changeUsername: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
   sendMessage: Scalars['Boolean'];
+  deleteMessage: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
 };
@@ -145,6 +146,11 @@ export type MutationSendMessageArgs = {
 };
 
 
+export type MutationDeleteMessageArgs = {
+  messageId: Scalars['Int'];
+};
+
+
 export type MutationCreateChannelArgs = {
   teamId: Scalars['Int'];
   channelName: Scalars['String'];
@@ -175,7 +181,7 @@ export type RegularChannelFragment = (
 
 export type RegularMessageFragment = (
   { __typename?: 'Message' }
-  & Pick<Message, 'text' | 'senderId' | 'createdAt' | 'channelId'>
+  & Pick<Message, 'id' | 'text' | 'senderId' | 'createdAt' | 'channelId'>
   & { user: (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'username'>
@@ -241,6 +247,16 @@ export type DeleteChannelMutationVariables = Exact<{
 export type DeleteChannelMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteChannel'>
+);
+
+export type DeleteMessageMutationVariables = Exact<{
+  messageId: Scalars['Int'];
+}>;
+
+
+export type DeleteMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteMessage'>
 );
 
 export type SendMessageMutationVariables = Exact<{
@@ -390,6 +406,7 @@ export const RegularChannelFragmentDoc = gql`
     `;
 export const RegularMessageFragmentDoc = gql`
     fragment RegularMessage on Message {
+  id
   text
   senderId
   createdAt
@@ -527,6 +544,36 @@ export function useDeleteChannelMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannelMutation>;
 export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
 export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
+export const DeleteMessageDocument = gql`
+    mutation DeleteMessage($messageId: Int!) {
+  deleteMessage(messageId: $messageId)
+}
+    `;
+export type DeleteMessageMutationFn = Apollo.MutationFunction<DeleteMessageMutation, DeleteMessageMutationVariables>;
+
+/**
+ * __useDeleteMessageMutation__
+ *
+ * To run a mutation, you first call `useDeleteMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteMessageMutation, { data, loading, error }] = useDeleteMessageMutation({
+ *   variables: {
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useDeleteMessageMutation(baseOptions?: Apollo.MutationHookOptions<DeleteMessageMutation, DeleteMessageMutationVariables>) {
+        return Apollo.useMutation<DeleteMessageMutation, DeleteMessageMutationVariables>(DeleteMessageDocument, baseOptions);
+      }
+export type DeleteMessageMutationHookResult = ReturnType<typeof useDeleteMessageMutation>;
+export type DeleteMessageMutationResult = Apollo.MutationResult<DeleteMessageMutation>;
+export type DeleteMessageMutationOptions = Apollo.BaseMutationOptions<DeleteMessageMutation, DeleteMessageMutationVariables>;
 export const SendMessageDocument = gql`
     mutation SendMessage($text: String!, $channelId: Int!) {
   sendMessage(text: $text, channelId: $channelId)
