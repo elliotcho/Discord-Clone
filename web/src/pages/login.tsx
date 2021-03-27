@@ -44,7 +44,7 @@ const Button = styled.button`
 
 
 const Login : React.FC<{}> = () => {
-    const [login] = useLoginMutation();
+    const [login] = useLoginMutation(); //name of func
    
     return(
         <Formik
