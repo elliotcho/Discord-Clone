@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import { withApollo } from '../../utils/withApollo';
 import { useTeamQuery } from '../../generated/graphql';
 import Teams from '../../components/shared/Teams';
-import Channels from '../../components/view-team/Channels';
+import Channels from '../../containers/view-team/Channels';
 import ChatHeader from '../../components/view-team/ChatHeader';
-import ChatContainer from '../../components/view-team/ChatContainer';
+import ChatContainer from '../../containers/view-team/ChatContainer';
 import SendMessage from '../../components/view-team/SendMessage';
-import AuthWrapper from '../../components/shared/AuthWrapper';
+import AuthWrapper from '../../containers/shared/AuthWrapper';
 import { useRouter } from 'next/router';
 
 const Container = styled.div`

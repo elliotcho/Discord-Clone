@@ -14,10 +14,17 @@ const Container = styled.div`
 `;
 
 const Card = styled.div`
-    width: 100%;
-    min-height: 140px;
-    background: #737373;
+    color: white;
     border: 1px solid gray;
+    background: #737373;
+    padding: 12px;
+    width: 100%;
+`;
+
+const Header = styled.h2``;
+
+const Body = styled.div`
+    font-size: 1.4rem;
 `;
 
 interface ChatContainerProps {
@@ -31,11 +38,19 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ channelId }) => {
 
     return (
         <Container>
-            {data?.messages.map(m => (
-                <Card>
-                    {m.text}
-                </Card>
-            ))}
+            {data?.messages.map(m => {
+                const { username } = m.user;
+
+                return (
+                    <Card>
+                        <Header>{username}</Header>
+
+                        <Body>
+                            {m.text}
+                        </Body>
+                    </Card>
+                )
+            })}
         </Container>
     )
 }

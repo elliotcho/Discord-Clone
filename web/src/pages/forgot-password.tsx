@@ -3,11 +3,12 @@ import styled from 'styled-components';
 import { Form, Formik } from 'formik';
 import { useForgotPasswordMutation } from '../generated/graphql'
 import { withApollo } from '../utils/withApollo';
-import AuthWrapper from '../components/shared/AuthWrapper';
+import AuthWrapper from '../containers/shared/AuthWrapper';
+import Layout from '../containers/shared/Layout';
 
 const Container = styled.div`
     width: 50%;
-    margin: 11% auto;
+    margin: 60px auto;
     padding: 1.2rem;
     background: #ffc478;
     border: 3px outset #d8c292;
@@ -47,34 +48,36 @@ const ForgotPassword: React.FC<{}> = () => {
 
     return(
         <AuthWrapper>
-            <Formik
-                initialValues = {{ email: '' }}
-                onSubmit = {async (values) => {
-                    const { email } = values;
+            <Layout>
+                <Formik
+                    initialValues = {{ email: '' }}
+                    onSubmit = {async (values) => {
+                        const { email } = values;
 
-                    const response = await forgotPassword({
-                        variables: { email }
-                    })
+                        const response = await forgotPassword({
+                            variables: { email }
+                        })
 
-                    console.log(response);
-                }}
-            >
-                {({ values, handleChange }) => (
-                    <Form>
-                        <Container>
-                            <h1>We'll send you an email to reset your password!</h1>
-                            <Input 
-                                type='email'
-                                placeholder='email'
-                                onChange= {handleChange}
-                                value= {values.email}
-                                name='email'
-                            />
-                            <Button type='submit'> Send</Button>
-                        </Container>
-                    </Form>
-                )}
-            </Formik>
+                        console.log(response);
+                    }}
+                >
+                    {({ values, handleChange }) => (
+                        <Form>
+                            <Container>
+                                <h1>We'll send you an email to reset your password!</h1>
+                                <Input 
+                                    type='email'
+                                    placeholder='email'
+                                    onChange= {handleChange}
+                                    value= {values.email}
+                                    name='email'
+                                />
+                                <Button type='submit'> Send</Button>
+                            </Container>
+                        </Form>
+                    )}
+                </Formik>
+            </Layout>
         </AuthWrapper>
     )
 }

@@ -1,0 +1,10 @@
+fragment RegularMessage on Message {
+    text
+    senderId
+    createdAt
+    channelId
+    user {
+        id
+        username
+    }
+}

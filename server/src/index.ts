@@ -33,6 +33,7 @@ const main = async () => {
     const schema = await createSchema();
 
     const apolloServer = new ApolloServer({
+        uploads: { maxFileSize: 10000000, maxFiles: 10 },
         context: ({ req, res }) => ({ req, res, redis }),
         schema
     });
