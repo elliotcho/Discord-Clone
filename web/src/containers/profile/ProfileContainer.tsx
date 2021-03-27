@@ -6,6 +6,7 @@ import {
     useUpdateProfilePicMutation,
     useChangeUsernameMutation
 } from '../../generated/graphql';
+import NextLink from 'next/link';
 
 const Container = styled.div`
     background: #222831;
@@ -63,6 +64,7 @@ const ChangePassword = styled.form`
     border: solid 2px #070d59;
     background: #34626c;
     font-family: 'Nunito', sans-serif;
+    cursor: pointer;
 `;
 
 const Label = styled.label`
@@ -148,11 +150,11 @@ const ProfileContainer: React.FC<{}> = () => {
                     <Button type='submit'>✔️</Button>
                 </ChangeEmail>
                     
-                <ChangePassword>
-                    <Label htmlFor='password'>Change Password</Label>
-                    <Input type='password' id='password' name='password' />
-                    <Button type='submit'>✔️</Button>
-                </ChangePassword>
+                <NextLink href='/forgot-password'>
+                    <ChangePassword>
+                        Change Password
+                    </ChangePassword>
+                </NextLink>
             </Edit>
         </Container>
     )

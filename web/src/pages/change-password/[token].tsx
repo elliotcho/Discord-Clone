@@ -19,65 +19,63 @@ const ChangePassword: React.FC<{}> = () => {
     const [changePassword] = useChangePasswordMutation();
 
     return (
-        <AuthWrapper>
-            <Layout>
-                <Formik
-                    initialValues = {{ newPassword: '' }}
-                    onSubmit = {async ({ newPassword }, { setErrors }) => {
-                        const response = await changePassword({
-                            variables: {
-                                token: typeof token === 'string'? token: '',
-                                newPassword
-                            },
-                            update: (cache, { data }) => {
-                                cache.writeQuery<MeQuery>({
-                                    query: MeDocument,
-                                    data: {
-                                        __typename: 'Query',
-                                        me: data?.changePassword.user
-                                    }
-                                });
-                            }
-                        });
-
-                        if(!response.data.changePassword.user) {
-                            setErrors(toErrorMap(response.data.changePassword.errors));
-                        } else {
-                            router.push('/profile');
+        <Layout>
+            <Formik
+                initialValues = {{ newPassword: '' }}
+                onSubmit = {async ({ newPassword }, { setErrors }) => {
+                    const response = await changePassword({
+                        variables: {
+                            token: typeof token === 'string'? token: '',
+                            newPassword
+                        },
+                        update: (cache, { data }) => {
+                            cache.writeQuery<MeQuery>({
+                                query: MeDocument,
+                                data: {
+                                    __typename: 'Query',
+                                    me: data?.changePassword.user
+                                }
+                            });
                         }
-                    }}
-                >
-                    {({ values, handleChange, errors }) => (
-                        <FormContainer
-                            borderColor = 'lightgreen'
-                            bg = 'turquoise'
-                        >
-                            <Form>
-                                <Title>Enter new password</Title>
+                    });
 
-                                <InputField
-                                    type = 'password'
-                                    placeholder = 'New password'
-                                    onChange = {handleChange}
-                                    value = {values.newPassword}
-                                    name = 'newPassword'
-                                />
+                    if(!response.data.changePassword.user) {
+                        setErrors(toErrorMap(response.data.changePassword.errors));
+                    } else {
+                        router.push('/profile');
+                    }
+                }}
+            >
+                {({ values, handleChange, errors }) => (
+                    <FormContainer
+                        borderColor = 'lightgreen'
+                        bg = 'turquoise'
+                    >
+                        <Form>
+                            <Title>Enter new password</Title>
 
-                                <Button bg='#99bbad'>
-                                    Submit
-                                </Button>
+                            <InputField
+                                type = 'password'
+                                placeholder = 'New password'
+                                onChange = {handleChange}
+                                value = {values.newPassword}
+                                name = 'newPassword'
+                            />
 
-                                {Object.keys(errors).map(key =>
-                                    <ErrorText>
-                                        {`${key} error: ${errors[key]}`}
-                                    </ErrorText>
-                                )}
-                            </Form>
-                        </FormContainer>
-                    )}
-                </Formik>
-            </Layout>
-        </AuthWrapper>
+                            <Button bg='#99bbad'>
+                                Submit
+                            </Button>
+
+                            {Object.keys(errors).map(key =>
+                                <ErrorText>
+                                    {`${key} error: ${errors[key]}`}
+                                </ErrorText>
+                            )}
+                        </Form>
+                    </FormContainer>
+                )}
+            </Formik>
+        </Layout>
     )
 }
 

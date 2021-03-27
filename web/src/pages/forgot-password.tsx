@@ -14,51 +14,49 @@ const ForgotPassword: React.FC<{}> = () => {
     const [forgotPassword] = useForgotPasswordMutation();
 
     return(
-        <AuthWrapper>
-            <Layout>
-                <Formik
-                    initialValues = {{ email: '' }}
-                    onSubmit = {async ({ email }, { setValues }) => {
-                        setIsLoading(true);
+        <Layout>
+            <Formik
+                initialValues = {{ email: '' }}
+                onSubmit = {async ({ email }, { setValues }) => {
+                    setIsLoading(true);
 
-                        await forgotPassword({
-                            variables: { email }
-                        });
+                    await forgotPassword({
+                        variables: { email }
+                    });
 
-                        setValues({ email: '' });
-                        setIsLoading(false);
-                    }}
-                >
-                    {({ values, handleChange }) => (
-                        <FormContainer
-                            borderColor = '#d8c292'
-                            bg = '#ffc478'
-                        >
-                            <Form>
-                                <Title>
-                                    We'll send you an email to reset your password!
-                                </Title>
-                                
-                                <InputField 
-                                    type='email'
-                                    placeholder='email'
-                                    onChange= {handleChange}
-                                    value= {values.email}
-                                    name='email'
-                                />
+                    setValues({ email: '' });
+                    setIsLoading(false);
+                }}
+            >
+                {({ values, handleChange }) => (
+                    <FormContainer
+                        borderColor = '#d8c292'
+                        bg = '#ffc478'
+                    >
+                        <Form>
+                            <Title>
+                                We'll send you an email to reset your password!
+                            </Title>
+                            
+                            <InputField 
+                                type='email'
+                                placeholder='email'
+                                onChange= {handleChange}
+                                value= {values.email}
+                                name='email'
+                            />
 
-                                <Button 
-                                    isLoading={isLoading}
-                                    bg='#94b5c0' 
-                                > 
-                                    Send
-                                </Button>
-                            </Form>
-                        </FormContainer>
-                    )}
-                </Formik>
-            </Layout>
-        </AuthWrapper>
+                            <Button 
+                                isLoading={isLoading}
+                                bg='#94b5c0' 
+                            > 
+                                Send
+                            </Button>
+                        </Form>
+                    </FormContainer>
+                )}
+            </Formik>
+        </Layout>
     )
 }
 
