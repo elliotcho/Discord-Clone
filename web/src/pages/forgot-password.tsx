@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Formik } from 'formik';
 import { useForgotPasswordMutation } from '../generated/graphql'
 import { withApollo } from '../utils/withApollo';
@@ -10,6 +10,7 @@ import Button from '../components/auth/Button';
 import Title from '../components/auth/Title';
 
 const ForgotPassword: React.FC<{}> = () => {
+    const [isLoading, setIsLoading] = useState(false);
     const [forgotPassword] = useForgotPasswordMutation();
 
     return(
@@ -17,14 +18,15 @@ const ForgotPassword: React.FC<{}> = () => {
             <Layout>
                 <Formik
                     initialValues = {{ email: '' }}
-                    onSubmit = {async (values) => {
-                        const { email } = values;
+                    onSubmit = {async ({ email }, { setValues }) => {
+                        setIsLoading(true);
 
-                        const response = await forgotPassword({
+                        await forgotPassword({
                             variables: { email }
-                        })
+                        });
 
-                        console.log(response);
+                        setValues({ email: '' });
+                        setIsLoading(false);
                     }}
                 >
                     {({ values, handleChange }) => (
@@ -45,7 +47,10 @@ const ForgotPassword: React.FC<{}> = () => {
                                     name='email'
                                 />
 
-                                <Button bg='#94b5c0'> 
+                                <Button 
+                                    isLoading={isLoading}
+                                    bg='#94b5c0' 
+                                > 
                                     Send
                                 </Button>
                             </Form>

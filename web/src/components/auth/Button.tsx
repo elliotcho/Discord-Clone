@@ -18,15 +18,23 @@ const Button = styled.button`
 `;
 
 interface ButtonProps {
+    isLoading?: boolean;
     bg: string;
 }
 
-const Index: React.FC<ButtonProps> = ({ children, bg }) => {
+const Index: React.FC<ButtonProps> = ({ children, isLoading, bg }) => {
+    let type: 'submit' | 'button' | 'reset';
     const style = { background: bg };
 
+    if(isLoading) {
+        type = 'button';
+    } else {
+        type = 'submit';
+    }
+
     return (
-        <Button type='submit' style={style}>
-            {children}
+        <Button type={type} style={style}>
+            {isLoading? 'Loading...': children}
         </Button>
     )
 }
