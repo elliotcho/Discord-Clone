@@ -59,8 +59,16 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
         <Container>
             <Flex>
                 <Title>Text Channels</Title>
-
-                
+                <Box onClick = {() =>{
+                    invite
+                }}>
+                    invite
+                </Box>
+                <Box onClick = {() =>{
+                    
+                }}>
+                    x
+                </Box>
 
                 <Box 
                     onClick = {() => {
