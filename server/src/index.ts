@@ -1,12 +1,7 @@
 import 'reflect-metadata';
 import 'dotenv/config';
-import { createConnection } from 'typeorm';
 import { createSchema } from './utils/createSchema';
-import { Message } from './entities/Message';
-import { Member } from './entities/Member';
-import { Channel } from './entities/Channel';
-import { Team } from './entities/Team';
-import { User } from './entities/User';
+import { createDbConnection } from './utils/createDbConnection';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import Redis from 'ioredis';
@@ -17,19 +12,7 @@ import path from 'path';
 import cors from 'cors';
 
 const main = async () => {
-    await createConnection({
-        type: 'postgres',
-        url: process.env.DB_URL,
-        synchronize: true,
-        logging: false,
-        entities: [
-            User,
-            Member,
-            Message,
-            Channel,
-            Team
-        ] 
-    });
+    await createDbConnection();
 
     const app = express();
     const RedisStore = connectRedis(session);
@@ -87,7 +70,7 @@ const main = async () => {
 
     const port = process.env.PORT;
 
-    app.listen(port, () => {
+    httpServer.listen(port, () => {
         console.log(`listening to port ${port}`);
     });
 }

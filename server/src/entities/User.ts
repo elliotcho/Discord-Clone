@@ -8,7 +8,6 @@ import {
     UpdateDateColumn
 } from "typeorm";
 
-
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {

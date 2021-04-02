@@ -87,18 +87,20 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                         <Channel style={style}>
                             # {c.name}
                            
-                            <Options
-                                onClick = {async () => {
-                                    await deleteChannel({
-                                        variables: { channelId },
-                                        update: (cache) => {
-                                            cache.evict({ fieldName: 'channels' });
-                                        }
-                                    })
-                                }}
-                            >
-                                X
-                            </Options>
+                           {data?.channels.length > 1 && (
+                                <Options
+                                    onClick = {async () => {
+                                        await deleteChannel({
+                                            variables: { channelId },
+                                            update: (cache) => {
+                                                cache.evict({ fieldName: 'channels' });
+                                            }
+                                        })
+                                    }}
+                                >
+                                    X
+                                </Options>
+                           )}
                         </Channel> 
                     </NextLink>
                 )   

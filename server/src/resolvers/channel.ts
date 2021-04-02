@@ -38,7 +38,6 @@ export class ChannelResolver {
     async deleteChannel(
         @Arg('channelId', () => Int) channelId: number
     ) : Promise<Boolean> {
-        
         await getConnection().query(
             `
                 delete from channel where
@@ -50,5 +49,11 @@ export class ChannelResolver {
         return true;
     }
 
+    @Query(() => Channel)
+    async channel(
+        @Arg('channelId', () => Int) channelId: number
+    ): Promise<Channel | undefined> {
+        const channel = await Channel.findOne(channelId);
+        return channel;
+    }
 }
-

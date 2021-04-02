@@ -48,6 +48,22 @@ export class UserResolver {
         return `${process.env.SERVER_URL}/images/default.png`;
     }
 
+    @Query(() => [User])
+    async searchResults(
+        @Arg('query') query: string
+    ) : Promise<User[]> {
+        let pattern = query.toLowerCase();
+
+        const users = await getConnection().query(
+            `
+                select * from "user" as u where
+                LOWER(u.username) LIKE '%${pattern}%'
+            `
+        );
+
+        return users;
+    }
+
     @Query(() => User)
     async me(
         @Ctx() { req } : MyContext
