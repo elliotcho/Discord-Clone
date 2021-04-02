@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useMeQuery } from '../../generated/graphql';
+import { isServer } from '../../utils/isServer';
 import NextLink from 'next/link';
 
 const Container = styled.div`
@@ -24,16 +26,40 @@ const Link = styled.span`
 `;
 
 const Navbar: React.FC<{}> = () => {
+    const { data, loading } = useMeQuery({
+        skip: isServer()
+    });
+
+    let body: any;
+
+    if(!loading) {
+        if(!data?.me) {
+            body = (
+                <>
+                    <NextLink href='/login'>
+                        <Link>Login</Link>
+                    </NextLink>
+
+                    <NextLink href='/register'>
+                        <Link>Register</Link>
+                    </NextLink>
+                </>
+            );
+        } else {
+            body = (
+                <>
+                    <NextLink href='/profile'>
+                        <Link>Profile</Link>
+                    </NextLink>
+                </>
+            )
+        }
+    }
+
     return (
         <Container>
             <Box>
-                <NextLink href='/login'>
-                    <Link>Login</Link>
-                </NextLink>
-
-                <NextLink href='/register'>
-                    <Link>Register</Link>
-                </NextLink>
+                {body}
             </Box>
         </Container>
     )

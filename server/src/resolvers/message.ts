@@ -55,4 +55,20 @@ export class MessageResolver {
 
         return messages;
     }
+
+    @Mutation(() => Boolean)
+    async deleteMessage(
+        @Arg('messageId', () => Int) messageId: number
+    ) : Promise<Boolean> {
+
+        await getConnection().query(
+            `
+                delete from message
+                where message.id = $1
+            `, 
+            [messageId]
+        )
+
+        return true; 
+    }
 }

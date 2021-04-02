@@ -95,10 +95,12 @@ export type Mutation = {
   updateProfilePic: Scalars['Boolean'];
   login: UserResponse;
   register: UserResponse;
-  changePassword: Scalars['Boolean'];
+  changePassword: UserResponse;
   forgotPassword: Scalars['Boolean'];
+  changeUsername: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
   sendMessage: Scalars['Boolean'];
+  deleteMessage: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
 };
@@ -123,14 +125,18 @@ export type MutationRegisterArgs = {
 
 
 export type MutationChangePasswordArgs = {
-  username: Scalars['String'];
   newPassword: Scalars['String'];
-  currentPassword: Scalars['String'];
+  token: Scalars['String'];
 };
 
 
 export type MutationForgotPasswordArgs = {
   email: Scalars['String'];
+};
+
+
+export type MutationChangeUsernameArgs = {
+  username: Scalars['String'];
 };
 
 
@@ -142,6 +148,11 @@ export type MutationCreateTeamArgs = {
 export type MutationSendMessageArgs = {
   channelId: Scalars['Int'];
   text: Scalars['String'];
+};
+
+
+export type MutationDeleteMessageArgs = {
+  messageId: Scalars['Int'];
 };
 
 
@@ -175,7 +186,7 @@ export type RegularChannelFragment = (
 
 export type RegularMessageFragment = (
   { __typename?: 'Message' }
-  & Pick<Message, 'text' | 'senderId' | 'createdAt' | 'channelId'>
+  & Pick<Message, 'id' | 'text' | 'senderId' | 'createdAt' | 'channelId'>
   & { user: (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'username'>
@@ -233,6 +244,16 @@ export type DeleteChannelMutation = (
   & Pick<Mutation, 'deleteChannel'>
 );
 
+export type DeleteMessageMutationVariables = Exact<{
+  messageId: Scalars['Int'];
+}>;
+
+
+export type DeleteMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteMessage'>
+);
+
 export type SendMessageMutationVariables = Exact<{
   text: Scalars['String'];
   channelId: Scalars['Int'];
@@ -252,6 +273,30 @@ export type CreateTeamMutationVariables = Exact<{
 export type CreateTeamMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'createTeam'>
+);
+
+export type ChangePasswordMutationVariables = Exact<{
+  token: Scalars['String'];
+  newPassword: Scalars['String'];
+}>;
+
+
+export type ChangePasswordMutation = (
+  { __typename?: 'Mutation' }
+  & { changePassword: (
+    { __typename?: 'UserResponse' }
+    & RegularUserResponseFragment
+  ) }
+);
+
+export type ChangeUsernameMutationVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type ChangeUsernameMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changeUsername'>
 );
 
 export type ForgotPasswordMutationVariables = Exact<{
@@ -299,6 +344,14 @@ export type RegisterMutation = (
     { __typename?: 'UserResponse' }
     & RegularUserResponseFragment
   ) }
+);
+
+export type RemoveProfilePicMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RemoveProfilePicMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'removeProfilePic'>
 );
 
 export type UpdateProfilePicMutationVariables = Exact<{
@@ -380,6 +433,7 @@ export const RegularChannelFragmentDoc = gql`
     `;
 export const RegularMessageFragmentDoc = gql`
     fragment RegularMessage on Message {
+  id
   text
   senderId
   createdAt
@@ -487,6 +541,36 @@ export function useDeleteChannelMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannelMutation>;
 export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
 export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
+export const DeleteMessageDocument = gql`
+    mutation DeleteMessage($messageId: Int!) {
+  deleteMessage(messageId: $messageId)
+}
+    `;
+export type DeleteMessageMutationFn = Apollo.MutationFunction<DeleteMessageMutation, DeleteMessageMutationVariables>;
+
+/**
+ * __useDeleteMessageMutation__
+ *
+ * To run a mutation, you first call `useDeleteMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteMessageMutation, { data, loading, error }] = useDeleteMessageMutation({
+ *   variables: {
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useDeleteMessageMutation(baseOptions?: Apollo.MutationHookOptions<DeleteMessageMutation, DeleteMessageMutationVariables>) {
+        return Apollo.useMutation<DeleteMessageMutation, DeleteMessageMutationVariables>(DeleteMessageDocument, baseOptions);
+      }
+export type DeleteMessageMutationHookResult = ReturnType<typeof useDeleteMessageMutation>;
+export type DeleteMessageMutationResult = Apollo.MutationResult<DeleteMessageMutation>;
+export type DeleteMessageMutationOptions = Apollo.BaseMutationOptions<DeleteMessageMutation, DeleteMessageMutationVariables>;
 export const SendMessageDocument = gql`
     mutation SendMessage($text: String!, $channelId: Int!) {
   sendMessage(text: $text, channelId: $channelId)
@@ -548,6 +632,69 @@ export function useCreateTeamMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateTeamMutationHookResult = ReturnType<typeof useCreateTeamMutation>;
 export type CreateTeamMutationResult = Apollo.MutationResult<CreateTeamMutation>;
 export type CreateTeamMutationOptions = Apollo.BaseMutationOptions<CreateTeamMutation, CreateTeamMutationVariables>;
+export const ChangePasswordDocument = gql`
+    mutation ChangePassword($token: String!, $newPassword: String!) {
+  changePassword(token: $token, newPassword: $newPassword) {
+    ...RegularUserResponse
+  }
+}
+    ${RegularUserResponseFragmentDoc}`;
+export type ChangePasswordMutationFn = Apollo.MutationFunction<ChangePasswordMutation, ChangePasswordMutationVariables>;
+
+/**
+ * __useChangePasswordMutation__
+ *
+ * To run a mutation, you first call `useChangePasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangePasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changePasswordMutation, { data, loading, error }] = useChangePasswordMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *      newPassword: // value for 'newPassword'
+ *   },
+ * });
+ */
+export function useChangePasswordMutation(baseOptions?: Apollo.MutationHookOptions<ChangePasswordMutation, ChangePasswordMutationVariables>) {
+        return Apollo.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument, baseOptions);
+      }
+export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
+export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
+export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
+export const ChangeUsernameDocument = gql`
+    mutation ChangeUsername($username: String!) {
+  changeUsername(username: $username)
+}
+    `;
+export type ChangeUsernameMutationFn = Apollo.MutationFunction<ChangeUsernameMutation, ChangeUsernameMutationVariables>;
+
+/**
+ * __useChangeUsernameMutation__
+ *
+ * To run a mutation, you first call `useChangeUsernameMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeUsernameMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeUsernameMutation, { data, loading, error }] = useChangeUsernameMutation({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useChangeUsernameMutation(baseOptions?: Apollo.MutationHookOptions<ChangeUsernameMutation, ChangeUsernameMutationVariables>) {
+        return Apollo.useMutation<ChangeUsernameMutation, ChangeUsernameMutationVariables>(ChangeUsernameDocument, baseOptions);
+      }
+export type ChangeUsernameMutationHookResult = ReturnType<typeof useChangeUsernameMutation>;
+export type ChangeUsernameMutationResult = Apollo.MutationResult<ChangeUsernameMutation>;
+export type ChangeUsernameMutationOptions = Apollo.BaseMutationOptions<ChangeUsernameMutation, ChangeUsernameMutationVariables>;
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
   forgotPassword(email: $email)
@@ -674,6 +821,35 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const RemoveProfilePicDocument = gql`
+    mutation RemoveProfilePic {
+  removeProfilePic
+}
+    `;
+export type RemoveProfilePicMutationFn = Apollo.MutationFunction<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>;
+
+/**
+ * __useRemoveProfilePicMutation__
+ *
+ * To run a mutation, you first call `useRemoveProfilePicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveProfilePicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeProfilePicMutation, { data, loading, error }] = useRemoveProfilePicMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRemoveProfilePicMutation(baseOptions?: Apollo.MutationHookOptions<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>) {
+        return Apollo.useMutation<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>(RemoveProfilePicDocument, baseOptions);
+      }
+export type RemoveProfilePicMutationHookResult = ReturnType<typeof useRemoveProfilePicMutation>;
+export type RemoveProfilePicMutationResult = Apollo.MutationResult<RemoveProfilePicMutation>;
+export type RemoveProfilePicMutationOptions = Apollo.BaseMutationOptions<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>;
 export const UpdateProfilePicDocument = gql`
     mutation UpdateProfilePic($file: Upload!) {
   updateProfilePic(file: $file)

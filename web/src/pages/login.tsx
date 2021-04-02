@@ -3,51 +3,20 @@ import styled from 'styled-components';
 import { Form, Formik } from 'formik';
 import { useLoginMutation } from '../generated/graphql';
 import { withApollo } from '../utils/withApollo';
+import { toErrorMap } from '../utils/toErrorMap';
 import AuthWrapper from '../containers/shared/AuthWrapper';
 import Layout from '../containers/shared/Layout';
+import FormContainer from '../containers/auth/FormContainer';
+import InputField from '../components/auth/InputField';
+import ErrorText from '../components/auth/ErrorText';
+import Button from '../components/auth/Button';
+import Title from '../components/auth/Title';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 
-const Container = styled.div`
-    width: 40%;
-    margin: 60px auto;
-    padding: 1.2rem;
-    background: #bd9354;
-    border: 3px outset #fb743e;
-    border-radius: 16px;
+const Link = styled.div`
+    margin-top: 20px;
     text-align: center;
-    font-family: 'Caveat', cursive;
-    font-size: 21px;
-    word-spacing: 2px;
-    color: #000000;
-`;
-
-const Input = styled.input`
-    display: block;
-    width: 70%;
-    margin: 5px auto;
-    font-size: 17px;
-    font-family: 'Shadows Into Light', cursive;
-    font-weight: 900;
-    letter-spacing: 3px;
-    border-radius: 10px;
-    outline: none;
-`;
-
-const Button = styled.button`
-    width: 40%;
-    padding: 1%;
-    margin: 14px auto 4px;
-    font-size: 20px;
-    font-family: 'Permanent Marker', cursive;
-    letter-spacing: 3px;
-    background: #99bbad;
-    border-radius: 19px;
-    cursor: pointer;
-    outline: none;
-`;
-
-const Link = styled.span`
     cursor: pointer;
     &:hover {
         text-decoration: underline;
@@ -63,24 +32,31 @@ const Login : React.FC<{}> = () => {
             <Layout>
                 <Formik
                     initialValues = {{ username: '', password: ''}}
-                    onSubmit = {async (values) => {
+                    onSubmit = {async (values, { setErrors }) => {
                         const { username, password } = values;
 
                         const response = await login({
                             variables: { username, password }
                         })
 
-                        if(response?.data?.login) {
+                        if(!response.data.login.user) {
+                            setErrors(toErrorMap(response.data.login.errors));
+                        } else {
                             router.push('/profile');
-                        }   
+                        }
                     }}
                 >
-                    {({ values, handleChange }) => (
-                        <Form>
-                            <Container>
-                                <h1>Sign in to get started</h1>
+                    {({ values, errors, handleChange }) => (
+                        <FormContainer
+                            borderColor = '#fb743e'
+                            bg = '#bd9354'
+                        >
+                            <Form>
+                                <Title>
+                                    Sign in to get started
+                                </Title>
                             
-                                <Input
+                                <InputField
                                     type='text'
                                     placeholder='username'
                                     onChange= {handleChange}
@@ -88,7 +64,7 @@ const Login : React.FC<{}> = () => {
                                     name='username'
                                 />
                             
-                                <Input 
+                                <InputField 
                                     type='password'
                                     placeholder='password'
                                     onChange= {handleChange}
@@ -96,17 +72,21 @@ const Login : React.FC<{}> = () => {
                                     name='password'
                                 />
                             
-                                <Button type='submit'>
+                                <Button bg='#99bbad'>
                                     Login
                                 </Button>    
                             
-                                <div style={{ marginTop: '20px' }}>
-                                    <NextLink href='forgot-password'>
-                                        <Link>Forgot password?</Link>
-                                    </NextLink> 
-                                </div>
-                            </Container>
-                        </Form>
+                                <NextLink href='forgot-password'>
+                                    <Link>Forgot password?</Link>
+                                </NextLink> 
+
+                                {Object.keys(errors).map(key => 
+                                    <ErrorText>
+                                        {`${key} error: ${errors[key]}`}
+                                    </ErrorText>
+                                )}
+                            </Form>
+                        </FormContainer>
                     )}  
                 </Formik>
             </Layout>

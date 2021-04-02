@@ -187,36 +187,40 @@ export class UserResolver {
         return { user };
     }
 
-    @Mutation(()=> Boolean)
+    @Mutation(()=> UserResponse)
     async changePassword(
-        @Arg('currentPassword') currPassword: string,
+        @Arg('token') token: string,
         @Arg('newPassword') newPassword: string,
-        @Arg('username') username: string
-    ): Promise<boolean>{
-        const user = await User.findOne({ where: { username } });
+        @Ctx() { req, redis } : MyContext
+    ): Promise<UserResponse>{
+        const uid = await redis.get(token);
+
+        if(!uid){
+            return {
+                errors: [{
+                    field: 'token',
+                    message: 'token expired'
+                }]
+            };
+        }
+
+        const user = await User.findOne(parseInt(uid));
+
 
         if(!user){
-            return false;
+            return {
+                errors: [{
+                    field: 'token',
+                    message: 'user no longer exists'
+                }]
+            };
         }
 
-        const comparePassword = await argon2.verify(user.password, currPassword);
+        await User.update({ id: user.id }, { password: await argon2.hash(newPassword) });
+        await redis.del(token);
 
-        if(!comparePassword){
-            return false;
-        }
-
-        const hashedNewPassword = await argon2.hash(newPassword);
-
-        await getConnection().query(
-            `
-            update "user" 
-            set password = $1
-            where username = $2
-            `,
-            [hashedNewPassword, username]
-        );
-
-        return true;
+        req.session.uid = user.id;
+        return { user };
     }
 
     @Mutation(() => Boolean)
@@ -238,5 +242,28 @@ export class UserResolver {
         await sendEmail(email, href);
 
         return true;
+    }
+
+    @Mutation(() => Boolean)
+    async changeUsername(
+        @Arg('username') username: string,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const user = await User.findOne({ where: { username }});
+
+        if(user){
+            return false;
+        }
+
+        await getConnection().query(
+            `
+                update 'user'
+                set username = $1
+                where id = $2
+            `,
+            [username, req.session.uid]
+        );
+        
+       return true;
     }
 }

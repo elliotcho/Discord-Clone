@@ -91,6 +91,12 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                     <NextLink key={c.id} href={route}>
                         <Channel style={style}>
                             # {c.name}
+                            <button onClick={async () => {
+                                await deleteChannel({
+                                    variables: {channelId}
+                                })}}>
+                                    X
+                            </button>
                         </Channel> 
                     </NextLink>
                 )   
