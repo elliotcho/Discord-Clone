@@ -19,12 +19,20 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
+  searchResults: Array<User>;
   me: User;
   team: Team;
   teams: Array<Team>;
   messages: Array<Message>;
   channels: Array<Channel>;
   channel: Channel;
+  friendRequests: Array<User>;
+  friends: Array<User>;
+};
+
+
+export type QuerySearchResultsArgs = {
+  query: Scalars['String'];
 };
 
 
@@ -45,6 +53,11 @@ export type QueryChannelsArgs = {
 
 export type QueryChannelArgs = {
   channelId: Scalars['Int'];
+};
+
+
+export type QueryFriendsArgs = {
+  userId: Scalars['Int'];
 };
 
 export type User = {
@@ -95,7 +108,7 @@ export type Mutation = {
   updateProfilePic: Scalars['Boolean'];
   login: UserResponse;
   register: UserResponse;
-  changePassword: Scalars['Boolean'];
+  changePassword: UserResponse;
   forgotPassword: Scalars['Boolean'];
   changeUsername: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
@@ -103,6 +116,11 @@ export type Mutation = {
   deleteMessage: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
+  removeFriend: Scalars['Boolean'];
+  acceptFriendRequest: Scalars['Boolean'];
+  cancelFriendRequest: Scalars['Boolean'];
+  declineFriendRequest: Scalars['Boolean'];
+  sendFriendRequest: Scalars['Boolean'];
 };
 
 
@@ -125,9 +143,8 @@ export type MutationRegisterArgs = {
 
 
 export type MutationChangePasswordArgs = {
-  username: Scalars['String'];
   newPassword: Scalars['String'];
-  currentPassword: Scalars['String'];
+  token: Scalars['String'];
 };
 
 
@@ -165,6 +182,31 @@ export type MutationCreateChannelArgs = {
 
 export type MutationDeleteChannelArgs = {
   channelId: Scalars['Int'];
+};
+
+
+export type MutationRemoveFriendArgs = {
+  friendId: Scalars['Int'];
+};
+
+
+export type MutationAcceptFriendRequestArgs = {
+  senderId: Scalars['Int'];
+};
+
+
+export type MutationCancelFriendRequestArgs = {
+  receiverId: Scalars['Int'];
+};
+
+
+export type MutationDeclineFriendRequestArgs = {
+  senderId: Scalars['Int'];
+};
+
+
+export type MutationSendFriendRequestArgs = {
+  receiverId: Scalars['Int'];
 };
 
 
@@ -224,16 +266,6 @@ export type RegularUserResponseFragment = (
   )>> }
 );
 
-export type ChangeUsernameMutationVariables = Exact<{
-  username: Scalars['String'];
-}>;
-
-
-export type ChangeUsernameMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'changeUsername'>
-);
-
 export type CreateChannelMutationVariables = Exact<{
   channelName: Scalars['String'];
   teamId: Scalars['Int'];
@@ -253,6 +285,56 @@ export type DeleteChannelMutationVariables = Exact<{
 export type DeleteChannelMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteChannel'>
+);
+
+export type AcceptFriendRequestMutationVariables = Exact<{
+  senderId: Scalars['Int'];
+}>;
+
+
+export type AcceptFriendRequestMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'acceptFriendRequest'>
+);
+
+export type CancelFriendRequestMutationVariables = Exact<{
+  receiverId: Scalars['Int'];
+}>;
+
+
+export type CancelFriendRequestMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'cancelFriendRequest'>
+);
+
+export type DeclineFriendRequestMutationVariables = Exact<{
+  senderId: Scalars['Int'];
+}>;
+
+
+export type DeclineFriendRequestMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'declineFriendRequest'>
+);
+
+export type RemoveFriendMutationVariables = Exact<{
+  friendId: Scalars['Int'];
+}>;
+
+
+export type RemoveFriendMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'removeFriend'>
+);
+
+export type SendFriendRequestMutationVariables = Exact<{
+  receiverId: Scalars['Int'];
+}>;
+
+
+export type SendFriendRequestMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'sendFriendRequest'>
 );
 
 export type DeleteMessageMutationVariables = Exact<{
@@ -284,6 +366,30 @@ export type CreateTeamMutationVariables = Exact<{
 export type CreateTeamMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'createTeam'>
+);
+
+export type ChangePasswordMutationVariables = Exact<{
+  token: Scalars['String'];
+  newPassword: Scalars['String'];
+}>;
+
+
+export type ChangePasswordMutation = (
+  { __typename?: 'Mutation' }
+  & { changePassword: (
+    { __typename?: 'UserResponse' }
+    & RegularUserResponseFragment
+  ) }
+);
+
+export type ChangeUsernameMutationVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type ChangeUsernameMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changeUsername'>
 );
 
 export type ForgotPasswordMutationVariables = Exact<{
@@ -333,6 +439,14 @@ export type RegisterMutation = (
   ) }
 );
 
+export type RemoveProfilePicMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RemoveProfilePicMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'removeProfilePic'>
+);
+
 export type UpdateProfilePicMutationVariables = Exact<{
   file: Scalars['Upload'];
 }>;
@@ -352,7 +466,7 @@ export type ChannelQuery = (
   { __typename?: 'Query' }
   & { channel: (
     { __typename?: 'Channel' }
-    & RegularChannelFragment
+    & Pick<Channel, 'name'>
   ) }
 );
 
@@ -366,6 +480,30 @@ export type ChannelsQuery = (
   & { channels: Array<(
     { __typename?: 'Channel' }
     & RegularChannelFragment
+  )> }
+);
+
+export type FriendRequestsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FriendRequestsQuery = (
+  { __typename?: 'Query' }
+  & { friendRequests: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
+);
+
+export type FriendsQueryVariables = Exact<{
+  userId: Scalars['Int'];
+}>;
+
+
+export type FriendsQuery = (
+  { __typename?: 'Query' }
+  & { friends: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
   )> }
 );
 
@@ -415,6 +553,19 @@ export type MeQuery = (
     { __typename?: 'User' }
     & RegularUserFragment
   ) }
+);
+
+export type SearchResultsQueryVariables = Exact<{
+  query: Scalars['String'];
+}>;
+
+
+export type SearchResultsQuery = (
+  { __typename?: 'Query' }
+  & { searchResults: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
 );
 
 export const RegularChannelFragmentDoc = gql`
@@ -472,36 +623,6 @@ export const RegularUserResponseFragmentDoc = gql`
 }
     ${RegularUserFragmentDoc}
 ${RegularErrorFragmentDoc}`;
-export const ChangeUsernameDocument = gql`
-    mutation ChangeUsername($username: String!) {
-  changeUsername(username: $username)
-}
-    `;
-export type ChangeUsernameMutationFn = Apollo.MutationFunction<ChangeUsernameMutation, ChangeUsernameMutationVariables>;
-
-/**
- * __useChangeUsernameMutation__
- *
- * To run a mutation, you first call `useChangeUsernameMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useChangeUsernameMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [changeUsernameMutation, { data, loading, error }] = useChangeUsernameMutation({
- *   variables: {
- *      username: // value for 'username'
- *   },
- * });
- */
-export function useChangeUsernameMutation(baseOptions?: Apollo.MutationHookOptions<ChangeUsernameMutation, ChangeUsernameMutationVariables>) {
-        return Apollo.useMutation<ChangeUsernameMutation, ChangeUsernameMutationVariables>(ChangeUsernameDocument, baseOptions);
-      }
-export type ChangeUsernameMutationHookResult = ReturnType<typeof useChangeUsernameMutation>;
-export type ChangeUsernameMutationResult = Apollo.MutationResult<ChangeUsernameMutation>;
-export type ChangeUsernameMutationOptions = Apollo.BaseMutationOptions<ChangeUsernameMutation, ChangeUsernameMutationVariables>;
 export const CreateChannelDocument = gql`
     mutation CreateChannel($channelName: String!, $teamId: Int!) {
   createChannel(channelName: $channelName, teamId: $teamId)
@@ -563,6 +684,156 @@ export function useDeleteChannelMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannelMutation>;
 export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
 export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
+export const AcceptFriendRequestDocument = gql`
+    mutation AcceptFriendRequest($senderId: Int!) {
+  acceptFriendRequest(senderId: $senderId)
+}
+    `;
+export type AcceptFriendRequestMutationFn = Apollo.MutationFunction<AcceptFriendRequestMutation, AcceptFriendRequestMutationVariables>;
+
+/**
+ * __useAcceptFriendRequestMutation__
+ *
+ * To run a mutation, you first call `useAcceptFriendRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAcceptFriendRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [acceptFriendRequestMutation, { data, loading, error }] = useAcceptFriendRequestMutation({
+ *   variables: {
+ *      senderId: // value for 'senderId'
+ *   },
+ * });
+ */
+export function useAcceptFriendRequestMutation(baseOptions?: Apollo.MutationHookOptions<AcceptFriendRequestMutation, AcceptFriendRequestMutationVariables>) {
+        return Apollo.useMutation<AcceptFriendRequestMutation, AcceptFriendRequestMutationVariables>(AcceptFriendRequestDocument, baseOptions);
+      }
+export type AcceptFriendRequestMutationHookResult = ReturnType<typeof useAcceptFriendRequestMutation>;
+export type AcceptFriendRequestMutationResult = Apollo.MutationResult<AcceptFriendRequestMutation>;
+export type AcceptFriendRequestMutationOptions = Apollo.BaseMutationOptions<AcceptFriendRequestMutation, AcceptFriendRequestMutationVariables>;
+export const CancelFriendRequestDocument = gql`
+    mutation CancelFriendRequest($receiverId: Int!) {
+  cancelFriendRequest(receiverId: $receiverId)
+}
+    `;
+export type CancelFriendRequestMutationFn = Apollo.MutationFunction<CancelFriendRequestMutation, CancelFriendRequestMutationVariables>;
+
+/**
+ * __useCancelFriendRequestMutation__
+ *
+ * To run a mutation, you first call `useCancelFriendRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelFriendRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cancelFriendRequestMutation, { data, loading, error }] = useCancelFriendRequestMutation({
+ *   variables: {
+ *      receiverId: // value for 'receiverId'
+ *   },
+ * });
+ */
+export function useCancelFriendRequestMutation(baseOptions?: Apollo.MutationHookOptions<CancelFriendRequestMutation, CancelFriendRequestMutationVariables>) {
+        return Apollo.useMutation<CancelFriendRequestMutation, CancelFriendRequestMutationVariables>(CancelFriendRequestDocument, baseOptions);
+      }
+export type CancelFriendRequestMutationHookResult = ReturnType<typeof useCancelFriendRequestMutation>;
+export type CancelFriendRequestMutationResult = Apollo.MutationResult<CancelFriendRequestMutation>;
+export type CancelFriendRequestMutationOptions = Apollo.BaseMutationOptions<CancelFriendRequestMutation, CancelFriendRequestMutationVariables>;
+export const DeclineFriendRequestDocument = gql`
+    mutation DeclineFriendRequest($senderId: Int!) {
+  declineFriendRequest(senderId: $senderId)
+}
+    `;
+export type DeclineFriendRequestMutationFn = Apollo.MutationFunction<DeclineFriendRequestMutation, DeclineFriendRequestMutationVariables>;
+
+/**
+ * __useDeclineFriendRequestMutation__
+ *
+ * To run a mutation, you first call `useDeclineFriendRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeclineFriendRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [declineFriendRequestMutation, { data, loading, error }] = useDeclineFriendRequestMutation({
+ *   variables: {
+ *      senderId: // value for 'senderId'
+ *   },
+ * });
+ */
+export function useDeclineFriendRequestMutation(baseOptions?: Apollo.MutationHookOptions<DeclineFriendRequestMutation, DeclineFriendRequestMutationVariables>) {
+        return Apollo.useMutation<DeclineFriendRequestMutation, DeclineFriendRequestMutationVariables>(DeclineFriendRequestDocument, baseOptions);
+      }
+export type DeclineFriendRequestMutationHookResult = ReturnType<typeof useDeclineFriendRequestMutation>;
+export type DeclineFriendRequestMutationResult = Apollo.MutationResult<DeclineFriendRequestMutation>;
+export type DeclineFriendRequestMutationOptions = Apollo.BaseMutationOptions<DeclineFriendRequestMutation, DeclineFriendRequestMutationVariables>;
+export const RemoveFriendDocument = gql`
+    mutation RemoveFriend($friendId: Int!) {
+  removeFriend(friendId: $friendId)
+}
+    `;
+export type RemoveFriendMutationFn = Apollo.MutationFunction<RemoveFriendMutation, RemoveFriendMutationVariables>;
+
+/**
+ * __useRemoveFriendMutation__
+ *
+ * To run a mutation, you first call `useRemoveFriendMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveFriendMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeFriendMutation, { data, loading, error }] = useRemoveFriendMutation({
+ *   variables: {
+ *      friendId: // value for 'friendId'
+ *   },
+ * });
+ */
+export function useRemoveFriendMutation(baseOptions?: Apollo.MutationHookOptions<RemoveFriendMutation, RemoveFriendMutationVariables>) {
+        return Apollo.useMutation<RemoveFriendMutation, RemoveFriendMutationVariables>(RemoveFriendDocument, baseOptions);
+      }
+export type RemoveFriendMutationHookResult = ReturnType<typeof useRemoveFriendMutation>;
+export type RemoveFriendMutationResult = Apollo.MutationResult<RemoveFriendMutation>;
+export type RemoveFriendMutationOptions = Apollo.BaseMutationOptions<RemoveFriendMutation, RemoveFriendMutationVariables>;
+export const SendFriendRequestDocument = gql`
+    mutation SendFriendRequest($receiverId: Int!) {
+  sendFriendRequest(receiverId: $receiverId)
+}
+    `;
+export type SendFriendRequestMutationFn = Apollo.MutationFunction<SendFriendRequestMutation, SendFriendRequestMutationVariables>;
+
+/**
+ * __useSendFriendRequestMutation__
+ *
+ * To run a mutation, you first call `useSendFriendRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendFriendRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendFriendRequestMutation, { data, loading, error }] = useSendFriendRequestMutation({
+ *   variables: {
+ *      receiverId: // value for 'receiverId'
+ *   },
+ * });
+ */
+export function useSendFriendRequestMutation(baseOptions?: Apollo.MutationHookOptions<SendFriendRequestMutation, SendFriendRequestMutationVariables>) {
+        return Apollo.useMutation<SendFriendRequestMutation, SendFriendRequestMutationVariables>(SendFriendRequestDocument, baseOptions);
+      }
+export type SendFriendRequestMutationHookResult = ReturnType<typeof useSendFriendRequestMutation>;
+export type SendFriendRequestMutationResult = Apollo.MutationResult<SendFriendRequestMutation>;
+export type SendFriendRequestMutationOptions = Apollo.BaseMutationOptions<SendFriendRequestMutation, SendFriendRequestMutationVariables>;
 export const DeleteMessageDocument = gql`
     mutation DeleteMessage($messageId: Int!) {
   deleteMessage(messageId: $messageId)
@@ -654,6 +925,69 @@ export function useCreateTeamMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateTeamMutationHookResult = ReturnType<typeof useCreateTeamMutation>;
 export type CreateTeamMutationResult = Apollo.MutationResult<CreateTeamMutation>;
 export type CreateTeamMutationOptions = Apollo.BaseMutationOptions<CreateTeamMutation, CreateTeamMutationVariables>;
+export const ChangePasswordDocument = gql`
+    mutation ChangePassword($token: String!, $newPassword: String!) {
+  changePassword(token: $token, newPassword: $newPassword) {
+    ...RegularUserResponse
+  }
+}
+    ${RegularUserResponseFragmentDoc}`;
+export type ChangePasswordMutationFn = Apollo.MutationFunction<ChangePasswordMutation, ChangePasswordMutationVariables>;
+
+/**
+ * __useChangePasswordMutation__
+ *
+ * To run a mutation, you first call `useChangePasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangePasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changePasswordMutation, { data, loading, error }] = useChangePasswordMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *      newPassword: // value for 'newPassword'
+ *   },
+ * });
+ */
+export function useChangePasswordMutation(baseOptions?: Apollo.MutationHookOptions<ChangePasswordMutation, ChangePasswordMutationVariables>) {
+        return Apollo.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument, baseOptions);
+      }
+export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
+export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
+export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
+export const ChangeUsernameDocument = gql`
+    mutation ChangeUsername($username: String!) {
+  changeUsername(username: $username)
+}
+    `;
+export type ChangeUsernameMutationFn = Apollo.MutationFunction<ChangeUsernameMutation, ChangeUsernameMutationVariables>;
+
+/**
+ * __useChangeUsernameMutation__
+ *
+ * To run a mutation, you first call `useChangeUsernameMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeUsernameMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeUsernameMutation, { data, loading, error }] = useChangeUsernameMutation({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useChangeUsernameMutation(baseOptions?: Apollo.MutationHookOptions<ChangeUsernameMutation, ChangeUsernameMutationVariables>) {
+        return Apollo.useMutation<ChangeUsernameMutation, ChangeUsernameMutationVariables>(ChangeUsernameDocument, baseOptions);
+      }
+export type ChangeUsernameMutationHookResult = ReturnType<typeof useChangeUsernameMutation>;
+export type ChangeUsernameMutationResult = Apollo.MutationResult<ChangeUsernameMutation>;
+export type ChangeUsernameMutationOptions = Apollo.BaseMutationOptions<ChangeUsernameMutation, ChangeUsernameMutationVariables>;
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
   forgotPassword(email: $email)
@@ -780,6 +1114,35 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const RemoveProfilePicDocument = gql`
+    mutation RemoveProfilePic {
+  removeProfilePic
+}
+    `;
+export type RemoveProfilePicMutationFn = Apollo.MutationFunction<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>;
+
+/**
+ * __useRemoveProfilePicMutation__
+ *
+ * To run a mutation, you first call `useRemoveProfilePicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveProfilePicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeProfilePicMutation, { data, loading, error }] = useRemoveProfilePicMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRemoveProfilePicMutation(baseOptions?: Apollo.MutationHookOptions<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>) {
+        return Apollo.useMutation<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>(RemoveProfilePicDocument, baseOptions);
+      }
+export type RemoveProfilePicMutationHookResult = ReturnType<typeof useRemoveProfilePicMutation>;
+export type RemoveProfilePicMutationResult = Apollo.MutationResult<RemoveProfilePicMutation>;
+export type RemoveProfilePicMutationOptions = Apollo.BaseMutationOptions<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>;
 export const UpdateProfilePicDocument = gql`
     mutation UpdateProfilePic($file: Upload!) {
   updateProfilePic(file: $file)
@@ -813,10 +1176,10 @@ export type UpdateProfilePicMutationOptions = Apollo.BaseMutationOptions<UpdateP
 export const ChannelDocument = gql`
     query Channel($channelId: Int!) {
   channel(channelId: $channelId) {
-    ...RegularChannel
+    name
   }
 }
-    ${RegularChannelFragmentDoc}`;
+    `;
 
 /**
  * __useChannelQuery__
@@ -876,6 +1239,71 @@ export function useChannelsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<C
 export type ChannelsQueryHookResult = ReturnType<typeof useChannelsQuery>;
 export type ChannelsLazyQueryHookResult = ReturnType<typeof useChannelsLazyQuery>;
 export type ChannelsQueryResult = Apollo.QueryResult<ChannelsQuery, ChannelsQueryVariables>;
+export const FriendRequestsDocument = gql`
+    query FriendRequests {
+  friendRequests {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useFriendRequestsQuery__
+ *
+ * To run a query within a React component, call `useFriendRequestsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFriendRequestsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFriendRequestsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useFriendRequestsQuery(baseOptions?: Apollo.QueryHookOptions<FriendRequestsQuery, FriendRequestsQueryVariables>) {
+        return Apollo.useQuery<FriendRequestsQuery, FriendRequestsQueryVariables>(FriendRequestsDocument, baseOptions);
+      }
+export function useFriendRequestsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FriendRequestsQuery, FriendRequestsQueryVariables>) {
+          return Apollo.useLazyQuery<FriendRequestsQuery, FriendRequestsQueryVariables>(FriendRequestsDocument, baseOptions);
+        }
+export type FriendRequestsQueryHookResult = ReturnType<typeof useFriendRequestsQuery>;
+export type FriendRequestsLazyQueryHookResult = ReturnType<typeof useFriendRequestsLazyQuery>;
+export type FriendRequestsQueryResult = Apollo.QueryResult<FriendRequestsQuery, FriendRequestsQueryVariables>;
+export const FriendsDocument = gql`
+    query Friends($userId: Int!) {
+  friends(userId: $userId) {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useFriendsQuery__
+ *
+ * To run a query within a React component, call `useFriendsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFriendsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFriendsQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useFriendsQuery(baseOptions: Apollo.QueryHookOptions<FriendsQuery, FriendsQueryVariables>) {
+        return Apollo.useQuery<FriendsQuery, FriendsQueryVariables>(FriendsDocument, baseOptions);
+      }
+export function useFriendsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FriendsQuery, FriendsQueryVariables>) {
+          return Apollo.useLazyQuery<FriendsQuery, FriendsQueryVariables>(FriendsDocument, baseOptions);
+        }
+export type FriendsQueryHookResult = ReturnType<typeof useFriendsQuery>;
+export type FriendsLazyQueryHookResult = ReturnType<typeof useFriendsLazyQuery>;
+export type FriendsQueryResult = Apollo.QueryResult<FriendsQuery, FriendsQueryVariables>;
 export const MessagesDocument = gql`
     query Messages($channelId: Int!) {
   messages(channelId: $channelId) {
@@ -1006,3 +1434,36 @@ export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const SearchResultsDocument = gql`
+    query SearchResults($query: String!) {
+  searchResults(query: $query) {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useSearchResultsQuery__
+ *
+ * To run a query within a React component, call `useSearchResultsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchResultsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchResultsQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useSearchResultsQuery(baseOptions: Apollo.QueryHookOptions<SearchResultsQuery, SearchResultsQueryVariables>) {
+        return Apollo.useQuery<SearchResultsQuery, SearchResultsQueryVariables>(SearchResultsDocument, baseOptions);
+      }
+export function useSearchResultsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchResultsQuery, SearchResultsQueryVariables>) {
+          return Apollo.useLazyQuery<SearchResultsQuery, SearchResultsQueryVariables>(SearchResultsDocument, baseOptions);
+        }
+export type SearchResultsQueryHookResult = ReturnType<typeof useSearchResultsQuery>;
+export type SearchResultsLazyQueryHookResult = ReturnType<typeof useSearchResultsLazyQuery>;
+export type SearchResultsQueryResult = Apollo.QueryResult<SearchResultsQuery, SearchResultsQueryVariables>;

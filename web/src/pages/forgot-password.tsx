@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Formik } from 'formik';
 import { useForgotPasswordMutation } from '../generated/graphql'
 import { withApollo } from '../utils/withApollo';
@@ -10,50 +10,53 @@ import Button from '../components/auth/Button';
 import Title from '../components/auth/Title';
 
 const ForgotPassword: React.FC<{}> = () => {
+    const [isLoading, setIsLoading] = useState(false);
     const [forgotPassword] = useForgotPasswordMutation();
 
     return(
-        <AuthWrapper>
-            <Layout>
-                <Formik
-                    initialValues = {{ email: '' }}
-                    onSubmit = {async (values) => {
-                        const { email } = values;
+        <Layout>
+            <Formik
+                initialValues = {{ email: '' }}
+                onSubmit = {async ({ email }, { setValues }) => {
+                    setIsLoading(true);
 
-                        const response = await forgotPassword({
-                            variables: { email }
-                        })
+                    await forgotPassword({
+                        variables: { email }
+                    });
 
-                        console.log(response);
-                    }}
-                >
-                    {({ values, handleChange }) => (
-                        <FormContainer
-                            borderColor = '#d8c292'
-                            bg = '#ffc478'
-                        >
-                            <Form>
-                                <Title>
-                                    We'll send you an email to reset your password!
-                                </Title>
-                                
-                                <InputField 
-                                    type='email'
-                                    placeholder='email'
-                                    onChange= {handleChange}
-                                    value= {values.email}
-                                    name='email'
-                                />
+                    setValues({ email: '' });
+                    setIsLoading(false);
+                }}
+            >
+                {({ values, handleChange }) => (
+                    <FormContainer
+                        borderColor = '#d8c292'
+                        bg = '#ffc478'
+                    >
+                        <Form>
+                            <Title>
+                                We'll send you an email to reset your password!
+                            </Title>
+                            
+                            <InputField 
+                                type='email'
+                                placeholder='email'
+                                onChange= {handleChange}
+                                value= {values.email}
+                                name='email'
+                            />
 
-                                <Button bg='#94b5c0'> 
-                                    Send
-                                </Button>
-                            </Form>
-                        </FormContainer>
-                    )}
-                </Formik>
-            </Layout>
-        </AuthWrapper>
+                            <Button 
+                                isLoading={isLoading}
+                                bg='#94b5c0' 
+                            > 
+                                Send
+                            </Button>
+                        </Form>
+                    </FormContainer>
+                )}
+            </Formik>
+        </Layout>
     )
 }
 

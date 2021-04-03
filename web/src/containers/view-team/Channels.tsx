@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useChannelsQuery, useDeleteChannelMutation } from '../../generated/graphql';
+import {Formik} from 'formik';
+import { useChannelsQuery, useDeleteChannelMutation, useAddUserToTeamMutation } from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
 import ChatHeader from '../../components/view-team/ChatHeader';
 import NextLink from 'next/link';
@@ -34,6 +35,7 @@ const Box = styled.div`
 const Channel = styled.div`
     padding: 5px;
     padding-left: 10px;
+    display: flex;
     cursor: pointer;
     color: white;
     &:hover {
@@ -41,13 +43,24 @@ const Channel = styled.div`
     }
 `;
 
+const Options = styled.div`
+    margin-left: auto;
+`;
+
 interface ChannelsProps {
     teamId: number;
     channelId: number;
 }
 
+async function invite(teamId) {
+    useAddUserToTeamMutation(teamId);
+}
+
+
+
 const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
+    let settingOption = "";
     const [deleteChannel] = useDeleteChannelMutation();
 
     const { data } = useChannelsQuery({
@@ -60,14 +73,26 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
         <Container>
             <Flex>
                 <Title>Text Channels</Title>
-
-                <Box 
-                    onClick = {() => {
+                <Box>
+                <select value={settingOption} name="choice" onChange = { (e) => {
+                    if(e.target.value === "invite"){
+                        invite(teamId)
+                    } 
+                    if(e.target.value === "delete"){
+                        //delete()
+                    }
+                    if(e.target.value === "new channel"){
                         setIsOpen(true);
-                    }}
-                >
-                    +
+                    }
+                } }>
+                    <option value="" label="Settings"/>
+                    <option value="invite" label="Invite Friends"/>
+                    <option value="delete" label="Leave Team"/>
+                    <option value="new channel" label="Create New Channel"/>
+                </select>
                 </Box>
+                
+
             </Flex>
 
             {data?.channels?.map((c, i) => {
@@ -82,13 +107,21 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                     <NextLink key={c.id} href={route}>
                         <Channel style={style}>
                             # {c.name}
-                            
-                            <button onClick={async () => {
-                                await deleteChannel({
-                                    variables: {channelId}
-                                })}}>
+                           
+                           {data?.channels.length > 1 && (
+                                <Options
+                                    onClick = {async () => {
+                                        await deleteChannel({
+                                            variables: { channelId },
+                                            update: (cache) => {
+                                                cache.evict({ fieldName: 'channels' });
+                                            }
+                                        })
+                                    }}
+                                >
                                     X
-                            </button> 
+                                </Options>
+                           )}
                         </Channel> 
                     </NextLink>
                 )   

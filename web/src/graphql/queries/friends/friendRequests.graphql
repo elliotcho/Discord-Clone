@@ -1,0 +1,5 @@
+query FriendRequests {
+    friendRequests {
+        ...RegularUser
+    }
+}

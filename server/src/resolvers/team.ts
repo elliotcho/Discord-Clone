@@ -77,4 +77,18 @@ export class TeamResolver {
 
         return true;
     }
+
+    @Mutation(() => Team)
+    async addUserToTeam(
+        @Arg('teamId', () => Int) teamId: number,
+        @Ctx() {req}: MyContext
+    ): Promise<Team | undefined>{
+       return await getConnection().query(
+            `
+            INSERT INTO MEMBER
+            WHERE teamId = $1 AND userId= $2
+
+            `,[teamId,req.session.uid]
+        );
+    }
 }

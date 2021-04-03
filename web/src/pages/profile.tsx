@@ -18,7 +18,7 @@ const Profile: React.FC<{}> = () => {
                 <Teams />
 
                 <div style={{background: '#1a1c20'}}>
-                    HELLO
+            
                 </div>
 
                 <ProfileContainer /> 

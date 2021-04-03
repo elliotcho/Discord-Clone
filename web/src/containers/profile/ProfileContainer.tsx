@@ -4,8 +4,10 @@ import {
     MeDocument, 
     useMeQuery, 
     useUpdateProfilePicMutation,
-    useChangeUsernameMutation
+    useRemoveProfilePicMutation
 } from '../../generated/graphql';
+import Searchbar from '../../components/profile/Searchbar';
+import NextLink from 'next/link';
 
 const Container = styled.div`
     background: #222831;
@@ -22,6 +24,8 @@ const Image = styled.img`
     width: 6rem;
     height: 6rem;
 `;
+
+const Remove = styled.button``;
 
 const Edit = styled.div`
     margin-top: 60px;
@@ -63,6 +67,7 @@ const ChangePassword = styled.form`
     border: solid 2px #070d59;
     background: #34626c;
     font-family: 'Nunito', sans-serif;
+    cursor: pointer;
 `;
 
 const Label = styled.label`
@@ -92,15 +97,28 @@ const ProfileContainer: React.FC<{}> = () => {
         ]
     });
 
+    const [removePic] = useRemoveProfilePicMutation({
+        refetchQueries: [
+            { query: MeDocument }
+        ]
+    });
+
     let username = data?.me?.username || 'Loading...';
     let imgURL = data?.me?.profileURL;
 
-    const [newName] = useChangeUsernameMutation();
-
-
     return (
         <Container>
+            <Searchbar />
+
             <Image src={imgURL} alt='profile pic' />
+            
+            <Remove
+                onClick = {async () => {
+                    await removePic();
+                }}
+            >
+                X
+            </Remove>
 
             <Intro> Whagwan, {username}</Intro>
 
@@ -148,11 +166,11 @@ const ProfileContainer: React.FC<{}> = () => {
                     <Button type='submit'>✔️</Button>
                 </ChangeEmail>
                     
-                <ChangePassword>
-                    <Label htmlFor='password'>Change Password</Label>
-                    <Input type='password' id='password' name='password' />
-                    <Button type='submit'>✔️</Button>
-                </ChangePassword>
+                <NextLink href='/forgot-password'>
+                    <ChangePassword>
+                        Change Password
+                    </ChangePassword>
+                </NextLink>
             </Edit>
         </Container>
     )
