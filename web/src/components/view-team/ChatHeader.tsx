@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useChannelQuery } from '../../generated/graphql';
 
 const Header = styled.h2`
     display: flex;
@@ -13,11 +14,19 @@ const Span = styled.span`
     margin-left: 20px;
 `;
 
-const ChatHeader: React.FC<{}> = () => {
+interface ChatHeaderProps {
+    channelId: number;
+}
+
+const ChatHeader: React.FC<ChatHeaderProps> = ({channelId}) => {
+    const {data} = useChannelQuery({
+        variables: {channelId}
+    }) 
+
     return (
         <Header>
             <Span>
-                # general
+                # {data?.channel?.name}
             </Span>
         </Header>
     )

@@ -24,6 +24,7 @@ export type Query = {
   teams: Array<Team>;
   messages: Array<Message>;
   channels: Array<Channel>;
+  channel: Channel;
 };
 
 
@@ -39,6 +40,11 @@ export type QueryMessagesArgs = {
 
 export type QueryChannelsArgs = {
   teamId: Scalars['Int'];
+};
+
+
+export type QueryChannelArgs = {
+  channelId: Scalars['Int'];
 };
 
 export type User = {
@@ -335,6 +341,19 @@ export type UpdateProfilePicMutationVariables = Exact<{
 export type UpdateProfilePicMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'updateProfilePic'>
+);
+
+export type ChannelQueryVariables = Exact<{
+  channelId: Scalars['Int'];
+}>;
+
+
+export type ChannelQuery = (
+  { __typename?: 'Query' }
+  & { channel: (
+    { __typename?: 'Channel' }
+    & RegularChannelFragment
+  ) }
 );
 
 export type ChannelsQueryVariables = Exact<{
@@ -791,6 +810,39 @@ export function useUpdateProfilePicMutation(baseOptions?: Apollo.MutationHookOpt
 export type UpdateProfilePicMutationHookResult = ReturnType<typeof useUpdateProfilePicMutation>;
 export type UpdateProfilePicMutationResult = Apollo.MutationResult<UpdateProfilePicMutation>;
 export type UpdateProfilePicMutationOptions = Apollo.BaseMutationOptions<UpdateProfilePicMutation, UpdateProfilePicMutationVariables>;
+export const ChannelDocument = gql`
+    query Channel($channelId: Int!) {
+  channel(channelId: $channelId) {
+    ...RegularChannel
+  }
+}
+    ${RegularChannelFragmentDoc}`;
+
+/**
+ * __useChannelQuery__
+ *
+ * To run a query within a React component, call `useChannelQuery` and pass it any options that fit your needs.
+ * When your component renders, `useChannelQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useChannelQuery({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useChannelQuery(baseOptions: Apollo.QueryHookOptions<ChannelQuery, ChannelQueryVariables>) {
+        return Apollo.useQuery<ChannelQuery, ChannelQueryVariables>(ChannelDocument, baseOptions);
+      }
+export function useChannelLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ChannelQuery, ChannelQueryVariables>) {
+          return Apollo.useLazyQuery<ChannelQuery, ChannelQueryVariables>(ChannelDocument, baseOptions);
+        }
+export type ChannelQueryHookResult = ReturnType<typeof useChannelQuery>;
+export type ChannelLazyQueryHookResult = ReturnType<typeof useChannelLazyQuery>;
+export type ChannelQueryResult = Apollo.QueryResult<ChannelQuery, ChannelQueryVariables>;
 export const ChannelsDocument = gql`
     query Channels($teamId: Int!) {
   channels(teamId: $teamId) {

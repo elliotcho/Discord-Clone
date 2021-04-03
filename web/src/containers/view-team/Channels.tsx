@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useChannelsQuery, useDeleteChannelMutation } from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
+import ChatHeader from '../../components/view-team/ChatHeader';
 import NextLink from 'next/link';
 
 const Container = styled.div`
@@ -81,12 +82,13 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                     <NextLink key={c.id} href={route}>
                         <Channel style={style}>
                             # {c.name}
+                            
                             <button onClick={async () => {
                                 await deleteChannel({
                                     variables: {channelId}
                                 })}}>
                                     X
-                            </button>
+                            </button> 
                         </Channel> 
                     </NextLink>
                 )   

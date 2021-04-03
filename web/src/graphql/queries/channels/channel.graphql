@@ -1,0 +1,5 @@
+query Channel($channelId: Int!){
+    channel(channelId: $channelId) {
+        ...RegularChannel
+    }
+}
