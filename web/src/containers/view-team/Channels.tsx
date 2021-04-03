@@ -53,7 +53,7 @@ interface ChannelsProps {
 }
 
 async function invite(teamId) {
-    useAddUserToTeamMutation(teamId);
+    // useAddUserToTeamMutation(teamId);
 }
 
 

@@ -26,7 +26,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({channelId}) => {
     return (
         <Header>
             <Span>
-                # {data?.channel?.name}
+                #{data?.channel?.name}
             </Span>
         </Header>
     )

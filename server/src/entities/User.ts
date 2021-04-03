@@ -40,4 +40,8 @@ export class User extends BaseEntity {
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Field()
+    @Column({ unique: true })
+    active: boolean; 
 }
