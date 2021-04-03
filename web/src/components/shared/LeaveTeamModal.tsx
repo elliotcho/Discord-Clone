@@ -4,6 +4,7 @@ import {Formik, Form} from 'formik';
 import {Modal} from 'react-responsive-modal';
 import { useLeaveTeamMutation } from '../../generated/graphql';
 import 'react-responsive-modal/styles.css';
+import {useRouter} from 'next/router';
 
 const Container = styled.div`
     width: 400px;
@@ -49,6 +50,7 @@ interface LeaveTeamModalProps {
 
 const LeaveTeamModal : React.FC<LeaveTeamModalProps> = ({ teamId, isOpen, onClose }) => {
     const [leaveTeam] = useLeaveTeamMutation();
+    const router = useRouter();
 
     return(
         <Modal
@@ -63,11 +65,18 @@ const LeaveTeamModal : React.FC<LeaveTeamModalProps> = ({ teamId, isOpen, onClos
                         enableReinitialize
                         initialValues={{ teamId }}
                         onSubmit = {async ({ teamId }) =>{
-                            await leaveTeam({
-                                variables: { teamId }
+                            const result = await leaveTeam({
+                                variables: { teamId },
+                                update: (cache) => {
+                                    cache.evict({ fieldName: "teams"});
+                                }
                             });
 
                             onClose();
+
+                            if(result.data.leaveTeam){
+                                router.push('/profile')
+                            }
                         }}
                 >
                         <Form>

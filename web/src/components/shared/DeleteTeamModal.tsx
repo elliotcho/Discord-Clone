@@ -4,6 +4,7 @@ import {Formik, Form} from 'formik';
 import {Modal} from 'react-responsive-modal';
 import {useDeleteTeamMutation} from '../../generated/graphql';
 import 'react-responsive-modal/styles.css';
+import {useRouter} from 'next/router';
 
 const Container = styled.div`
     width: 400px;
@@ -55,6 +56,7 @@ interface DeleteTeamModal {
 
 const DeleteTeamModal : React.FC<DeleteTeamModal> = ({teamId, isOpen, onClose }) => {
     const [deleteTeam] = useDeleteTeamMutation();
+    const router = useRouter();
 
     return(
         <Modal
@@ -69,11 +71,18 @@ const DeleteTeamModal : React.FC<DeleteTeamModal> = ({teamId, isOpen, onClose })
                         enableReinitialize
                         initialValues={{ teamId }}
                         onSubmit = {async ({ teamId }) =>{
-                            await deleteTeam({
-                                variables: { teamId }
+                           const result =  await deleteTeam({
+                                variables: { teamId },
+                                update: (cache) => {
+                                    cache.evict({ fieldName: "teams"})
+                                }
                             });
 
                             onClose();
+
+                            if (result.data.deleteTeam){
+                                router.push('/profile')
+                            }
                         }}
                 >
                     <Form>
