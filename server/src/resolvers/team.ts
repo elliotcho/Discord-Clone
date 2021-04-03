@@ -102,19 +102,21 @@ export class TeamResolver {
         @Ctx() {req}: MyContext
     ): Promise<boolean>{
         let success = false;
-        const teamOwner = await getConnection().query(
+
+        const teams = await getConnection().query(
             `
-            SELECT ownerId FROM TEAM
-            WHERE 'ownerId'=$1 and 'teamId'=$2
-            `,[req.session.uid, teamId]
+            select t.* from team as t
+            where id = $1
+            `,[teamId]
         );
-        if(!teamOwner){
-            success = await getConnection().query(
+
+        if( !(teams.length && teams[0].ownerId === req.session.uid) ){
+            await getConnection().query(
                 `
-                DELETE FROM MEMBER WHERE
-                'userId'=$1 AND id=$2
-                `, [req.session.uid, teamId]
+                delete from member where id = $1
+                `, [ teamId]
             );
+            success = true;
         }
         return success;
     }
