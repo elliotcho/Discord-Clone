@@ -1,0 +1,3 @@
+mutation DeclineFriendRequest($senderId: Int!) {
+    declineFriendRequest(senderId: $senderId)
+}

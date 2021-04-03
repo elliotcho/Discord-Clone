@@ -31,6 +31,9 @@ export class User extends BaseEntity {
     profilePic: string;
 
     @Field()
+    friendStatus: number;
+
+    @Field()
     @CreateDateColumn()
     createdAt: Date;
 
