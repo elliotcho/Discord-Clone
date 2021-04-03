@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import {Formik} from 'formik';
 import { useChannelsQuery, useDeleteChannelMutation, useAddUserToTeamMutation } from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
+import ChatHeader from '../../components/view-team/ChatHeader';
 import NextLink from 'next/link';
 
 const Container = styled.div`

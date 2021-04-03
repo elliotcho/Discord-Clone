@@ -1,5 +1,5 @@
-query Channel($channelId: Int!) {
+query Channel($channelId: Int!){
     channel(channelId: $channelId) {
-        name
+        ...RegularChannel
     }
 }

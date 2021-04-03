@@ -28,7 +28,7 @@ export class ChannelResolver {
                 insert into channel (name, "teamId")
                 values ($1, $2)
             `,
-            [channelName, teamId]
+            [channelName, teamId] 
         );
         
         return true;
@@ -52,8 +52,7 @@ export class ChannelResolver {
     @Query(() => Channel)
     async channel(
         @Arg('channelId', () => Int) channelId: number
-    ): Promise<Channel | undefined> {
-        const channel = await Channel.findOne(channelId);
-        return channel;
+    ) : Promise<Channel | undefined> {
+        return Channel.findOne(channelId)
     }
 }

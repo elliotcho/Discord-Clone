@@ -48,7 +48,7 @@ const ViewTeams: React.FC<{}> = () => {
                 <Channels teamId={teamId} channelId={channelId}/>
 
                 <Chat>
-                    <ChatHeader />
+                    <ChatHeader channelId={channelId}/>
 
                     <ChatContainer channelId={channelId}/>
 
