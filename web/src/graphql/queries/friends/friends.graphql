@@ -1,0 +1,5 @@
+  query Friends($userId: Int!) {
+    friends(userId: $userId) {
+        ...RegularUser
+    }
+}

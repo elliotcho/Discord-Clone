@@ -3,10 +3,12 @@ import {
     Ctx,
     Field,
     FieldResolver,
+    Int,
     Mutation,  
     ObjectType,  
     Query,  
-    Resolver
+    Resolver,
+    Root
 } from "type-graphql";
 import argon2 from 'argon2';
 import { v4 } from 'uuid';
@@ -46,6 +48,49 @@ export class UserResolver {
         }
 
         return `${process.env.SERVER_URL}/images/default.png`;
+    }
+
+    @FieldResolver(() => Int)
+    async friendStatus(
+        @Root() user : User,
+        @Ctx() { req } : MyContext
+    ) : Promise<0 | 1 | 2> {
+        const { uid } =  req.session;
+
+        const friends = await getConnection().query(
+            `
+                select * from friend as f
+                where (f."senderId" = $1 or f."receiverId" = $1) and
+                (f."receiverId" = $2 or f."senderId" = $2)
+            `, 
+            [uid, user.id]
+        );
+
+        if(!friends.length) {
+            return 0;
+        }
+
+        if(!friends[0].status) {
+            return 1;
+        }
+
+        return 2;
+    }
+
+    @Query(() => [User])
+    async searchResults(
+        @Arg('query') query: string
+    ) : Promise<User[]> {
+        let pattern = query.toLowerCase();
+
+        const users = await getConnection().query(
+            `
+                select * from "user" as u where
+                LOWER(u.username) LIKE '%${pattern}%'
+            `
+        );
+
+        return users;
     }
 
     @Query(() => User)

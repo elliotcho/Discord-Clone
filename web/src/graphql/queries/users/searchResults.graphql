@@ -1,0 +1,5 @@
+query SearchResults($query: String!) {
+    searchResults(query: $query) {
+       ...RegularUser
+    }
+}

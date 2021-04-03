@@ -34,11 +34,16 @@ const Box = styled.div`
 const Channel = styled.div`
     padding: 5px;
     padding-left: 10px;
+    display: flex;
     cursor: pointer;
     color: white;
     &:hover {
         background: #808080;
     }
+`;
+
+const Options = styled.div`
+    margin-left: auto;
 `;
 
 interface ChannelsProps {
@@ -101,12 +106,21 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                     <NextLink key={c.id} href={route}>
                         <Channel style={style}>
                             # {c.name}
-                            <button onClick={async () => {
-                                await deleteChannel({
-                                    variables: {channelId}
-                                })}}>
+                           
+                           {data?.channels.length > 1 && (
+                                <Options
+                                    onClick = {async () => {
+                                        await deleteChannel({
+                                            variables: { channelId },
+                                            update: (cache) => {
+                                                cache.evict({ fieldName: 'channels' });
+                                            }
+                                        })
+                                    }}
+                                >
                                     X
-                            </button>
+                                </Options>
+                           )}
                         </Channel> 
                     </NextLink>
                 )   

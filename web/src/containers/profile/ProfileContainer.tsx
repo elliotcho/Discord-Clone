@@ -6,6 +6,7 @@ import {
     useUpdateProfilePicMutation,
     useRemoveProfilePicMutation
 } from '../../generated/graphql';
+import Searchbar from '../../components/profile/Searchbar';
 import NextLink from 'next/link';
 
 const Container = styled.div`
@@ -107,6 +108,8 @@ const ProfileContainer: React.FC<{}> = () => {
 
     return (
         <Container>
+            <Searchbar />
+
             <Image src={imgURL} alt='profile pic' />
             
             <Remove
