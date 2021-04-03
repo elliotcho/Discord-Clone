@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import {Formik} from 'formik';
-import { useChannelsQuery, useDeleteChannelMutation, useAddUserToTeamMutation, useLeaveTeamMutation, useDeleteTeamMutation } from '../../generated/graphql';
+import { 
+    useChannelsQuery, 
+    useDeleteChannelMutation, 
+    useAddUserToTeamMutation, 
+    useDeleteTeamMutation 
+} from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
 import LeaveTeamModal from '../../components/shared/LeaveTeamModal';
-import ChatHeader from '../../components/view-team/ChatHeader';
 import NextLink from 'next/link';
 import DeleteTeamModal from '../../components/shared/DeleteTeamModal';
 
@@ -54,26 +57,16 @@ interface ChannelsProps {
     channelId: number;
 }
 
-async function invite(teamId) {
-    //useAddUserToTeamMutation(teamId);
-}
-
-async function leaveTeam(){
-    //useLeaveTeamMutation(teamId)
-   
-}
-
-async function deleteTeam(teamId){
-    //useDeleteTeamMutation(teamId)
-}
-
 const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
     const[openLeaveChannel, setLeaveChannel] = useState(false);
-    const[openInvite, setInvite] = useState(false);
     const[openDelete, setDelete] = useState(false);
+
     let settingOption = "";
+    
     const [deleteChannel] = useDeleteChannelMutation();
+    const [deleteTeam] = useDeleteTeamMutation();
+    const [addUser] = useAddUserToTeamMutation();
 
     const { data } = useChannelsQuery({
         variables: { teamId }

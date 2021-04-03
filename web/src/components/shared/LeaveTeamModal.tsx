@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import {Formik, Form} from 'formik';
 import {Modal} from 'react-responsive-modal';
-import {useLeaveTeamMutation} from '../../generated/graphql';
+import { useLeaveTeamMutation } from '../../generated/graphql';
 import 'react-responsive-modal/styles.css';
 
 const Container = styled.div`
@@ -10,12 +10,6 @@ const Container = styled.div`
     `;
 
 const Header = styled.h2``;
-
-const Input = styled.input`
-    padding: 7px:
-    margin-bottom: 20px;
-    width: 90%;
-    `
 
 const Footer = styled.div`
     border-top: 1px solid gray;
@@ -53,7 +47,7 @@ interface LeaveTeamModalProps {
     onClose(): void;
 }
 
-const LeaveTeamModal : React.FC<LeaveTeamModalProps> = ({ isOpen, onClose }) => {
+const LeaveTeamModal : React.FC<LeaveTeamModalProps> = ({ teamId, isOpen, onClose }) => {
     const [leaveTeam] = useLeaveTeamMutation();
 
     return(
@@ -63,32 +57,34 @@ const LeaveTeamModal : React.FC<LeaveTeamModalProps> = ({ isOpen, onClose }) => 
             closeOnOverlayClick = {false}
             styles = {{closeButton: {outline: 'none'}}}
             onClose = {onClose}
-            >
+        >
                 <Container>
                     <Formik
-                        initialValues={{ teamId: 0}}
-                        onSubmit = {async ({teamId}) =>{
+                        enableReinitialize
+                        initialValues={{ teamId }}
+                        onSubmit = {async ({ teamId }) =>{
                             await leaveTeam({
-                                variables: {teamId}
+                                variables: { teamId }
                             });
 
                             onClose();
                         }}
                 >
-                    <Form>
-                        <Header>
-                            Are you sure you want to leave this team?
-                        </Header>
-                    <Footer>
-                            <Close onClick={onClose}>
-                                Close
-                            </Close>
+                        <Form>
+                            <Header>
+                                Are you sure you want to leave this team?
+                            </Header>
+                            
+                            <Footer>
+                                    <Close onClick={onClose}>
+                                        Close
+                                    </Close>
 
-                            <Submit type='submit'>
-                                Leave Team
-                            </Submit>
-                    </Footer>
-                    </Form>
+                                    <Submit type='submit'>
+                                        Leave Team
+                                    </Submit>
+                            </Footer>
+                        </Form>
                     </Formik>
                 </Container>
         </Modal>
