@@ -68,9 +68,9 @@ const DeleteTeamModal : React.FC<DeleteTeamModal> = ({teamId, isOpen, onClose })
                     <Formik
                         enableReinitialize
                         initialValues={{ teamId }}
-                        onSubmit = {async ({teamId}) =>{
+                        onSubmit = {async ({ teamId }) =>{
                             await deleteTeam({
-                                variables: {teamId}
+                                variables: { teamId }
                             });
 
                             onClose();
@@ -80,15 +80,16 @@ const DeleteTeamModal : React.FC<DeleteTeamModal> = ({teamId, isOpen, onClose })
                         <Header>
                             Are you sure you want to permanently delete this team?
                         </Header>
-                    <Footer>
-                            <Close onClick={onClose}>
-                                Close
-                            </Close>
 
-                            <Submit type='submit'>
-                                Delete Team
-                            </Submit>
-                    </Footer>
+                        <Footer>
+                                <Close onClick={onClose}>
+                                    Close
+                                </Close>
+
+                                <Submit type='submit'>
+                                    Delete Team
+                                </Submit>
+                        </Footer>
                     </Form>
                     </Formik>
                 </Container>

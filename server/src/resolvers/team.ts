@@ -54,8 +54,10 @@ export class TeamResolver {
             const result = await tm.createQueryBuilder()
                                   .insert()
                                   .into(Team)
-                                  .values({ name: teamName,
-                                            ownerId: req.session.uid })
+                                  .values({ 
+                                      name: teamName,
+                                        ownerId: req.session.uid 
+                                   })
                                   .returning('*')
                                   .execute();
 
@@ -110,7 +112,7 @@ export class TeamResolver {
             success = await getConnection().query(
                 `
                 DELETE FROM MEMBER WHERE
-                'userId'=$1 AND 'id'=$2
+                'userId'=$1 AND id=$2
                 `, [req.session.uid, teamId]
             );
         }
@@ -123,20 +125,24 @@ export class TeamResolver {
         @Ctx() {req}: MyContext
     ): Promise<boolean>{
         let success= false;
-        const teamOwner = await getConnection().query(
+
+        const teams = await getConnection().query(
             `
-            SELECT 'ownerId' FROM TEAM
-            WHERE 'ownerId'=$1 and 'id'=$2
-            `,[req.session.uid, teamId]
+                select t.* from team as t
+                where id = $1
+            `,[teamId]
         );
-        if(teamOwner){
-            success = await getConnection().query(
+
+        if(teams.length && teams[0].ownerId === req.session.uid){
+            await getConnection().query(
                 `
-                DELETE FROM TEAM
-                WHERE 'id'=$1 and 'ownerId'=$2
-                `, [teamId, req.session.uid]
+                    delete from team where id = $1
+                `, [teamId]
             );
+
+            success = true;
         }
+
         return success;
     }
 }
