@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useChannelsQuery, useDeleteChannelMutation } from '../../generated/graphql';
+import {Formik} from 'formik';
+import { useChannelsQuery, useDeleteChannelMutation, useAddUserToTeamMutation } from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
 import NextLink from 'next/link';
 
@@ -50,8 +51,15 @@ interface ChannelsProps {
     channelId: number;
 }
 
+async function invite(teamId) {
+    useAddUserToTeamMutation(teamId);
+}
+
+
+
 const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
+    let settingOption = "";
     const [deleteChannel] = useDeleteChannelMutation();
 
     const { data } = useChannelsQuery({
@@ -64,14 +72,26 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
         <Container>
             <Flex>
                 <Title>Text Channels</Title>
-
-                <Box 
-                    onClick = {() => {
+                <Box>
+                <select value={settingOption} name="choice" onChange = { (e) => {
+                    if(e.target.value === "invite"){
+                        invite(teamId)
+                    } 
+                    if(e.target.value === "delete"){
+                        //delete()
+                    }
+                    if(e.target.value === "new channel"){
                         setIsOpen(true);
-                    }}
-                >
-                    +
+                    }
+                } }>
+                    <option value="" label="Settings"/>
+                    <option value="invite" label="Invite Friends"/>
+                    <option value="delete" label="Leave Team"/>
+                    <option value="new channel" label="Create New Channel"/>
+                </select>
                 </Box>
+                
+
             </Flex>
 
             {data?.channels?.map((c, i) => {
