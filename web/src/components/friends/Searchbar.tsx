@@ -1,37 +1,36 @@
-import React, { useState } from 'react';
-import { Formik, Form } from 'formik'
+import React from 'react';
+import { Formik, Form } from 'formik';
 import styled from 'styled-components';
-import { useSearchResultsQuery } from '../../generated/graphql';
 
 const Input = styled.input`
-    width: 400px;
-    display: block;
-    margin: auto;
+    width: 70%;
+    margin: 30px;
+    font-size: 1.3rem;
+    background: #333;
+    color: #d9d9d9;
+    padding: 15px;
+
+    &:focus {
+        outline: none;
+    }
 `;
 
-const Searchbar : React.FC<{}> = () => {
-    const [query, setQuery] = useState('');
+interface SearchbarProps {
+    setQuery(q: string): void;
+    query: string;
+}
 
-    const { data, refetch } = useSearchResultsQuery({
-        variables: { query },
-        skip: !!query
-    });
-
+const Searchbar: React.FC<SearchbarProps> = ({ query, setQuery}) => {
     return (
         <Formik
-            enableReinitialize
             initialValues = {{ query }}
             onSubmit = {async ({ query }) => {
                 setQuery(query);
-                await refetch();
-
-                console.log(data)
             }}
         >
             {({ handleChange, values }) => (
                 <Form>
                     <Input
-                        type = 'text'
                         value = {values.query}
                         placeholder = 'Search...'
                         onChange = {handleChange}

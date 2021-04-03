@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import NextLink from 'next/link';
 
 const Container = styled.div`
     padding: 15px;
@@ -8,12 +9,15 @@ const Container = styled.div`
 `;
 
 const Nav = styled.div`
-    cursor: pointer;
     margin-right: 30px;
     color: #d9d9d9;
     padding: 5px;
 
-    &:hover {
+    &:not(:first-child) {
+        cursor: pointer;
+    }
+
+    &:not(:first-child):hover {
         background: #4d4d4d;
     }
 `;
@@ -36,9 +40,11 @@ const FriendsNav: React.FC<{}> = () => {
 
             <Nav>All</Nav>
 
-            <Button>
-                Add Friend
-            </Button>
+            <NextLink href='/friends/search'>
+                <Button>
+                    Add Friend
+                </Button>
+            </NextLink>
         </Container> 
     )
 }

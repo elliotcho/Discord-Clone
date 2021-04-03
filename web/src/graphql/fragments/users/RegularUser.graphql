@@ -1,7 +1,9 @@
 fragment RegularUser on User {
     id
+    isMe
     email
     username
+    friendStatus
     profileURL
     createdAt
     updatedAt

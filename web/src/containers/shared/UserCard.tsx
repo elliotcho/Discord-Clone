@@ -5,26 +5,20 @@ const Card = styled.div`
     display: flex;
     align-items: center;
     border: 1px solid black;
-    margin: 50px auto;
-    background: white;
+    background: #404040;
     max-width: 600px;
     padding: 15px;
-    width: 90%;
+    margin: 30px;
 `;
 
 const Image = styled.img`
-    cursor: pointer;
     width: 6rem;
     height: 6rem;
 `;
 
-const Primary = styled.h3`
-    color: #0275d8;
-    cursor: pointer;
+const Primary = styled.h2`
     margin-left: 20px;
-    &:hover {
-        text-decoration: underline;
-    }
+    color: #e6e6e6;
 `;
 
 const Box = styled.div`
