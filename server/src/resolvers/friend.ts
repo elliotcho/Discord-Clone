@@ -62,15 +62,6 @@ export class FriendResolver {
                 `,
                 [friendId, uid]
             );
-
-            await tm.query(
-                `
-                    delete from notification as n
-                    where ((n."senderId" = $1 and n."receiverId" = $2) or 
-                    (n."receiverId" = $1 and n."senderId" = $2)) and
-                    n.type = $3
-                `,[uid, friendId, 'friend']
-            );
         });
 
         return true;
@@ -100,13 +91,6 @@ export class FriendResolver {
                     and "receiverId" = $2
                     and status = false
                 `, [uid, senderId]
-            );
-
-            await tm.query(
-                `
-                    insert into notification ("receiverId", "senderId", "type")
-                    values  ($1, $2, $3)
-                `, [senderId, uid, "friend"]
             );
         });
 

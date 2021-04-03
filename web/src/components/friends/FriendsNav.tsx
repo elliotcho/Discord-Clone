@@ -31,16 +31,30 @@ const Button = styled.button`
     border: none;
 `;
 
-const FriendsNav: React.FC<{}> = () => { 
+interface FriendsNavProps {
+    type: string | string[];
+}
+
+const FriendsNav: React.FC<FriendsNavProps> = ({ type }) => { 
+    const style = { background: '#4d4d4d' };
+
     return (
         <Container>
             <Nav>Friends</Nav>
 
             <Nav>Online</Nav>
 
-            <Nav>All</Nav>
+            <NextLink href='/friends/all'>
+                <Nav style={type === 'all' ? style: {}}>
+                    All
+                </Nav>
+            </NextLink>
 
-            <Nav>Pending</Nav>
+            <NextLink href='/friends/requests'>
+                <Nav style={type === 'requests' ? style: {}}>
+                    Pending
+                </Nav>
+            </NextLink>
 
             <NextLink href='/friends/search'>
                 <Button>
