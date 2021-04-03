@@ -3,7 +3,7 @@ import { Formik, Form } from 'formik';
 import { MeDocument, MeQuery, useChangePasswordMutation } from '../../generated/graphql';
 import { withApollo } from '../../utils/withApollo';
 import { toErrorMap } from '../../utils/toErrorMap';
-import Layout from '../../containers/shared/Layout';
+import Layout from '../../containers/shared/AuthLayout';
 import AuthWrapper from '../../containers/shared/AuthWrapper';
 import FormContainer from '../../containers/auth/FormContainer';
 import Title from '../../components/auth/Title';
