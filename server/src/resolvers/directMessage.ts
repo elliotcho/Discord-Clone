@@ -6,9 +6,12 @@ import{
     Query,
     Resolver
 } from 'type-graphql';
-import {MyContext} from "../types";
+import {MyContext, GraphQLUpload, Upload} from "../types";
 import {getConnection} from "typeorm";
 import {DirectMessage} from "../entities/DirectMessage";
+import {createWriteStream} from 'fs';
+import path from 'path';
+import { v4 } from 'uuid';
 
 @Resolver(DirectMessage)
 export class DirectMessageResolver {
@@ -58,5 +61,29 @@ export class DirectMessageResolver {
             [req.session.uid, receiverId]
         );
         return messages;
+    }
+
+    @Mutation(()=> Boolean)
+    async sendFile(
+        @Arg('file', () => GraphQLUpload) {createReadStream, filename}: Upload,
+        @Arg('receiverId', ()=> Int) receiverId: number,
+        @Ctx() {req}: MyContext
+    ): Promise<boolean>{
+        const name = 'DM-' + v4() + path.extname(filename);
+        const senderId = req.session.uid;
+
+        await getConnection().query(
+            `
+            insert into "directMessage" ('senderId', 'receiverId', pic)
+            values ($1, $2, $3)
+            `,
+            [senderId, receiverId, name]
+        );
+        return new Promise(async (resolve, reject) =>
+            createReadStream()
+           .pipe(createWriteStream(path.join(__dirname, `../../images/${name}`)))
+           .on('finish', () => resolve(true))
+           .on('error', () => reject(false))
+        )
     }
 }

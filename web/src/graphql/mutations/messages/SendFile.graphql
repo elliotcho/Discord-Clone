@@ -1,0 +1,3 @@
+mutation SendFile($file: Upload!, $channelId: Int!){
+    sendFile(file: $file, channelId: $channelId)
+}

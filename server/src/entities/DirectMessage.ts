@@ -34,4 +34,8 @@ export class DirectMessage extends BaseEntity{
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Field()
+    @Column()
+    pic: string;
 }
