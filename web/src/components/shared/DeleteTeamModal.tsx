@@ -53,7 +53,7 @@ interface DeleteTeamModal {
     onClose(): void;
 }
 
-const DeleteTeamModal : React.FC<DeleteTeamModal> = ({ isOpen, onClose }) => {
+const DeleteTeamModal : React.FC<DeleteTeamModal> = ({teamId, isOpen, onClose }) => {
     const [deleteTeam] = useDeleteTeamMutation();
 
     return(
@@ -66,7 +66,8 @@ const DeleteTeamModal : React.FC<DeleteTeamModal> = ({ isOpen, onClose }) => {
             >
                 <Container>
                     <Formik
-                        initialValues={{ teamId: 0}}
+                        enableReinitialize
+                        initialValues={{ teamId }}
                         onSubmit = {async ({teamId}) =>{
                             await deleteTeam({
                                 variables: {teamId}
