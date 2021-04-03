@@ -34,4 +34,9 @@ export class Message extends BaseEntity{
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Field()
+    @Column({default: ''})
+    pic: string;
+
 }
