@@ -31,7 +31,7 @@ export class FriendResolver {
 
     @Query(() => [User])
     async friends(
-        @Arg('userId', () => Int) userId: number
+        @Ctx() { req } : MyContext
     ) : Promise<User[]> {
         const friends = await getConnection().query(
             `
@@ -39,7 +39,7 @@ export class FriendResolver {
                 on u.id = f."senderId" or u.id = f."receiverId"
                 where (f."senderId" = $1 or f."receiverId" = $1) and u.id != $1
                 and f.status = true
-            `,[userId]
+            `,[req.session.uid]
         );
 
         return friends;

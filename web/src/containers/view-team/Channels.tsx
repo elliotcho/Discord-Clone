@@ -67,8 +67,6 @@ async function deleteTeam(teamId){
     //useDeleteTeamMutation(teamId)
 }
 
-
-
 const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
     const[openLeaveChannel, setLeaveChannel] = useState(false);
