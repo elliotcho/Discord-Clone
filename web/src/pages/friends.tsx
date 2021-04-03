@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 
 const Container = styled.div`
     background: #595959;
+    height: 100%;
 `;
 
 const Friends: React.FC<{}> =() => {

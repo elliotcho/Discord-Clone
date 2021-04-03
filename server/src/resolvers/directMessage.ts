@@ -11,7 +11,7 @@ import {getConnection} from "typeorm";
 import {DirectMessage} from "../entities/DirectMessage";
 
 @Resolver(DirectMessage)
-export class directMessageResolver {
+export class DirectMessageResolver {
     @Mutation(()=> Boolean)
     async sendMessage(
         @Arg('text') text: string,

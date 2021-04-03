@@ -8,6 +8,10 @@ const Container = styled.div`
     display: grid;
 `;
 
+const Column = styled.div`
+    height: 100vh;
+`;
+
 const Layout: React.FC<{}> = ({ children }) => {
     return (
         <Container>
@@ -17,9 +21,9 @@ const Layout: React.FC<{}> = ({ children }) => {
             
             </div>
 
-            <>
+            <Column>
                 {children}
-            </>
+            </Column>
         </Container>
     )
 }

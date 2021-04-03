@@ -83,6 +83,22 @@ export class UserResolver {
         return 2;
     }
 
+    @Query(() => User)
+    async user(
+        @Arg('userId', () => Int, { nullable: true })  userId: number,
+        @Ctx() { req } : MyContext
+    ): Promise<User | undefined> {
+        let user: User | undefined;
+
+        if(userId) {
+            user = await User.findOne(userId);
+            return user;
+        }
+
+        user = await User.findOne(req.session.uid);
+        return user;
+    }
+
     @Query(() => [User])
     async searchResults(
         @Arg('query') query: string

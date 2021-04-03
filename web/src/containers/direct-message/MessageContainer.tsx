@@ -3,16 +3,21 @@ import styled from 'styled-components';
 
 const Container = styled.div`
     display: flex;
+    height: auto;
     flex-direction: column-reverse;
     background: #808080;
     overflow-x: hidden;
     overflow-y: auto;
 `;
 
-const MessageContainer: React.FC<{}> = () => {
+interface MessageContainerProps {
+    userId: number;
+}
+
+const MessageContainer: React.FC<MessageContainerProps> = ({ userId }) => {
     return (
         <Container>
-            HELLo
+           
         </Container>
     )
 }
