@@ -66,6 +66,7 @@ export type User = {
   email: Scalars['String'];
   username: Scalars['String'];
   profilePic: Scalars['String'];
+  friendStatus: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   profileURL: Scalars['String'];
@@ -78,6 +79,7 @@ export type Team = {
   name: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  ownerId: Scalars['Float'];
   channels: Array<Channel>;
 };
 
@@ -112,10 +114,14 @@ export type Mutation = {
   forgotPassword: Scalars['Boolean'];
   changeUsername: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
+  addUserToTeam: Team;
+  leaveTeam: Scalars['Boolean'];
+  deleteTeam: Scalars['Boolean'];
   sendMessage: Scalars['Boolean'];
   deleteMessage: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
+  invite: Invite;
   removeFriend: Scalars['Boolean'];
   acceptFriendRequest: Scalars['Boolean'];
   cancelFriendRequest: Scalars['Boolean'];
@@ -163,6 +169,21 @@ export type MutationCreateTeamArgs = {
 };
 
 
+export type MutationAddUserToTeamArgs = {
+  teamId: Scalars['Int'];
+};
+
+
+export type MutationLeaveTeamArgs = {
+  teamId: Scalars['Int'];
+};
+
+
+export type MutationDeleteTeamArgs = {
+  teamId: Scalars['Int'];
+};
+
+
 export type MutationSendMessageArgs = {
   channelId: Scalars['Int'];
   text: Scalars['String'];
@@ -182,6 +203,12 @@ export type MutationCreateChannelArgs = {
 
 export type MutationDeleteChannelArgs = {
   channelId: Scalars['Int'];
+};
+
+
+export type MutationInviteArgs = {
+  receiverId: Scalars['Int'];
+  teamId: Scalars['Int'];
 };
 
 
@@ -220,6 +247,14 @@ export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
   message: Scalars['String'];
+};
+
+export type Invite = {
+  __typename?: 'Invite';
+  senderID: Scalars['Float'];
+  receiverID: Scalars['Float'];
+  teamID: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
 };
 
 export type RegularChannelFragment = (
@@ -358,6 +393,19 @@ export type SendMessageMutation = (
   & Pick<Mutation, 'sendMessage'>
 );
 
+export type AddUserToTeamMutationVariables = Exact<{
+  teamId: Scalars['Int'];
+}>;
+
+
+export type AddUserToTeamMutation = (
+  { __typename?: 'Mutation' }
+  & { addUserToTeam: (
+    { __typename?: 'Team' }
+    & RegularTeamFragment
+  ) }
+);
+
 export type CreateTeamMutationVariables = Exact<{
   teamName: Scalars['String'];
 }>;
@@ -366,6 +414,26 @@ export type CreateTeamMutationVariables = Exact<{
 export type CreateTeamMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'createTeam'>
+);
+
+export type DeleteTeamMutationVariables = Exact<{
+  teamId: Scalars['Int'];
+}>;
+
+
+export type DeleteTeamMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteTeam'>
+);
+
+export type LeaveTeamMutationVariables = Exact<{
+  teamId: Scalars['Int'];
+}>;
+
+
+export type LeaveTeamMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'leaveTeam'>
 );
 
 export type ChangePasswordMutationVariables = Exact<{
@@ -466,7 +534,7 @@ export type ChannelQuery = (
   { __typename?: 'Query' }
   & { channel: (
     { __typename?: 'Channel' }
-    & Pick<Channel, 'name'>
+    & RegularChannelFragment
   ) }
 );
 
@@ -895,6 +963,38 @@ export function useSendMessageMutation(baseOptions?: Apollo.MutationHookOptions<
 export type SendMessageMutationHookResult = ReturnType<typeof useSendMessageMutation>;
 export type SendMessageMutationResult = Apollo.MutationResult<SendMessageMutation>;
 export type SendMessageMutationOptions = Apollo.BaseMutationOptions<SendMessageMutation, SendMessageMutationVariables>;
+export const AddUserToTeamDocument = gql`
+    mutation AddUserToTeam($teamId: Int!) {
+  addUserToTeam(teamId: $teamId) {
+    ...RegularTeam
+  }
+}
+    ${RegularTeamFragmentDoc}`;
+export type AddUserToTeamMutationFn = Apollo.MutationFunction<AddUserToTeamMutation, AddUserToTeamMutationVariables>;
+
+/**
+ * __useAddUserToTeamMutation__
+ *
+ * To run a mutation, you first call `useAddUserToTeamMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddUserToTeamMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addUserToTeamMutation, { data, loading, error }] = useAddUserToTeamMutation({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useAddUserToTeamMutation(baseOptions?: Apollo.MutationHookOptions<AddUserToTeamMutation, AddUserToTeamMutationVariables>) {
+        return Apollo.useMutation<AddUserToTeamMutation, AddUserToTeamMutationVariables>(AddUserToTeamDocument, baseOptions);
+      }
+export type AddUserToTeamMutationHookResult = ReturnType<typeof useAddUserToTeamMutation>;
+export type AddUserToTeamMutationResult = Apollo.MutationResult<AddUserToTeamMutation>;
+export type AddUserToTeamMutationOptions = Apollo.BaseMutationOptions<AddUserToTeamMutation, AddUserToTeamMutationVariables>;
 export const CreateTeamDocument = gql`
     mutation CreateTeam($teamName: String!) {
   createTeam(teamName: $teamName)
@@ -925,6 +1025,66 @@ export function useCreateTeamMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateTeamMutationHookResult = ReturnType<typeof useCreateTeamMutation>;
 export type CreateTeamMutationResult = Apollo.MutationResult<CreateTeamMutation>;
 export type CreateTeamMutationOptions = Apollo.BaseMutationOptions<CreateTeamMutation, CreateTeamMutationVariables>;
+export const DeleteTeamDocument = gql`
+    mutation DeleteTeam($teamId: Int!) {
+  deleteTeam(teamId: $teamId)
+}
+    `;
+export type DeleteTeamMutationFn = Apollo.MutationFunction<DeleteTeamMutation, DeleteTeamMutationVariables>;
+
+/**
+ * __useDeleteTeamMutation__
+ *
+ * To run a mutation, you first call `useDeleteTeamMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteTeamMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteTeamMutation, { data, loading, error }] = useDeleteTeamMutation({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useDeleteTeamMutation(baseOptions?: Apollo.MutationHookOptions<DeleteTeamMutation, DeleteTeamMutationVariables>) {
+        return Apollo.useMutation<DeleteTeamMutation, DeleteTeamMutationVariables>(DeleteTeamDocument, baseOptions);
+      }
+export type DeleteTeamMutationHookResult = ReturnType<typeof useDeleteTeamMutation>;
+export type DeleteTeamMutationResult = Apollo.MutationResult<DeleteTeamMutation>;
+export type DeleteTeamMutationOptions = Apollo.BaseMutationOptions<DeleteTeamMutation, DeleteTeamMutationVariables>;
+export const LeaveTeamDocument = gql`
+    mutation LeaveTeam($teamId: Int!) {
+  leaveTeam(teamId: $teamId)
+}
+    `;
+export type LeaveTeamMutationFn = Apollo.MutationFunction<LeaveTeamMutation, LeaveTeamMutationVariables>;
+
+/**
+ * __useLeaveTeamMutation__
+ *
+ * To run a mutation, you first call `useLeaveTeamMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLeaveTeamMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [leaveTeamMutation, { data, loading, error }] = useLeaveTeamMutation({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useLeaveTeamMutation(baseOptions?: Apollo.MutationHookOptions<LeaveTeamMutation, LeaveTeamMutationVariables>) {
+        return Apollo.useMutation<LeaveTeamMutation, LeaveTeamMutationVariables>(LeaveTeamDocument, baseOptions);
+      }
+export type LeaveTeamMutationHookResult = ReturnType<typeof useLeaveTeamMutation>;
+export type LeaveTeamMutationResult = Apollo.MutationResult<LeaveTeamMutation>;
+export type LeaveTeamMutationOptions = Apollo.BaseMutationOptions<LeaveTeamMutation, LeaveTeamMutationVariables>;
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($token: String!, $newPassword: String!) {
   changePassword(token: $token, newPassword: $newPassword) {
@@ -1176,10 +1336,10 @@ export type UpdateProfilePicMutationOptions = Apollo.BaseMutationOptions<UpdateP
 export const ChannelDocument = gql`
     query Channel($channelId: Int!) {
   channel(channelId: $channelId) {
-    name
+    ...RegularChannel
   }
 }
-    `;
+    ${RegularChannelFragmentDoc}`;
 
 /**
  * __useChannelQuery__
