@@ -3,6 +3,7 @@ import { UserResolver } from '../resolvers/user';
 import { TeamResolver } from '../resolvers/team';
 import { MessageResolver } from '../resolvers/message';
 import { ChannelResolver } from '../resolvers/channel';
+import {InviteResolver} from '../resolvers/invite';
 
 export const createSchema = async () => (
     await buildSchema({
@@ -12,7 +13,8 @@ export const createSchema = async () => (
             TeamResolver,
             UserResolver,
             ChannelResolver,
-            MessageResolver
+            MessageResolver,
+            InviteResolver
         ]
     })
 )

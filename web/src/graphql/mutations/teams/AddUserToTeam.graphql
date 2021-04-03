@@ -1,0 +1,5 @@
+mutation AddUserToTeam($teamId: Int!){
+    addUserToTeam(teamId: $teamId){
+        ...RegularTeam
+    }
+}
