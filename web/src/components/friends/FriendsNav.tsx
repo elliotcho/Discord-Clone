@@ -40,6 +40,8 @@ const FriendsNav: React.FC<{}> = () => {
 
             <Nav>All</Nav>
 
+            <Nav>Pending</Nav>
+
             <NextLink href='/friends/search'>
                 <Button>
                     Add Friend

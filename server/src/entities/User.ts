@@ -31,6 +31,10 @@ export class User extends BaseEntity {
     profilePic: string;
 
     @Field()
+    @Column({ default: false })
+    online: boolean;
+
+    @Field()
     profileURL: string;
 
     @Field()

@@ -195,6 +195,8 @@ export class UserResolver {
             };
         }
 
+        await User.update({ id: user.id }, { online: true });
+
         req.session.uid = user.id;
         return { user };
     }
@@ -233,6 +235,8 @@ export class UserResolver {
                 }
             }
         }
+
+        await User.update({ id: user.id }, { online: true });
   
         req.session.uid = user.id;
         return { user };
@@ -267,7 +271,11 @@ export class UserResolver {
             };
         }
 
-        await User.update({ id: user.id }, { password: await argon2.hash(newPassword) });
+        await User.update({ id: user.id }, { 
+            password: await argon2.hash(newPassword),
+            online: true
+        });
+        
         await redis.del(token);
 
         req.session.uid = user.id;
