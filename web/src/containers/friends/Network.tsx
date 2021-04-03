@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useFriendsQuery } from '../../generated/graphql';
 import UserCard from '../shared/UserCard';
+import NextLink from 'next/link';
 
 const Button = styled.button`
     color: #f2f2f2;
@@ -29,9 +30,11 @@ const Friends: React.FC<{}> =() => {
                     profileURL = {u.profileURL}
                     username = {u.username}
                 >
-                    <Button>
-                        Message
-                    </Button>
+                    <NextLink href={`/direct-message/${u.id}`}>
+                        <Button>
+                            Message
+                        </Button>
+                    </NextLink>
                 </UserCard>
             )}
         </> 
