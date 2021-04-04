@@ -15,9 +15,13 @@ export class Message extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Field()
-    @Column()
+    @Field({nullable: true})
+    @Column({ nullable: true})
     text: string;
+
+    @Field()
+    @Column({default: ''})
+    pic: string;
 
     @Field()
     @Column()
@@ -34,9 +38,5 @@ export class Message extends BaseEntity{
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
-
-    @Field()
-    @Column({default: ''})
-    pic: string;
 
 }
