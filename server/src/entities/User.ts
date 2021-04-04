@@ -50,4 +50,8 @@ export class User extends BaseEntity {
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Field({nullable: true})
+    @Column({nullable: true})
+    status: string;
 }

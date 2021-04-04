@@ -79,6 +79,7 @@ export type User = {
   isMe: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  status?: Maybe<Scalars['String']>;
 };
 
 
@@ -104,19 +105,19 @@ export type Channel = {
 export type Message = {
   __typename?: 'Message';
   id: Scalars['Float'];
-  text: Scalars['String'];
+  text?: Maybe<Scalars['String']>;
+  pic: Scalars['String'];
   senderId: Scalars['Float'];
   channelId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  pic: Scalars['String'];
   user: User;
 };
 
 export type DirectMessage = {
   __typename?: 'DirectMessage';
   id: Scalars['Float'];
-  text: Scalars['String'];
+  text?: Maybe<Scalars['String']>;
   pic: Scalars['String'];
   senderId: Scalars['Float'];
   receiverId: Scalars['Float'];
@@ -134,6 +135,7 @@ export type Mutation = {
   changePassword: UserResponse;
   forgotPassword: Scalars['Boolean'];
   changeUsername: Scalars['Boolean'];
+  setStatus: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
   addUserToTeam: Team;
   leaveTeam: Scalars['Boolean'];
@@ -186,6 +188,11 @@ export type MutationForgotPasswordArgs = {
 
 export type MutationChangeUsernameArgs = {
   username: Scalars['String'];
+};
+
+
+export type MutationSetStatusArgs = {
+  status: Scalars['String'];
 };
 
 
@@ -594,6 +601,16 @@ export type RemoveProfilePicMutationVariables = Exact<{ [key: string]: never; }>
 export type RemoveProfilePicMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'removeProfilePic'>
+);
+
+export type SetStatusMutationVariables = Exact<{
+  status: Scalars['String'];
+}>;
+
+
+export type SetStatusMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'setStatus'>
 );
 
 export type UpdateProfilePicMutationVariables = Exact<{
@@ -1503,6 +1520,36 @@ export function useRemoveProfilePicMutation(baseOptions?: Apollo.MutationHookOpt
 export type RemoveProfilePicMutationHookResult = ReturnType<typeof useRemoveProfilePicMutation>;
 export type RemoveProfilePicMutationResult = Apollo.MutationResult<RemoveProfilePicMutation>;
 export type RemoveProfilePicMutationOptions = Apollo.BaseMutationOptions<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>;
+export const SetStatusDocument = gql`
+    mutation SetStatus($status: String!) {
+  setStatus(status: $status)
+}
+    `;
+export type SetStatusMutationFn = Apollo.MutationFunction<SetStatusMutation, SetStatusMutationVariables>;
+
+/**
+ * __useSetStatusMutation__
+ *
+ * To run a mutation, you first call `useSetStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setStatusMutation, { data, loading, error }] = useSetStatusMutation({
+ *   variables: {
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useSetStatusMutation(baseOptions?: Apollo.MutationHookOptions<SetStatusMutation, SetStatusMutationVariables>) {
+        return Apollo.useMutation<SetStatusMutation, SetStatusMutationVariables>(SetStatusDocument, baseOptions);
+      }
+export type SetStatusMutationHookResult = ReturnType<typeof useSetStatusMutation>;
+export type SetStatusMutationResult = Apollo.MutationResult<SetStatusMutation>;
+export type SetStatusMutationOptions = Apollo.BaseMutationOptions<SetStatusMutation, SetStatusMutationVariables>;
 export const UpdateProfilePicDocument = gql`
     mutation UpdateProfilePic($file: Upload!) {
   updateProfilePic(file: $file)
