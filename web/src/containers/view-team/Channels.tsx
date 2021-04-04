@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { 
-    useChannelsQuery, 
-    useDeleteChannelMutation, 
-    useAddUserToTeamMutation, 
-    useDeleteTeamMutation,
-    useUpdateReadMutation 
-} from '../../generated/graphql';
+import { useChannelsQuery } from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
 import LeaveTeamModal from '../../components/shared/LeaveTeamModal';
 import DeleteTeamModal from '../../components/shared/DeleteTeamModal';
+import Channel from '../../components/view-team/Channel';
 import UserNav from '../../components/shared/UserNav';
-import NextLink from 'next/link';
 
 const Container = styled.div`
     position: relative;
@@ -40,21 +34,6 @@ const Box = styled.div`
     }
 `;
 
-const Channel = styled.div`
-    padding: 5px;
-    padding-left: 10px;
-    display: flex;
-    cursor: pointer;
-    color: white;
-    &:hover {
-        background: #808080;
-    }
-`;
-
-const Options = styled.div`
-    margin-left: auto;
-`;
-
 interface ChannelsProps {
     teamId: number;
     channelId: number;
@@ -66,15 +45,10 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const[openDelete, setDelete] = useState(false);
 
     let settingOption = "";
-    
-    const [deleteChannel] = useDeleteChannelMutation();
-    const [read] = useUpdateReadMutation();
 
     const { data } = useChannelsQuery({
         variables: { teamId }
     });
-
-    const active = { background: '#808080' };
 
     return (
         <Container>
@@ -110,42 +84,25 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
             </Flex>
 
             {data?.channels?.map((c, i) => {
-                let style = {};
+                let numChannels = data?.channels?.length;
                 let route = `/view-team/${teamId}/${c.id}`;
+                let active = false;
 
                 if((i === 0 && channelId === -1) || (channelId === c.id)) {
-                    style = active;
+                    active = true;
                 } 
 
                 return (
-                    <NextLink key={c.id} href={route}>
-                        <Channel 
-                            style={style}
-                            onClick= {async (e) =>{
-                                await read({
-                                    variables: {teamId, channelId}
-                                })
-                            }}
-                            >
-                            # {c.name}
-                           
-                           {data?.channels.length > 1 && (
-                                <Options
-                                    onClick = {async () => {
-                                        await deleteChannel({
-                                            variables: { channelId },
-                                            update: (cache) => {
-                                                cache.evict({ fieldName: 'channels' });
-                                            }
-                                        })
-                                    }}
-                                >
-                                    X
-                                </Options>
-                           )}
-                        </Channel> 
-                    </NextLink>
-                )   
+                    <Channel 
+                        key = {c.id}
+                        isRead = {c.read}
+                        channelId = {c.id}
+                        numChannels = {numChannels}
+                        active = {active}
+                        route = {route}
+                        {...c}
+                    />
+                ) 
             })} 
 
             <CreateChannelModal

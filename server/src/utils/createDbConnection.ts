@@ -5,7 +5,8 @@ import { Channel } from '../entities/Channel';
 import { Friend } from '../entities/Friend';
 import { Team } from '../entities/Team';
 import { User } from '../entities/User';
-import {DirectMessage} from '../entities/DirectMessage';
+import { DirectMessage } from '../entities/DirectMessage';
+import { Read } from '../entities/Read';
 
 export const createDbConnection = async () => {
     await createConnection({
@@ -20,7 +21,8 @@ export const createDbConnection = async () => {
             Friend,
             Channel,
             Team,
-            DirectMessage
+            DirectMessage,
+            Read
         ] 
     });
 

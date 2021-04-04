@@ -1,19 +1,14 @@
-import {Field, ObjectType} from "type-graphql";
 import{
     BaseEntity,
-    Column,
+    PrimaryColumn,
     Entity
 } from "typeorm";
 
-
-@ObjectType()
 @Entity()
 export class Read extends BaseEntity{
-    @Field()
-    @Column()
-    channelId: number
+    @PrimaryColumn()
+    channelId: number;
 
-    @Field()
-    @Column()
-    userId: number
+    @PrimaryColumn()
+    userId: number;
 }

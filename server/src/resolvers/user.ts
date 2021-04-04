@@ -344,9 +344,9 @@ export class UserResolver {
     ): Promise<boolean>{
         await getConnection().query(
             `
-            update "user"
-            set status = $1
-            where id = $2
+                update "user"
+                set status = $1
+                where id = $2
             `,
             [status, req.session.uid]
         );
