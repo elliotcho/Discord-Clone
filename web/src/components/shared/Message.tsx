@@ -71,7 +71,7 @@ const Message: React.FC<MessageProps> = ({
                 <MessageSettings 
                     messageId={messageId}
                     isDm = {isDm}
-                />
+                /> 
             </Header>
 
             <Main>
