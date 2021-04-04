@@ -31,8 +31,8 @@ export class User extends BaseEntity {
     profilePic: string;
 
     @Field()
-    @Column({ default: false })
-    online: boolean;
+    @Column({ nullable: true })
+    status: string;
 
     @Field()
     profileURL: string;
@@ -50,8 +50,4 @@ export class User extends BaseEntity {
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
-
-    @Field({nullable: true})
-    @Column({nullable: true})
-    status: string;
 }

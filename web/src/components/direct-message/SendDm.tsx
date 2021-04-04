@@ -98,6 +98,8 @@ const SendDm: React.FC<SendDmProps> = ({ userId: receiverId }) => {
                                 cache.evict({ fieldName: 'directMessages' });
                             }
                         });
+
+                        setText('');
                     }
                 }}
             />

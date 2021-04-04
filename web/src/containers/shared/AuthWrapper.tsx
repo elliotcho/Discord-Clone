@@ -12,7 +12,7 @@ const AuthWrapper : React.FC<AuthWrapperProps> = ({ children, requiresAuth = fal
 
     if(!loading) {
         if(data?.me && !requiresAuth) {
-            router.push('/profile');
+            router.push('/friends');
         }
 
         else if(!data?.me && requiresAuth) {

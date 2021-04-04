@@ -14,10 +14,21 @@ import { Message } from "../entities/Message";
 import { User } from '../entities/User';
 import { v4 } from "uuid";
 import path from 'path';
-import {createWriteStream} from 'fs';
+import fs, { createWriteStream } from 'fs';
 
 @Resolver(Message)
 export class MessageResolver {
+    @FieldResolver()
+    async pic(
+        @Root() message: Message
+    ) : Promise<string> {
+        if(!message.pic) {
+            return '';
+        }
+
+        return `${process.env.SERVER_URL}/images/${message.pic}`;
+    }
+
     @FieldResolver(() => User)
     async user (
         @Root() message: Message
@@ -52,7 +63,7 @@ export class MessageResolver {
             `
                 select * from message
                 where message."channelId" = $1
-                order by message."createdAt"
+                order by message."createdAt" DESC
             `, [channelId]
         );
 
@@ -63,6 +74,12 @@ export class MessageResolver {
     async deleteMessage(
         @Arg('messageId', () => Int) messageId: number
     ) : Promise<Boolean> {
+        const message = await Message.findOne(messageId);
+
+        if(message?.pic) {
+            const location = path.join(__dirname, `../../images/${message.pic}`);
+            fs.unlink(location, () => {});
+        }
 
         await getConnection().query(
             `
@@ -70,7 +87,7 @@ export class MessageResolver {
                 where message.id = $1
             `, 
             [messageId]
-        )
+        );
 
         return true; 
     }

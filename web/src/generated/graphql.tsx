@@ -100,7 +100,6 @@ export type Channel = {
   teamId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  read: Scalars['Boolean'];
 };
 
 export type Message = {
@@ -122,8 +121,9 @@ export type DirectMessage = {
   pic: Scalars['String'];
   senderId: Scalars['Float'];
   receiverId: Scalars['Float'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+  user: User;
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
 };
 
 export type Mutation = {
@@ -149,7 +149,6 @@ export type Mutation = {
   sendDmFile: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
-  updateRead: Scalars['Boolean'];
   invite: Invite;
   removeFriend: Scalars['Boolean'];
   acceptFriendRequest: Scalars['Boolean'];
@@ -263,12 +262,6 @@ export type MutationDeleteChannelArgs = {
 };
 
 
-export type MutationUpdateReadArgs = {
-  teamId: Scalars['Int'];
-  channelId: Scalars['Int'];
-};
-
-
 export type MutationInviteArgs = {
   receiverId: Scalars['Int'];
   teamId: Scalars['Int'];
@@ -327,10 +320,10 @@ export type RegularChannelFragment = (
 
 export type RegularMessageFragment = (
   { __typename?: 'Message' }
-  & Pick<Message, 'id' | 'text' | 'senderId' | 'createdAt' | 'channelId'>
+  & Pick<Message, 'id' | 'text' | 'createdAt' | 'pic'>
   & { user: (
     { __typename?: 'User' }
-    & Pick<User, 'id' | 'username'>
+    & RegularUserFragment
   ) }
 );
 
@@ -385,15 +378,14 @@ export type DeleteChannelMutation = (
   & Pick<Mutation, 'deleteChannel'>
 );
 
-export type UpdateReadMutationVariables = Exact<{
-  channelId: Scalars['Int'];
-  teamId: Scalars['Int'];
+export type DeleteDirectMessageMutationVariables = Exact<{
+  messageId: Scalars['Int'];
 }>;
 
 
-export type UpdateReadMutation = (
+export type DeleteDirectMessageMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'updateRead'>
+  & Pick<Mutation, 'deleteDirectMessage'>
 );
 
 export type SendDirectMessageMutationVariables = Exact<{
@@ -677,7 +669,11 @@ export type DirectMessagesQuery = (
   { __typename?: 'Query' }
   & { directMessages: Array<(
     { __typename?: 'DirectMessage' }
-    & Pick<DirectMessage, 'text' | 'pic'>
+    & Pick<DirectMessage, 'id' | 'text' | 'createdAt' | 'pic'>
+    & { user: (
+      { __typename?: 'User' }
+      & RegularUserFragment
+    ) }
   )> }
 );
 
@@ -783,28 +779,6 @@ export const RegularChannelFragmentDoc = gql`
   name
 }
     `;
-export const RegularMessageFragmentDoc = gql`
-    fragment RegularMessage on Message {
-  id
-  text
-  senderId
-  createdAt
-  channelId
-  user {
-    id
-    username
-  }
-}
-    `;
-export const RegularTeamFragmentDoc = gql`
-    fragment RegularTeam on Team {
-  id
-  name
-  channels {
-    id
-  }
-}
-    `;
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
@@ -815,6 +789,26 @@ export const RegularUserFragmentDoc = gql`
   profileURL
   createdAt
   updatedAt
+}
+    `;
+export const RegularMessageFragmentDoc = gql`
+    fragment RegularMessage on Message {
+  id
+  text
+  createdAt
+  pic
+  user {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+export const RegularTeamFragmentDoc = gql`
+    fragment RegularTeam on Team {
+  id
+  name
+  channels {
+    id
+  }
 }
     `;
 export const RegularErrorFragmentDoc = gql`
@@ -895,37 +889,36 @@ export function useDeleteChannelMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannelMutation>;
 export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
 export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
-export const UpdateReadDocument = gql`
-    mutation UpdateRead($channelId: Int!, $teamId: Int!) {
-  updateRead(channelId: $channelId, teamId: $teamId)
+export const DeleteDirectMessageDocument = gql`
+    mutation DeleteDirectMessage($messageId: Int!) {
+  deleteDirectMessage(messageId: $messageId)
 }
     `;
-export type UpdateReadMutationFn = Apollo.MutationFunction<UpdateReadMutation, UpdateReadMutationVariables>;
+export type DeleteDirectMessageMutationFn = Apollo.MutationFunction<DeleteDirectMessageMutation, DeleteDirectMessageMutationVariables>;
 
 /**
- * __useUpdateReadMutation__
+ * __useDeleteDirectMessageMutation__
  *
- * To run a mutation, you first call `useUpdateReadMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateReadMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useDeleteDirectMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteDirectMessageMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [updateReadMutation, { data, loading, error }] = useUpdateReadMutation({
+ * const [deleteDirectMessageMutation, { data, loading, error }] = useDeleteDirectMessageMutation({
  *   variables: {
- *      channelId: // value for 'channelId'
- *      teamId: // value for 'teamId'
+ *      messageId: // value for 'messageId'
  *   },
  * });
  */
-export function useUpdateReadMutation(baseOptions?: Apollo.MutationHookOptions<UpdateReadMutation, UpdateReadMutationVariables>) {
-        return Apollo.useMutation<UpdateReadMutation, UpdateReadMutationVariables>(UpdateReadDocument, baseOptions);
+export function useDeleteDirectMessageMutation(baseOptions?: Apollo.MutationHookOptions<DeleteDirectMessageMutation, DeleteDirectMessageMutationVariables>) {
+        return Apollo.useMutation<DeleteDirectMessageMutation, DeleteDirectMessageMutationVariables>(DeleteDirectMessageDocument, baseOptions);
       }
-export type UpdateReadMutationHookResult = ReturnType<typeof useUpdateReadMutation>;
-export type UpdateReadMutationResult = Apollo.MutationResult<UpdateReadMutation>;
-export type UpdateReadMutationOptions = Apollo.BaseMutationOptions<UpdateReadMutation, UpdateReadMutationVariables>;
+export type DeleteDirectMessageMutationHookResult = ReturnType<typeof useDeleteDirectMessageMutation>;
+export type DeleteDirectMessageMutationResult = Apollo.MutationResult<DeleteDirectMessageMutation>;
+export type DeleteDirectMessageMutationOptions = Apollo.BaseMutationOptions<DeleteDirectMessageMutation, DeleteDirectMessageMutationVariables>;
 export const SendDirectMessageDocument = gql`
     mutation SendDirectMessage($text: String!, $receiverId: Int!) {
   sendDirectMessage(text: $text, receiverId: $receiverId)
@@ -1699,11 +1692,16 @@ export type ChannelsQueryResult = Apollo.QueryResult<ChannelsQuery, ChannelsQuer
 export const DirectMessagesDocument = gql`
     query DirectMessages($receiverId: Int!) {
   directMessages(receiverId: $receiverId) {
+    id
     text
+    createdAt
     pic
+    user {
+      ...RegularUser
+    }
   }
 }
-    `;
+    ${RegularUserFragmentDoc}`;
 
 /**
  * __useDirectMessagesQuery__

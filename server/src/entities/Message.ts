@@ -15,12 +15,12 @@ export class Message extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Field({nullable: true})
-    @Column({ nullable: true})
+    @Field({ nullable: true })
+    @Column({ nullable: true })
     text: string;
 
     @Field()
-    @Column({default: ''})
+    @Column({ default: '' })
     pic: string;
 
     @Field()
@@ -31,7 +31,7 @@ export class Message extends BaseEntity{
     @Column()
     channelId: number;
 
-    @Field()
+    @Field(() => String)
     @CreateDateColumn()
     createdAt: Date;
 
