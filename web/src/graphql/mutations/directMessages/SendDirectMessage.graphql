@@ -1,0 +1,3 @@
+mutation SendDirectMessage($text: String!, $receiverId: Int!) {
+    sendDirectMessage(text: $text, receiverId: $receiverId)
+}

@@ -3,12 +3,15 @@ import styled from 'styled-components';
 import { withApollo } from '../utils/withApollo';
 import Layout from '../containers/shared/MainLayout';
 import AuthWrapper from '../containers/shared/AuthWrapper';
+import FriendRequests from '../containers/friends/FriendRequests';
 import AddFriend from '../containers/friends/AddFriend';
+import Network from '../containers/friends/Network';
 import FriendsNav from '../components/friends/FriendsNav';
 import { useRouter } from 'next/router';
 
 const Container = styled.div`
     background: #595959;
+    height: 100%;
 `;
 
 const Friends: React.FC<{}> =() => {
@@ -18,8 +21,10 @@ const Friends: React.FC<{}> =() => {
         <AuthWrapper requiresAuth>
             <Layout>
                 <Container>
-                    <FriendsNav />
+                    <FriendsNav type={type}/>
 
+                    {type === 'all' && <Network />}
+                    {type === 'requests' && <FriendRequests />}
                     {type === 'search' && <AddFriend />}
                 </Container>
             </Layout>

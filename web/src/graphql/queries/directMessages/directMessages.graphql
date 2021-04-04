@@ -1,0 +1,6 @@
+query DirectMessages($receiverId: Int!) {
+    directMessages(receiverId: $receiverId) {
+        text
+        pic
+    }
+}

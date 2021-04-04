@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import {Formik} from 'formik';
-import { useChannelsQuery, useDeleteChannelMutation } from '../../generated/graphql';
+import { 
+    useChannelsQuery, 
+    useDeleteChannelMutation, 
+    useAddUserToTeamMutation, 
+    useDeleteTeamMutation 
+} from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
-import ChatHeader from '../../components/view-team/ChatHeader';
+import LeaveTeamModal from '../../components/shared/LeaveTeamModal';
 import NextLink from 'next/link';
+import DeleteTeamModal from '../../components/shared/DeleteTeamModal';
 
 const Container = styled.div`
     background #333;
@@ -52,16 +57,16 @@ interface ChannelsProps {
     channelId: number;
 }
 
-async function invite(teamId) {
-    //useAddUserToTeamMutation(teamId);
-}
-
-
-
 const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const[openLeaveChannel, setLeaveChannel] = useState(false);
+    const[openDelete, setDelete] = useState(false);
+
     let settingOption = "";
+    
     const [deleteChannel] = useDeleteChannelMutation();
+    const [deleteTeam] = useDeleteTeamMutation();
+    const [addUser] = useAddUserToTeamMutation();
 
     const { data } = useChannelsQuery({
         variables: { teamId }
@@ -76,19 +81,26 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                 <Box>
                 <select value={settingOption} name="choice" onChange = { (e) => {
                     if(e.target.value === "invite"){
-                        invite(teamId)
+                        //invite(teamId)
+                        //setInvite(true);
                     } 
-                    if(e.target.value === "delete"){
-                        //delete()
+                    if(e.target.value === "leave"){
+                        setLeaveChannel(true);
+                        
                     }
                     if(e.target.value === "new channel"){
                         setIsOpen(true);
                     }
+                    //next option should only appear for the Team Owner!
+                    if(e.target.value === "delete"){
+                        setDelete(true);
+                    }
                 } }>
                     <option value="" label="Settings"/>
                     <option value="invite" label="Invite Friends"/>
-                    <option value="delete" label="Leave Team"/>
+                    <option value="leave" label="Leave Team"/>
                     <option value="new channel" label="Create New Channel"/>
+                    <option value="delete" label="Delete Team"/>
                 </select>
                 </Box>
                 
@@ -132,6 +144,18 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                 onClose = {() => setIsOpen(false)}
                 teamId = {teamId}
             />
+
+            <LeaveTeamModal
+                isOpen = {openLeaveChannel}
+                onClose = {()=> setLeaveChannel(false)}
+                teamId = {teamId}
+            />
+
+            <DeleteTeamModal
+                isOpen = {openDelete}
+                onClose = {()=> setDelete(false)}
+                teamId = {teamId}
+                />
         </Container>
     )
 }

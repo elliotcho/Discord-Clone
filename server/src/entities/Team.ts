@@ -31,4 +31,8 @@ export class Team extends BaseEntity {
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Field()
+    @Column()
+    ownerId: number
 }

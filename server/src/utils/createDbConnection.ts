@@ -5,20 +5,23 @@ import { Channel } from '../entities/Channel';
 import { Friend } from '../entities/Friend';
 import { Team } from '../entities/Team';
 import { User } from '../entities/User';
+import {DirectMessage} from '../entities/DirectMessage';
 
 export const createDbConnection = async () => {
     await createConnection({
         type: 'postgres',
         url: process.env.DB_URL,
         synchronize: true,
-        logging: false,
+        logging: true,
         entities: [
             User,
             Member,
             Message,
             Friend,
             Channel,
-            Team
+            Team,
+            DirectMessage
         ] 
     });
+
 }

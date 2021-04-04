@@ -54,7 +54,10 @@ export class TeamResolver {
             const result = await tm.createQueryBuilder()
                                   .insert()
                                   .into(Team)
-                                  .values({ name: teamName })
+                                  .values({ 
+                                      name: teamName,
+                                        ownerId: req.session.uid 
+                                   })
                                   .returning('*')
                                   .execute();
 
@@ -90,5 +93,58 @@ export class TeamResolver {
 
             `,[teamId,req.session.uid]
         );
+    }
+
+
+    @Mutation(() => Boolean)
+    async leaveTeam(
+        @Arg('teamId', ()=> Int) teamId: number,
+        @Ctx() {req}: MyContext
+    ): Promise<boolean>{
+        let success = false;
+
+        const teams = await getConnection().query(
+            `
+            select t.* from team as t
+            where id = $1
+            `,[teamId]
+        );
+
+        if( !(teams.length && teams[0].ownerId === req.session.uid) ){
+            await getConnection().query(
+                `
+                delete from member where id = $1
+                `, [ teamId]
+            );
+            success = true;
+        }
+        return success;
+    }
+
+    @Mutation(()=> Boolean)
+    async deleteTeam(
+        @Arg('teamId', ()=> Int) teamId:number,
+        @Ctx() {req}: MyContext
+    ): Promise<boolean>{
+        let success= false;
+
+        const teams = await getConnection().query(
+            `
+                select t.* from team as t
+                where id = $1
+            `,[teamId]
+        );
+
+        if(teams.length && teams[0].ownerId === req.session.uid){
+            await getConnection().query(
+                `
+                    delete from team where id = $1
+                `, [teamId]
+            );
+
+            success = true;
+        }
+
+        return success;
     }
 }

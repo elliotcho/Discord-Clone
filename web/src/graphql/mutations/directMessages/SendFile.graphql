@@ -1,0 +1,3 @@
+mutation SendDmFile($file: Upload!, $receiverId: Int!){
+    sendDmFile(file: $file, receiverId: $receiverId)
+}

@@ -1,26 +1,26 @@
-import { Field, ObjectType } from "type-graphql";
+import {Field, ObjectType} from "type-graphql";
 import{
     BaseEntity,
     Column,
-    CreateDateColumn,
     Entity,
     PrimaryGeneratedColumn,
+    CreateDateColumn,
     UpdateDateColumn
-} from "typeorm";
+} from 'typeorm';
 
 @ObjectType()
 @Entity()
-export class Message extends BaseEntity{
+export class DirectMessage extends BaseEntity{
     @Field()
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Field({nullable: true})
-    @Column({ nullable: true})
+    @Field({ nullable: true })
+    @Column({ nullable: true })
     text: string;
 
     @Field()
-    @Column({default: ''})
+    @Column({ default: '' })
     pic: string;
 
     @Field()
@@ -29,7 +29,7 @@ export class Message extends BaseEntity{
 
     @Field()
     @Column()
-    channelId: number;
+    receiverId: number;
 
     @Field()
     @CreateDateColumn()
@@ -38,5 +38,4 @@ export class Message extends BaseEntity{
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
-
 }
