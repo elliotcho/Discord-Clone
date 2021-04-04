@@ -1,0 +1,3 @@
+mutation UpdateRead($channelId: Int!, $teamId: Int!){
+    updateRead(channelId: $channelId, teamId: $teamId)
+}
