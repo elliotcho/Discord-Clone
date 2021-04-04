@@ -19,7 +19,7 @@ export class Friend extends BaseEntity {
     senderId: number;
 
     @Field()
-    @Column()
+    @Column({ default: false })
     status: boolean;
 
     @Field()

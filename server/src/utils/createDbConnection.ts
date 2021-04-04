@@ -2,6 +2,7 @@ import { createConnection } from 'typeorm';
 import { Message } from '../entities/Message';
 import { Member } from '../entities/Member';
 import { Channel } from '../entities/Channel';
+import { Friend } from '../entities/Friend';
 import { Team } from '../entities/Team';
 import { User } from '../entities/User';
 
@@ -15,6 +16,7 @@ export const createDbConnection = async () => {
             User,
             Member,
             Message,
+            Friend,
             Channel,
             Team
         ] 

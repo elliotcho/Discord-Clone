@@ -39,15 +39,21 @@ class UserResponse {
 export class UserResolver {
     @FieldResolver(() => String)
     async profileURL (
-        @Ctx() { req } : MyContext
+        @Root() user : User
     ) : Promise<string> {
-        const user = await User.findOne(req.session.uid);
-
         if(user && user.profilePic) {
             return `${process.env.SERVER_URL}/images/${user.profilePic}`;
         }
 
         return `${process.env.SERVER_URL}/images/default.png`;
+    }
+
+    @FieldResolver(() => Boolean)
+    isMe(
+        @Root() user: User,
+        @Ctx() { req } : MyContext
+    ) : boolean {
+        return req.session.uid === user.id;
     }
 
     @FieldResolver(() => Int)
@@ -189,6 +195,8 @@ export class UserResolver {
             };
         }
 
+        await User.update({ id: user.id }, { online: true });
+
         req.session.uid = user.id;
         return { user };
     }
@@ -227,6 +235,8 @@ export class UserResolver {
                 }
             }
         }
+
+        await User.update({ id: user.id }, { online: true });
   
         req.session.uid = user.id;
         return { user };
@@ -261,7 +271,11 @@ export class UserResolver {
             };
         }
 
-        await User.update({ id: user.id }, { password: await argon2.hash(newPassword) });
+        await User.update({ id: user.id }, { 
+            password: await argon2.hash(newPassword),
+            online: true
+        });
+        
         await redis.del(token);
 
         req.session.uid = user.id;
