@@ -2,7 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-import { useDeleteDirectMessageMutation } from '../../generated/graphql';
+import { 
+    useDeleteDirectMessageMutation,
+    useDeleteMessageMutation
+} from '../../generated/graphql';
 
 const Box = styled.div`
     font-size: 1.8rem;
@@ -44,10 +47,12 @@ const Text = styled.div`
 
 interface MessageSettingsProps {
     messageId: number;
+    isDm: boolean;
 }
 
-const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId }) => {
-    const [deleteMessage] = useDeleteDirectMessageMutation();
+const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, isDm }) => {
+    const [deleteDm] = useDeleteDirectMessageMutation();
+    const [deleteMessage] = useDeleteMessageMutation();
 
     return (
         <Box>
@@ -56,10 +61,21 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId }) => {
             <Dropdown>
                 <Option
                     onClick = {async () => {
+                        if(isDm) {
+                            await deleteDm({
+                                variables: { messageId },
+                                update: (cache) => {
+                                    cache.evict({ fieldName: 'directMessages' });
+                                }
+                            });
+
+                            return;
+                        } 
+
                         await deleteMessage({
                             variables: { messageId },
                             update: (cache) => {
-                                cache.evict({ fieldName: 'directMessages' });
+                                cache.evict({ fieldName: 'messages' });
                             }
                         })
                     }}

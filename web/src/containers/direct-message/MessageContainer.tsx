@@ -29,6 +29,7 @@ const MessageContainer: React.FC<MessageContainerProps> = ({ userId: receiverId 
                         key = {m.id}
                         messageId = {m.id}
                         date = {m.createdAt}
+                        isDm = {true}
                         {...m.user}
                         {...m} 
                     />
