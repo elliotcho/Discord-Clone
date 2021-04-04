@@ -89,7 +89,6 @@ export type Team = {
   name: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  ownerId: Scalars['Float'];
   channels: Array<Channel>;
 };
 
@@ -109,7 +108,7 @@ export type Message = {
   pic: Scalars['String'];
   senderId: Scalars['Float'];
   channelId: Scalars['Float'];
-  createdAt: Scalars['DateTime'];
+  createdAt: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   user: User;
 };
@@ -144,6 +143,7 @@ export type Mutation = {
   sendMessage: Scalars['Boolean'];
   deleteMessage: Scalars['Boolean'];
   sendFile: Scalars['Boolean'];
+  editMessage: Scalars['Boolean'];
   sendDirectMessage: Scalars['Boolean'];
   deleteDirectMessage: Scalars['Boolean'];
   sendDmFile: Scalars['Boolean'];
@@ -231,6 +231,12 @@ export type MutationDeleteMessageArgs = {
 export type MutationSendFileArgs = {
   channelId: Scalars['Int'];
   file: Scalars['Upload'];
+};
+
+
+export type MutationEditMessageArgs = {
+  messageId: Scalars['Int'];
+  text: Scalars['String'];
 };
 
 

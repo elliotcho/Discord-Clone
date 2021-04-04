@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { 
     useDeleteDirectMessageMutation,
-    useDeleteMessageMutation
+    useDeleteMessageMutation,
+    useEditMessageMutation, 
 } from '../../generated/graphql';
 
 const Box = styled.div`
@@ -85,6 +86,12 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, isDm }) =>
                     <Text>
                         Delete
                     </Text>
+                </Option>
+                <Option>
+
+                    <Text>
+                        Edit
+                    </Text> 
                 </Option>
             </Dropdown>
         </Box>
