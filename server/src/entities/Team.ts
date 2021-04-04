@@ -32,7 +32,7 @@ export class Team extends BaseEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Field()
-    @Column()
-    ownerId: number
+    // @Field()
+    // @Column()
+    // ownerId: number
 }
