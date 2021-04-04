@@ -14,7 +14,7 @@ import { Message } from "../entities/Message";
 import { User } from '../entities/User';
 import { v4 } from "uuid";
 import path from 'path';
-import {createWriteStream} from 'fs';
+import fs, { createWriteStream } from 'fs';
 
 @Resolver(Message)
 export class MessageResolver {
@@ -74,7 +74,12 @@ export class MessageResolver {
     async deleteMessage(
         @Arg('messageId', () => Int) messageId: number
     ) : Promise<Boolean> {
-        
+        const message = await Message.findOne(messageId);
+
+        if(message?.pic) {
+            const location = path.join(__dirname, `../../images/${message.pic}`);
+            fs.unlink(location, () => {});
+        }
 
         await getConnection().query(
             `
@@ -82,7 +87,7 @@ export class MessageResolver {
                 where message.id = $1
             `, 
             [messageId]
-        )
+        );
 
         return true; 
     }
