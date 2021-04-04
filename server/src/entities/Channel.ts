@@ -37,4 +37,8 @@ export class Channel extends BaseEntity {
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Field()
+    @Column({default: false})
+    read: boolean;
 }

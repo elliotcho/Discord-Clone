@@ -4,7 +4,8 @@ import {
     useChannelsQuery, 
     useDeleteChannelMutation, 
     useAddUserToTeamMutation, 
-    useDeleteTeamMutation 
+    useDeleteTeamMutation,
+    useUpdateReadMutation 
 } from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
 import LeaveTeamModal from '../../components/shared/LeaveTeamModal';
@@ -67,6 +68,7 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [deleteChannel] = useDeleteChannelMutation();
     const [deleteTeam] = useDeleteTeamMutation();
     const [addUser] = useAddUserToTeamMutation();
+    const [read] = useUpdateReadMutation();
 
     const { data } = useChannelsQuery({
         variables: { teamId }
@@ -117,7 +119,14 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
 
                 return (
                     <NextLink key={c.id} href={route}>
-                        <Channel style={style}>
+                        <Channel 
+                            style={style}
+                            onClick= {async (e) =>{
+                                await read({
+                                    variables: {teamId, channelId}
+                                })
+                            }}
+                            >
                             # {c.name}
                            
                            {data?.channels.length > 1 && (
