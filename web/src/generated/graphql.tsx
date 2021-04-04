@@ -79,6 +79,7 @@ export type User = {
   isMe: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  status?: Maybe<Scalars['String']>;
 };
 
 
@@ -104,24 +105,25 @@ export type Channel = {
 export type Message = {
   __typename?: 'Message';
   id: Scalars['Float'];
-  text: Scalars['String'];
+  text?: Maybe<Scalars['String']>;
+  pic: Scalars['String'];
   senderId: Scalars['Float'];
   channelId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  pic: Scalars['String'];
   user: User;
 };
 
 export type DirectMessage = {
   __typename?: 'DirectMessage';
   id: Scalars['Float'];
-  text: Scalars['String'];
+  text?: Maybe<Scalars['String']>;
   pic: Scalars['String'];
   senderId: Scalars['Float'];
   receiverId: Scalars['Float'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+  user: User;
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
 };
 
 export type Mutation = {
@@ -134,6 +136,7 @@ export type Mutation = {
   changePassword: UserResponse;
   forgotPassword: Scalars['Boolean'];
   changeUsername: Scalars['Boolean'];
+  setStatus: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
   addUserToTeam: Team;
   leaveTeam: Scalars['Boolean'];
@@ -186,6 +189,11 @@ export type MutationForgotPasswordArgs = {
 
 export type MutationChangeUsernameArgs = {
   username: Scalars['String'];
+};
+
+
+export type MutationSetStatusArgs = {
+  status: Scalars['String'];
 };
 
 
@@ -368,6 +376,16 @@ export type DeleteChannelMutationVariables = Exact<{
 export type DeleteChannelMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteChannel'>
+);
+
+export type DeleteDirectMessageMutationVariables = Exact<{
+  messageId: Scalars['Int'];
+}>;
+
+
+export type DeleteDirectMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteDirectMessage'>
 );
 
 export type SendDirectMessageMutationVariables = Exact<{
@@ -596,6 +614,16 @@ export type RemoveProfilePicMutation = (
   & Pick<Mutation, 'removeProfilePic'>
 );
 
+export type SetStatusMutationVariables = Exact<{
+  status: Scalars['String'];
+}>;
+
+
+export type SetStatusMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'setStatus'>
+);
+
 export type UpdateProfilePicMutationVariables = Exact<{
   file: Scalars['Upload'];
 }>;
@@ -641,7 +669,11 @@ export type DirectMessagesQuery = (
   { __typename?: 'Query' }
   & { directMessages: Array<(
     { __typename?: 'DirectMessage' }
-    & Pick<DirectMessage, 'text' | 'pic'>
+    & Pick<DirectMessage, 'id' | 'text' | 'createdAt' | 'pic'>
+    & { user: (
+      { __typename?: 'User' }
+      & RegularUserFragment
+    ) }
   )> }
 );
 
@@ -859,6 +891,36 @@ export function useDeleteChannelMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannelMutation>;
 export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
 export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
+export const DeleteDirectMessageDocument = gql`
+    mutation DeleteDirectMessage($messageId: Int!) {
+  deleteDirectMessage(messageId: $messageId)
+}
+    `;
+export type DeleteDirectMessageMutationFn = Apollo.MutationFunction<DeleteDirectMessageMutation, DeleteDirectMessageMutationVariables>;
+
+/**
+ * __useDeleteDirectMessageMutation__
+ *
+ * To run a mutation, you first call `useDeleteDirectMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteDirectMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteDirectMessageMutation, { data, loading, error }] = useDeleteDirectMessageMutation({
+ *   variables: {
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useDeleteDirectMessageMutation(baseOptions?: Apollo.MutationHookOptions<DeleteDirectMessageMutation, DeleteDirectMessageMutationVariables>) {
+        return Apollo.useMutation<DeleteDirectMessageMutation, DeleteDirectMessageMutationVariables>(DeleteDirectMessageDocument, baseOptions);
+      }
+export type DeleteDirectMessageMutationHookResult = ReturnType<typeof useDeleteDirectMessageMutation>;
+export type DeleteDirectMessageMutationResult = Apollo.MutationResult<DeleteDirectMessageMutation>;
+export type DeleteDirectMessageMutationOptions = Apollo.BaseMutationOptions<DeleteDirectMessageMutation, DeleteDirectMessageMutationVariables>;
 export const SendDirectMessageDocument = gql`
     mutation SendDirectMessage($text: String!, $receiverId: Int!) {
   sendDirectMessage(text: $text, receiverId: $receiverId)
@@ -1503,6 +1565,36 @@ export function useRemoveProfilePicMutation(baseOptions?: Apollo.MutationHookOpt
 export type RemoveProfilePicMutationHookResult = ReturnType<typeof useRemoveProfilePicMutation>;
 export type RemoveProfilePicMutationResult = Apollo.MutationResult<RemoveProfilePicMutation>;
 export type RemoveProfilePicMutationOptions = Apollo.BaseMutationOptions<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>;
+export const SetStatusDocument = gql`
+    mutation SetStatus($status: String!) {
+  setStatus(status: $status)
+}
+    `;
+export type SetStatusMutationFn = Apollo.MutationFunction<SetStatusMutation, SetStatusMutationVariables>;
+
+/**
+ * __useSetStatusMutation__
+ *
+ * To run a mutation, you first call `useSetStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setStatusMutation, { data, loading, error }] = useSetStatusMutation({
+ *   variables: {
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useSetStatusMutation(baseOptions?: Apollo.MutationHookOptions<SetStatusMutation, SetStatusMutationVariables>) {
+        return Apollo.useMutation<SetStatusMutation, SetStatusMutationVariables>(SetStatusDocument, baseOptions);
+      }
+export type SetStatusMutationHookResult = ReturnType<typeof useSetStatusMutation>;
+export type SetStatusMutationResult = Apollo.MutationResult<SetStatusMutation>;
+export type SetStatusMutationOptions = Apollo.BaseMutationOptions<SetStatusMutation, SetStatusMutationVariables>;
 export const UpdateProfilePicDocument = gql`
     mutation UpdateProfilePic($file: Upload!) {
   updateProfilePic(file: $file)
@@ -1602,11 +1694,16 @@ export type ChannelsQueryResult = Apollo.QueryResult<ChannelsQuery, ChannelsQuer
 export const DirectMessagesDocument = gql`
     query DirectMessages($receiverId: Int!) {
   directMessages(receiverId: $receiverId) {
+    id
     text
+    createdAt
     pic
+    user {
+      ...RegularUser
+    }
   }
 }
-    `;
+    ${RegularUserFragmentDoc}`;
 
 /**
  * __useDirectMessagesQuery__

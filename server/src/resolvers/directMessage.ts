@@ -8,15 +8,23 @@ import{
     Resolver,
     Root
 } from 'type-graphql';
-import {MyContext, GraphQLUpload, Upload} from "../types";
-import {getConnection} from "typeorm";
-import {DirectMessage} from "../entities/DirectMessage";
+import { MyContext, GraphQLUpload, Upload } from "../types";
+import { getConnection } from "typeorm";
+import { User } from '../entities/User';
+import { DirectMessage } from "../entities/DirectMessage";
 import { createWriteStream } from 'fs';
 import path from 'path';
 import { v4 } from 'uuid';
 
 @Resolver(DirectMessage)
 export class DirectMessageResolver {
+    @FieldResolver()
+    async user(
+        @Root() dm: DirectMessage
+    ) : Promise<User | undefined> {
+        return User.findOne(dm.senderId);
+    }
+
     @FieldResolver()
     async pic(
         @Root() dm:  DirectMessage
@@ -70,7 +78,7 @@ export class DirectMessageResolver {
             `
             select * from direct_message
             where direct_message."senderId" = $1 AND direct_message."receiverId"= $2
-            order by direct_message."createdAt"
+            order by direct_message."createdAt" DESC
             `,
             [req.session.uid, receiverId]
         );

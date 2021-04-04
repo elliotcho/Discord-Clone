@@ -1,6 +1,12 @@
 query DirectMessages($receiverId: Int!) {
     directMessages(receiverId: $receiverId) {
+        id
         text
+        createdAt
         pic
+
+        user {
+            ...RegularUser
+        }
     }
 }

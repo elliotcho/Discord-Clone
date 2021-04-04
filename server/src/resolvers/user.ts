@@ -332,7 +332,7 @@ export class UserResolver {
 
         await getConnection().query(
             `
-                update 'user'
+                update "user"
                 set username = $1
                 where id = $2
             `,
@@ -340,5 +340,21 @@ export class UserResolver {
         );
         
        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async setStatus(
+        @Arg('status') status: string,
+        @Ctx() {req}: MyContext
+    ): Promise<boolean>{
+        await getConnection().query(
+            `
+            update "user"
+            set status = $1
+            where id = $2
+            `,
+            [status, req.session.uid]
+        );
+        return true;
     }
 }

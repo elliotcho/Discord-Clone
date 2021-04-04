@@ -5,7 +5,7 @@ const Container = styled.div`
     display: flex;
     align-items: center;
     border-bottom: 1px solid black;
-    background: #4d4d4d;
+    background: #808080;
     padding: 0 10px;
 `;
 

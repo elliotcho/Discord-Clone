@@ -33,7 +33,7 @@ const Teams: React.FC<{}> = () => {
 
     return (
         <Container>
-            <NextLink href='/profile'>
+            <NextLink href='/friends'>
                 <TeamIcon>
                    
                 </TeamIcon>

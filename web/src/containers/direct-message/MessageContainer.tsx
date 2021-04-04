@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useDirectMessagesQuery } from '../../generated/graphql';
+import Message from '../../components/shared/Message';
 
 const Container = styled.div`
     display: flex;
     height: auto;
     flex-direction: column-reverse;
-    background: #808080;
+    background: #4d4d4d;
     overflow-x: hidden;
     overflow-y: auto;
 `;
@@ -23,13 +24,15 @@ const MessageContainer: React.FC<MessageContainerProps> = ({ userId: receiverId 
     return (
         <Container>
            {data?.directMessages.map(m => {
-               if(m.pic) {
-                   return (
-                       <img src={m.pic} alt='pic' width='100' height='100'/>
-                   )
-               }
-
-               return <h1>{m.text}</h1>
+               return (
+                    <Message
+                        key = {m.id}
+                        messageId = {m.id}
+                        date = {m.createdAt}
+                        {...m.user}
+                        {...m} 
+                    />
+               )
            })}
         </Container>
     )

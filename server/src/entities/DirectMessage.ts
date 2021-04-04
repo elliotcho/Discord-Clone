@@ -7,6 +7,7 @@ import{
     CreateDateColumn,
     UpdateDateColumn
 } from 'typeorm';
+import { User } from './User';
 
 @ObjectType()
 @Entity()
@@ -31,11 +32,14 @@ export class DirectMessage extends BaseEntity{
     @Column()
     receiverId: number;
 
-    @Field()
+    @Field(() => User)
+    user: User;
+
+    @Field(() => String)
     @CreateDateColumn()
     createdAt: Date;
 
-    @Field()
+    @Field(() => String)
     @UpdateDateColumn()
     updatedAt: Date;
 }

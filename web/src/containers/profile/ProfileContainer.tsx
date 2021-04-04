@@ -4,7 +4,8 @@ import {
     MeDocument, 
     useMeQuery, 
     useUpdateProfilePicMutation,
-    useRemoveProfilePicMutation
+    useRemoveProfilePicMutation,
+    useSetStatusMutation
 } from '../../generated/graphql';
 import NextLink from 'next/link';
 
@@ -87,6 +88,18 @@ const Button = styled.button`
     margin-left: 4px;
 `;
 
+
+
+const Status = styled.select`
+    width: 46%;
+    padding: 2%;
+    margin: 6px 0 20px;
+    border-radius: 14px;
+    border: solid 2px #a6f6f1;
+    background: #5c6e91;
+    font-family: 'Nunito', sans-serif;
+    `
+
 const ProfileContainer: React.FC<{}> = () => {
     const { data } = useMeQuery();
     
@@ -101,6 +114,8 @@ const ProfileContainer: React.FC<{}> = () => {
             { query: MeDocument }
         ]
     });
+
+    const [setStatus] = useSetStatusMutation();
 
     let username = data?.me?.username || 'Loading...';
     let imgURL = data?.me?.profileURL;
@@ -119,7 +134,26 @@ const ProfileContainer: React.FC<{}> = () => {
 
             <Intro> Whagwan, {username}</Intro>
 
+
             <Edit>
+                <Status
+                    name='status'
+                    id='status'
+                    onChange={async (e) =>{
+                        const status = e.target.value;
+
+                        await setStatus({
+                            variables: {status}
+                        })
+
+                        
+                    }}>
+                    <option value=''>Set Status</option>
+                    <option value="invisible">Invisible</option>
+                    <option value='active'>Active</option>
+                    <option value='idle'>Idle</option>
+                    <option value='disturb'>Do Not Disturb</option>
+                </Status>
                 <UpdatePic>
                     <Label>
                         Update Profile Picture
