@@ -320,10 +320,10 @@ export type RegularChannelFragment = (
 
 export type RegularMessageFragment = (
   { __typename?: 'Message' }
-  & Pick<Message, 'id' | 'text' | 'senderId' | 'createdAt' | 'channelId'>
+  & Pick<Message, 'id' | 'text' | 'createdAt' | 'pic'>
   & { user: (
     { __typename?: 'User' }
-    & Pick<User, 'id' | 'username'>
+    & RegularUserFragment
   ) }
 );
 
@@ -779,28 +779,6 @@ export const RegularChannelFragmentDoc = gql`
   name
 }
     `;
-export const RegularMessageFragmentDoc = gql`
-    fragment RegularMessage on Message {
-  id
-  text
-  senderId
-  createdAt
-  channelId
-  user {
-    id
-    username
-  }
-}
-    `;
-export const RegularTeamFragmentDoc = gql`
-    fragment RegularTeam on Team {
-  id
-  name
-  channels {
-    id
-  }
-}
-    `;
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
@@ -811,6 +789,26 @@ export const RegularUserFragmentDoc = gql`
   profileURL
   createdAt
   updatedAt
+}
+    `;
+export const RegularMessageFragmentDoc = gql`
+    fragment RegularMessage on Message {
+  id
+  text
+  createdAt
+  pic
+  user {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+export const RegularTeamFragmentDoc = gql`
+    fragment RegularTeam on Team {
+  id
+  name
+  channels {
+    id
+  }
 }
     `;
 export const RegularErrorFragmentDoc = gql`

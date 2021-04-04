@@ -1,11 +1,9 @@
 fragment RegularMessage on Message {
     id
     text
-    senderId
     createdAt
-    channelId
+    pic
     user {
-        id
-        username
+        ...RegularUser
     }
 }

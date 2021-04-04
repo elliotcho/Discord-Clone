@@ -18,6 +18,17 @@ import {createWriteStream} from 'fs';
 
 @Resolver(Message)
 export class MessageResolver {
+    @FieldResolver()
+    async pic(
+        @Root() message: Message
+    ) : Promise<string> {
+        if(!message.pic) {
+            return '';
+        }
+
+        return `${process.env.SERVER_URL}/images/${message.pic}`;
+    }
+
     @FieldResolver(() => User)
     async user (
         @Root() message: Message
@@ -63,6 +74,7 @@ export class MessageResolver {
     async deleteMessage(
         @Arg('messageId', () => Int) messageId: number
     ) : Promise<Boolean> {
+        
 
         await getConnection().query(
             `

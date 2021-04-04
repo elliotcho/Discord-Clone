@@ -56,7 +56,7 @@ export class TeamResolver {
                                   .into(Team)
                                   .values({ 
                                       name: teamName,
-                                        ownerId: req.session.uid 
+                                        // ownerId: req.session.uid 
                                    })
                                   .returning('*')
                                   .execute();

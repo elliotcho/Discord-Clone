@@ -20,7 +20,7 @@ export class Message extends BaseEntity{
     text: string;
 
     @Field()
-    @Column({default: ''})
+    @Column({ default: '' })
     pic: string;
 
     @Field()
@@ -31,7 +31,7 @@ export class Message extends BaseEntity{
     @Column()
     channelId: number;
 
-    @Field()
+    @Field(() => String)
     @CreateDateColumn()
     createdAt: Date;
 
