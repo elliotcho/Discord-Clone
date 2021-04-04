@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { MessagesDocument, useSendMessageMutation } from '../../generated/graphql';
+import { MessagesDocument, useSendFileMutation, useSendMessageMutation } from '../../generated/graphql';
 import { handleEnterPress } from '../../utils/handleEnterPress';
 
 const Container = styled.div`
@@ -32,6 +32,10 @@ const Textarea = styled.textarea`
     resize: none;
 `;
 
+const Input = styled.input`
+    display: none;
+    `;
+
 interface SendMessageProps {
     channelId: number;
 }
@@ -39,6 +43,7 @@ interface SendMessageProps {
 const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
     const [text, setText] = useState('');
 
+    const [sendPicture] = useSendFileMutation();
     const [sendMessage] = useSendMessageMutation({
         refetchQueries: [ 
             { query: MessagesDocument, variables: { channelId } }
@@ -48,9 +53,27 @@ const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
 
     return (
         <Container>
-            <Button>
+            <Button 
+                onClick= {() =>{
+                    document.getElementById('picture').click();
+                }}>
                 +
             </Button>
+
+            <Input 
+                type= 'file'
+                id= 'picture'
+                onChange= {async (e) => {
+                    const file = e.target.files[0]
+
+                    await sendPicture({
+                        variables: {file, channelId},
+                        update: (cache) => {
+                            cache.evict({ fieldName: 'messages'})
+                        }
+                    }); 
+                }}
+            />
 
             <Textarea
                 value = {text}

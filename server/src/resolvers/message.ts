@@ -86,7 +86,7 @@ export class MessageResolver {
 
         await getConnection().query(
             `
-            insert into message ('senderId', 'channelId', pic)
+            insert into message ("senderId", "channelId", pic)
             values ($1, $2, $3)
             `,
             [senderId, channelId, name]
