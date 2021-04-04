@@ -63,7 +63,7 @@ export class MessageResolver {
             `
                 select * from message
                 where message."channelId" = $1
-                order by message."createdAt"
+                order by message."createdAt" DESC
             `, [channelId]
         );
 

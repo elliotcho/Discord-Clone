@@ -8,10 +8,12 @@ import {
 } from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
 import LeaveTeamModal from '../../components/shared/LeaveTeamModal';
-import NextLink from 'next/link';
 import DeleteTeamModal from '../../components/shared/DeleteTeamModal';
+import UserNav from '../../components/shared/UserNav';
+import NextLink from 'next/link';
 
 const Container = styled.div`
+    position: relative;
     background #333;
 `;
 
@@ -65,8 +67,6 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     let settingOption = "";
     
     const [deleteChannel] = useDeleteChannelMutation();
-    const [deleteTeam] = useDeleteTeamMutation();
-    const [addUser] = useAddUserToTeamMutation();
 
     const { data } = useChannelsQuery({
         variables: { teamId }
@@ -155,7 +155,9 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                 isOpen = {openDelete}
                 onClose = {()=> setDelete(false)}
                 teamId = {teamId}
-                />
+            />
+
+            <UserNav />
         </Container>
     )
 }

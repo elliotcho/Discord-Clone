@@ -15,8 +15,8 @@ export class Message extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Field({nullable: true})
-    @Column({ nullable: true})
+    @Field({ nullable: true })
+    @Column({ nullable: true })
     text: string;
 
     @Field()

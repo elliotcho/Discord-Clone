@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Teams from '../../components/shared/Teams';
+import UserNav from '../../components/shared/UserNav';
 
 const Container = styled.div`
     height: 100vh;
@@ -17,8 +18,8 @@ const Layout: React.FC<{}> = ({ children }) => {
         <Container>
             <Teams />
 
-            <div style={{background: '#1a1c20'}}>
-            
+            <div style={{background: '#1a1c20', position: 'relative'}}>
+                <UserNav />
             </div>
 
             <Column>
