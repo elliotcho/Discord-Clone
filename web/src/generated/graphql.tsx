@@ -25,6 +25,7 @@ export type Query = {
   team: Team;
   teams: Array<Team>;
   messages: Array<Message>;
+  directMessages: Array<DirectMessage>;
   channels: Array<Channel>;
   channel: Channel;
   friendRequests: Array<User>;
@@ -49,6 +50,11 @@ export type QueryTeamArgs = {
 
 export type QueryMessagesArgs = {
   channelId: Scalars['Int'];
+};
+
+
+export type QueryDirectMessagesArgs = {
+  receiverId: Scalars['Int'];
 };
 
 
@@ -103,7 +109,19 @@ export type Message = {
   channelId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  pic: Scalars['String'];
   user: User;
+};
+
+export type DirectMessage = {
+  __typename?: 'DirectMessage';
+  id: Scalars['Float'];
+  text: Scalars['String'];
+  pic: Scalars['String'];
+  senderId: Scalars['Float'];
+  receiverId: Scalars['Float'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
 };
 
 export type Mutation = {
@@ -122,6 +140,10 @@ export type Mutation = {
   deleteTeam: Scalars['Boolean'];
   sendMessage: Scalars['Boolean'];
   deleteMessage: Scalars['Boolean'];
+  sendFile: Scalars['Boolean'];
+  sendDirectMessage: Scalars['Boolean'];
+  deleteDirectMessage: Scalars['Boolean'];
+  sendDmFile: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
   invite: Invite;
@@ -195,6 +217,29 @@ export type MutationSendMessageArgs = {
 
 export type MutationDeleteMessageArgs = {
   messageId: Scalars['Int'];
+};
+
+
+export type MutationSendFileArgs = {
+  channelId: Scalars['Int'];
+  file: Scalars['Upload'];
+};
+
+
+export type MutationSendDirectMessageArgs = {
+  receiverId: Scalars['Int'];
+  text: Scalars['String'];
+};
+
+
+export type MutationDeleteDirectMessageArgs = {
+  messageId: Scalars['Int'];
+};
+
+
+export type MutationSendDmFileArgs = {
+  receiverId: Scalars['Int'];
+  file: Scalars['Upload'];
 };
 
 
@@ -325,6 +370,28 @@ export type DeleteChannelMutation = (
   & Pick<Mutation, 'deleteChannel'>
 );
 
+export type SendDirectMessageMutationVariables = Exact<{
+  text: Scalars['String'];
+  receiverId: Scalars['Int'];
+}>;
+
+
+export type SendDirectMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'sendDirectMessage'>
+);
+
+export type SendDmFileMutationVariables = Exact<{
+  file: Scalars['Upload'];
+  receiverId: Scalars['Int'];
+}>;
+
+
+export type SendDmFileMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'sendDmFile'>
+);
+
 export type AcceptFriendRequestMutationVariables = Exact<{
   senderId: Scalars['Int'];
 }>;
@@ -383,6 +450,17 @@ export type DeleteMessageMutationVariables = Exact<{
 export type DeleteMessageMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteMessage'>
+);
+
+export type SendFileMutationVariables = Exact<{
+  file: Scalars['Upload'];
+  channelId: Scalars['Int'];
+}>;
+
+
+export type SendFileMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'sendFile'>
 );
 
 export type SendMessageMutationVariables = Exact<{
@@ -551,6 +629,19 @@ export type ChannelsQuery = (
   & { channels: Array<(
     { __typename?: 'Channel' }
     & RegularChannelFragment
+  )> }
+);
+
+export type DirectMessagesQueryVariables = Exact<{
+  receiverId: Scalars['Int'];
+}>;
+
+
+export type DirectMessagesQuery = (
+  { __typename?: 'Query' }
+  & { directMessages: Array<(
+    { __typename?: 'DirectMessage' }
+    & Pick<DirectMessage, 'text' | 'pic'>
   )> }
 );
 
@@ -768,6 +859,68 @@ export function useDeleteChannelMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannelMutation>;
 export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
 export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
+export const SendDirectMessageDocument = gql`
+    mutation SendDirectMessage($text: String!, $receiverId: Int!) {
+  sendDirectMessage(text: $text, receiverId: $receiverId)
+}
+    `;
+export type SendDirectMessageMutationFn = Apollo.MutationFunction<SendDirectMessageMutation, SendDirectMessageMutationVariables>;
+
+/**
+ * __useSendDirectMessageMutation__
+ *
+ * To run a mutation, you first call `useSendDirectMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendDirectMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendDirectMessageMutation, { data, loading, error }] = useSendDirectMessageMutation({
+ *   variables: {
+ *      text: // value for 'text'
+ *      receiverId: // value for 'receiverId'
+ *   },
+ * });
+ */
+export function useSendDirectMessageMutation(baseOptions?: Apollo.MutationHookOptions<SendDirectMessageMutation, SendDirectMessageMutationVariables>) {
+        return Apollo.useMutation<SendDirectMessageMutation, SendDirectMessageMutationVariables>(SendDirectMessageDocument, baseOptions);
+      }
+export type SendDirectMessageMutationHookResult = ReturnType<typeof useSendDirectMessageMutation>;
+export type SendDirectMessageMutationResult = Apollo.MutationResult<SendDirectMessageMutation>;
+export type SendDirectMessageMutationOptions = Apollo.BaseMutationOptions<SendDirectMessageMutation, SendDirectMessageMutationVariables>;
+export const SendDmFileDocument = gql`
+    mutation SendDmFile($file: Upload!, $receiverId: Int!) {
+  sendDmFile(file: $file, receiverId: $receiverId)
+}
+    `;
+export type SendDmFileMutationFn = Apollo.MutationFunction<SendDmFileMutation, SendDmFileMutationVariables>;
+
+/**
+ * __useSendDmFileMutation__
+ *
+ * To run a mutation, you first call `useSendDmFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendDmFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendDmFileMutation, { data, loading, error }] = useSendDmFileMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *      receiverId: // value for 'receiverId'
+ *   },
+ * });
+ */
+export function useSendDmFileMutation(baseOptions?: Apollo.MutationHookOptions<SendDmFileMutation, SendDmFileMutationVariables>) {
+        return Apollo.useMutation<SendDmFileMutation, SendDmFileMutationVariables>(SendDmFileDocument, baseOptions);
+      }
+export type SendDmFileMutationHookResult = ReturnType<typeof useSendDmFileMutation>;
+export type SendDmFileMutationResult = Apollo.MutationResult<SendDmFileMutation>;
+export type SendDmFileMutationOptions = Apollo.BaseMutationOptions<SendDmFileMutation, SendDmFileMutationVariables>;
 export const AcceptFriendRequestDocument = gql`
     mutation AcceptFriendRequest($senderId: Int!) {
   acceptFriendRequest(senderId: $senderId)
@@ -948,6 +1101,37 @@ export function useDeleteMessageMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteMessageMutationHookResult = ReturnType<typeof useDeleteMessageMutation>;
 export type DeleteMessageMutationResult = Apollo.MutationResult<DeleteMessageMutation>;
 export type DeleteMessageMutationOptions = Apollo.BaseMutationOptions<DeleteMessageMutation, DeleteMessageMutationVariables>;
+export const SendFileDocument = gql`
+    mutation SendFile($file: Upload!, $channelId: Int!) {
+  sendFile(file: $file, channelId: $channelId)
+}
+    `;
+export type SendFileMutationFn = Apollo.MutationFunction<SendFileMutation, SendFileMutationVariables>;
+
+/**
+ * __useSendFileMutation__
+ *
+ * To run a mutation, you first call `useSendFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendFileMutation, { data, loading, error }] = useSendFileMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useSendFileMutation(baseOptions?: Apollo.MutationHookOptions<SendFileMutation, SendFileMutationVariables>) {
+        return Apollo.useMutation<SendFileMutation, SendFileMutationVariables>(SendFileDocument, baseOptions);
+      }
+export type SendFileMutationHookResult = ReturnType<typeof useSendFileMutation>;
+export type SendFileMutationResult = Apollo.MutationResult<SendFileMutation>;
+export type SendFileMutationOptions = Apollo.BaseMutationOptions<SendFileMutation, SendFileMutationVariables>;
 export const SendMessageDocument = gql`
     mutation SendMessage($text: String!, $channelId: Int!) {
   sendMessage(text: $text, channelId: $channelId)
@@ -1415,6 +1599,40 @@ export function useChannelsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<C
 export type ChannelsQueryHookResult = ReturnType<typeof useChannelsQuery>;
 export type ChannelsLazyQueryHookResult = ReturnType<typeof useChannelsLazyQuery>;
 export type ChannelsQueryResult = Apollo.QueryResult<ChannelsQuery, ChannelsQueryVariables>;
+export const DirectMessagesDocument = gql`
+    query DirectMessages($receiverId: Int!) {
+  directMessages(receiverId: $receiverId) {
+    text
+    pic
+  }
+}
+    `;
+
+/**
+ * __useDirectMessagesQuery__
+ *
+ * To run a query within a React component, call `useDirectMessagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDirectMessagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDirectMessagesQuery({
+ *   variables: {
+ *      receiverId: // value for 'receiverId'
+ *   },
+ * });
+ */
+export function useDirectMessagesQuery(baseOptions: Apollo.QueryHookOptions<DirectMessagesQuery, DirectMessagesQueryVariables>) {
+        return Apollo.useQuery<DirectMessagesQuery, DirectMessagesQueryVariables>(DirectMessagesDocument, baseOptions);
+      }
+export function useDirectMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DirectMessagesQuery, DirectMessagesQueryVariables>) {
+          return Apollo.useLazyQuery<DirectMessagesQuery, DirectMessagesQueryVariables>(DirectMessagesDocument, baseOptions);
+        }
+export type DirectMessagesQueryHookResult = ReturnType<typeof useDirectMessagesQuery>;
+export type DirectMessagesLazyQueryHookResult = ReturnType<typeof useDirectMessagesLazyQuery>;
+export type DirectMessagesQueryResult = Apollo.QueryResult<DirectMessagesQuery, DirectMessagesQueryVariables>;
 export const FriendRequestsDocument = gql`
     query FriendRequests {
   friendRequests {

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useSendDirectMessageMutation, useSendDmFileMutation } from '../../generated/graphql';
 import { handleEnterPress } from '../../utils/handleEnterPress';
 
 const Container = styled.div`
@@ -19,7 +20,7 @@ const Button = styled.button`
     border-radius: 50%;
     cursor: pointer;
     border: none;
-    
+
     &:hover {
         box-shadow: 0 0 5px black;
     }
@@ -27,6 +28,10 @@ const Button = styled.button`
     &:focus {
         outline: none;
     }
+`;
+
+const Input = styled.input`
+    display: none;
 `;
 
 const Textarea = styled.textarea`
@@ -49,16 +54,51 @@ interface SendDmProps {
     userId: number;
 }
 
-const SendDm: React.FC<SendDmProps> = () => {
+const SendDm: React.FC<SendDmProps> = ({ userId: receiverId }) => {
+    const [text, setText] = useState('');
+    
+    const [sendText] = useSendDirectMessageMutation();
+    const [sendFile] = useSendDmFileMutation();
+
     return (
         <Container>
-            <Button>
+            <Button
+                onClick = {() => {
+                    document.getElementById('dmFile').click();
+                }}
+            >
                 +
             </Button>
 
+            <Input
+                type = 'file'
+                id = 'dmFile'
+                onChange= {async (e) => {
+                    const file = e.target.files[0];
+
+                    await sendFile({
+                        variables: { file, receiverId },
+                        update: (cache) => {
+                            cache.evict({ fieldName: 'directMessages' });
+                        }
+                    });
+                }}
+            />
+
             <Textarea
-                onKeyDown = {(e) => {
+                value = {text}
+                onChange = {(e) => setText(e.target.value)}
+                onKeyDown = {async (e) => {
                     const submit = handleEnterPress(e, 130);
+
+                    if(submit) {
+                        await sendText({
+                            variables: { text, receiverId },
+                            update: (cache) => {
+                                cache.evict({ fieldName: 'directMessages' });
+                            }
+                        });
+                    }
                 }}
             />
         </Container>
