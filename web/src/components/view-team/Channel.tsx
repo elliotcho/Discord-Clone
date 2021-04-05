@@ -41,18 +41,18 @@ const Channel: React.FC<ChannelProps> = ({
 
     useEffect(() => {
 
-        const fetchData = async () => {
-            await read({
-                variables: { channelId },
-                update: (cache) => {
-                    cache.evict({ fieldName: 'channels' });
-                }
-            });
-        }
+        // const fetchData = async () => {
+        //     await read({
+        //         variables: { channelId },
+        //         update: (cache) => {
+        //             cache.evict({ fieldName: 'channels' });
+        //         }
+        //     });
+        // }
 
-        if(active) {
-            fetchData();
-        }
+        // if(active) {
+        //     //fetchData();
+        // }
 
     }, [channelId])
 
@@ -60,20 +60,13 @@ const Channel: React.FC<ChannelProps> = ({
         style = { background: '#808080' };
     }
 
-    if(!isRead) {
-        style = { color: 'red' };
-    }
+    // if(!isRead) {
+    //     style = { color: 'red' };
+    // }
 
     return (
         <NextLink href={route}>
-            <Container
-                style={style}
-                onClick= {async (e) =>{
-                    await read({
-                        variables: { channelId }
-                    })
-                }}
-            >
+            <Container style={style}>
                 # {name}
                 
                 {numChannels > 1 && (

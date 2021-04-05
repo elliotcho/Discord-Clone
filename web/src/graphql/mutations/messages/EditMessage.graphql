@@ -1,3 +1,3 @@
-mutation EditMessage($text: String, $messageId: Int){
+mutation EditMessage($text: String!, $messageId: Int!) {
     editMessage(text: $text, messageId: $messageId)
 }

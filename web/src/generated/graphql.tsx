@@ -492,6 +492,17 @@ export type DeleteMessageMutation = (
   & Pick<Mutation, 'deleteMessage'>
 );
 
+export type EditMessageMutationVariables = Exact<{
+  text: Scalars['String'];
+  messageId: Scalars['Int'];
+}>;
+
+
+export type EditMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'editMessage'>
+);
+
 export type SendFileMutationVariables = Exact<{
   file: Scalars['Upload'];
   channelId: Scalars['Int'];
@@ -1214,6 +1225,37 @@ export function useDeleteMessageMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteMessageMutationHookResult = ReturnType<typeof useDeleteMessageMutation>;
 export type DeleteMessageMutationResult = Apollo.MutationResult<DeleteMessageMutation>;
 export type DeleteMessageMutationOptions = Apollo.BaseMutationOptions<DeleteMessageMutation, DeleteMessageMutationVariables>;
+export const EditMessageDocument = gql`
+    mutation EditMessage($text: String!, $messageId: Int!) {
+  editMessage(text: $text, messageId: $messageId)
+}
+    `;
+export type EditMessageMutationFn = Apollo.MutationFunction<EditMessageMutation, EditMessageMutationVariables>;
+
+/**
+ * __useEditMessageMutation__
+ *
+ * To run a mutation, you first call `useEditMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editMessageMutation, { data, loading, error }] = useEditMessageMutation({
+ *   variables: {
+ *      text: // value for 'text'
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useEditMessageMutation(baseOptions?: Apollo.MutationHookOptions<EditMessageMutation, EditMessageMutationVariables>) {
+        return Apollo.useMutation<EditMessageMutation, EditMessageMutationVariables>(EditMessageDocument, baseOptions);
+      }
+export type EditMessageMutationHookResult = ReturnType<typeof useEditMessageMutation>;
+export type EditMessageMutationResult = Apollo.MutationResult<EditMessageMutation>;
+export type EditMessageMutationOptions = Apollo.BaseMutationOptions<EditMessageMutation, EditMessageMutationVariables>;
 export const SendFileDocument = gql`
     mutation SendFile($file: Upload!, $channelId: Int!) {
   sendFile(file: $file, channelId: $channelId)

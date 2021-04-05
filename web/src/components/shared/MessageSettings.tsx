@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { 
     useDeleteDirectMessageMutation,
     useDeleteMessageMutation,
-    useEditMessageMutation, 
+    useEditMessageMutation 
 } from '../../generated/graphql';
+import EditModal from './EditModal';
 
 const Box = styled.div`
     font-size: 1.8rem;
@@ -48,12 +49,16 @@ const Text = styled.div`
 
 interface MessageSettingsProps {
     messageId: number;
+    text: string;
     isDm: boolean;
 }
 
-const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, isDm }) => {
-    const [deleteDm] = useDeleteDirectMessageMutation();
+const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const [editMessage] = useEditMessageMutation();
     const [deleteMessage] = useDeleteMessageMutation();
+    const [deleteDm] = useDeleteDirectMessageMutation();
 
     return (
         <Box>
@@ -87,13 +92,37 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, isDm }) =>
                         Delete
                     </Text>
                 </Option>
-                <Option>
 
-                    <Text>
-                        Edit
-                    </Text> 
-                </Option>
+               {text && (
+                    <Option
+                        onClick = {() => {
+                            setIsOpen(true);
+                        }}
+                    >
+                        <FontAwesomeIcon icon={faEdit} />
+
+                        <Text>
+                            Edit
+                        </Text> 
+                    </Option>
+               )}
             </Dropdown>
+
+            <EditModal
+                isOpen = {isOpen}
+                content = {text}
+                onClose = {() => setIsOpen(false)}
+                onSave = {async (newText) => {
+                    if(!isDm) {
+                        await editMessage({
+                            variables: { messageId, text: newText },
+                            update: (cache) => {
+                                cache.evict({ fieldName: 'messages' });
+                            }
+                        });
+                    }
+                }}
+            />
         </Box>
     )
 }

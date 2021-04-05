@@ -115,7 +115,23 @@ export class MessageResolver {
            .on('finish', () => resolve(true))
            .on('error', () => reject(false))
         )
+    }
 
-        
+    @Mutation(() => Boolean)
+    async editMessage(
+        @Arg('text') text: string,
+        @Arg('messageId', () => Int) messageId: number
+    ) : Promise<Boolean> {
+
+        await getConnection().query(
+            `
+                update message
+                set text = $1
+                where id = $2
+            `, 
+            [text, messageId]
+        )
+
+        return true; 
     }
 }
