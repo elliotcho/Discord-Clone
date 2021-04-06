@@ -70,6 +70,7 @@ const Message: React.FC<MessageProps> = ({
 
                 <MessageSettings 
                     messageId={messageId}
+                    text = {text}
                     isDm = {isDm}
                 /> 
             </Header>

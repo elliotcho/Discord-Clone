@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { 
-    useChannelsQuery, 
-    useDeleteChannelMutation, 
-    useAddUserToTeamMutation, 
-    useDeleteTeamMutation 
+    useChannelsQuery,
+    useDeleteTeamMutation,
+    useLeaveTeamMutation
 } from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
-import LeaveTeamModal from '../../components/shared/LeaveTeamModal';
-import NextLink from 'next/link';
-import DeleteTeamModal from '../../components/shared/DeleteTeamModal';
+import ConfirmModal from '../../components/shared/ConfirmModal';
+import Channel from '../../components/view-team/Channel';
+import UserNav from '../../components/shared/UserNav';
+import { useRouter } from 'next/router';
 
 const Container = styled.div`
+    position: relative;
     background #333;
 `;
 
@@ -37,21 +38,6 @@ const Box = styled.div`
     }
 `;
 
-const Channel = styled.div`
-    padding: 5px;
-    padding-left: 10px;
-    display: flex;
-    cursor: pointer;
-    color: white;
-    &:hover {
-        background: #808080;
-    }
-`;
-
-const Options = styled.div`
-    margin-left: auto;
-`;
-
 interface ChannelsProps {
     teamId: number;
     channelId: number;
@@ -61,18 +47,15 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
     const[openLeaveChannel, setLeaveChannel] = useState(false);
     const[openDelete, setDelete] = useState(false);
+    const router = useRouter();
+
+    const { data } = useChannelsQuery({ variables: { teamId } });
+    const [deleteTeam] = useDeleteTeamMutation();
+    const [leaveTeam] = useLeaveTeamMutation();
 
     let settingOption = "";
-    
-    const [deleteChannel] = useDeleteChannelMutation();
-    const [deleteTeam] = useDeleteTeamMutation();
-    const [addUser] = useAddUserToTeamMutation();
 
-    const { data } = useChannelsQuery({
-        variables: { teamId }
-    });
-
-    const active = { background: '#808080' };
+ 
 
     return (
         <Container>
@@ -108,35 +91,25 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
             </Flex>
 
             {data?.channels?.map((c, i) => {
-                let style = {};
+                let numChannels = data?.channels?.length;
                 let route = `/view-team/${teamId}/${c.id}`;
+                let active = false;
 
                 if((i === 0 && channelId === -1) || (channelId === c.id)) {
-                    style = active;
+                    active = true;
                 } 
 
                 return (
-                    <NextLink key={c.id} href={route}>
-                        <Channel style={style}>
-                            # {c.name}
-                           
-                           {data?.channels.length > 1 && (
-                                <Options
-                                    onClick = {async () => {
-                                        await deleteChannel({
-                                            variables: { channelId },
-                                            update: (cache) => {
-                                                cache.evict({ fieldName: 'channels' });
-                                            }
-                                        })
-                                    }}
-                                >
-                                    X
-                                </Options>
-                           )}
-                        </Channel> 
-                    </NextLink>
-                )   
+                    <Channel 
+                        key = {c.id}
+                        isRead = {c.read}
+                        channelId = {c.id}
+                        numChannels = {numChannels}
+                        active = {active}
+                        route = {route}
+                        {...c}
+                    />
+                ) 
             })} 
 
             <CreateChannelModal
@@ -145,17 +118,43 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                 teamId = {teamId}
             />
 
-            <LeaveTeamModal
+            <ConfirmModal
                 isOpen = {openLeaveChannel}
-                onClose = {()=> setLeaveChannel(false)}
-                teamId = {teamId}
+                onClose = {() => setLeaveChannel(false)}
+                title =  'Are you sure you want to leave this team?'
+                onSave ={async () => {
+                    const result = await leaveTeam({
+                        variables: { teamId },
+                        update: (cache) => {
+                            cache.evict({ fieldName: "teams"});
+                        }
+                    });
+
+                    if(result.data.leaveTeam){
+                        router.push('/profile')
+                    }
+                }}
             />
 
-            <DeleteTeamModal
+            <ConfirmModal
                 isOpen = {openDelete}
-                onClose = {()=> setDelete(false)}
-                teamId = {teamId}
-                />
+                onClose = {() => setDelete(false)}
+                title = 'Are you sure you want to permanently delete this team?'
+                onSave = {async () => {
+                    const result =  await deleteTeam({
+                        variables: { teamId },
+                        update: (cache) => {
+                            cache.evict({ fieldName: "teams"})
+                        }
+                    });
+
+                    if (result.data.deleteTeam){
+                        router.push('/profile')
+                    }
+                }}
+            />
+            
+            <UserNav />
         </Container>
     )
 }

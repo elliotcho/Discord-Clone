@@ -73,13 +73,12 @@ export type User = {
   email: Scalars['String'];
   username: Scalars['String'];
   profilePic: Scalars['String'];
-  online: Scalars['Boolean'];
+  status: Scalars['String'];
   profileURL: Scalars['String'];
   friendStatus: Scalars['Float'];
   isMe: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  status?: Maybe<Scalars['String']>;
 };
 
 
@@ -97,6 +96,7 @@ export type Channel = {
   id: Scalars['Float'];
   name: Scalars['String'];
   teamId: Scalars['Float'];
+  lastMessage: Message;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
 };
@@ -108,6 +108,7 @@ export type Message = {
   pic: Scalars['String'];
   senderId: Scalars['Float'];
   channelId: Scalars['Float'];
+  isRead: Scalars['Boolean'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   user: User;
@@ -147,8 +148,10 @@ export type Mutation = {
   sendDirectMessage: Scalars['Boolean'];
   deleteDirectMessage: Scalars['Boolean'];
   sendDmFile: Scalars['Boolean'];
+  editDirectMessage: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
+  updateRead: Scalars['Boolean'];
   invite: Invite;
   removeFriend: Scalars['Boolean'];
   acceptFriendRequest: Scalars['Boolean'];
@@ -257,6 +260,12 @@ export type MutationSendDmFileArgs = {
 };
 
 
+export type MutationEditDirectMessageArgs = {
+  messageId: Scalars['Int'];
+  text: Scalars['String'];
+};
+
+
 export type MutationCreateChannelArgs = {
   teamId: Scalars['Int'];
   channelName: Scalars['String'];
@@ -264,6 +273,11 @@ export type MutationCreateChannelArgs = {
 
 
 export type MutationDeleteChannelArgs = {
+  channelId: Scalars['Int'];
+};
+
+
+export type MutationUpdateReadArgs = {
   channelId: Scalars['Int'];
 };
 
@@ -322,11 +336,15 @@ export type Invite = {
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
   & Pick<Channel, 'id' | 'name'>
+  & { lastMessage: (
+    { __typename?: 'Message' }
+    & RegularMessageFragment
+  ) }
 );
 
 export type RegularMessageFragment = (
   { __typename?: 'Message' }
-  & Pick<Message, 'id' | 'text' | 'createdAt' | 'pic'>
+  & Pick<Message, 'id' | 'text' | 'createdAt' | 'isRead' | 'pic'>
   & { user: (
     { __typename?: 'User' }
     & RegularUserFragment
@@ -384,6 +402,16 @@ export type DeleteChannelMutation = (
   & Pick<Mutation, 'deleteChannel'>
 );
 
+export type UpdateReadMutationVariables = Exact<{
+  channelId: Scalars['Int'];
+}>;
+
+
+export type UpdateReadMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'updateRead'>
+);
+
 export type DeleteDirectMessageMutationVariables = Exact<{
   messageId: Scalars['Int'];
 }>;
@@ -392,6 +420,17 @@ export type DeleteDirectMessageMutationVariables = Exact<{
 export type DeleteDirectMessageMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteDirectMessage'>
+);
+
+export type EditDirectMessageMutationVariables = Exact<{
+  text: Scalars['String'];
+  messageId: Scalars['Int'];
+}>;
+
+
+export type EditDirectMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'editDirectMessage'>
 );
 
 export type SendDirectMessageMutationVariables = Exact<{
@@ -474,6 +513,17 @@ export type DeleteMessageMutationVariables = Exact<{
 export type DeleteMessageMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteMessage'>
+);
+
+export type EditMessageMutationVariables = Exact<{
+  text: Scalars['String'];
+  messageId: Scalars['Int'];
+}>;
+
+
+export type EditMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'editMessage'>
 );
 
 export type SendFileMutationVariables = Exact<{
@@ -779,12 +829,6 @@ export type UserQuery = (
   ) }
 );
 
-export const RegularChannelFragmentDoc = gql`
-    fragment RegularChannel on Channel {
-  id
-  name
-}
-    `;
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
@@ -802,12 +846,22 @@ export const RegularMessageFragmentDoc = gql`
   id
   text
   createdAt
+  isRead
   pic
   user {
     ...RegularUser
   }
 }
     ${RegularUserFragmentDoc}`;
+export const RegularChannelFragmentDoc = gql`
+    fragment RegularChannel on Channel {
+  id
+  name
+  lastMessage {
+    ...RegularMessage
+  }
+}
+    ${RegularMessageFragmentDoc}`;
 export const RegularTeamFragmentDoc = gql`
     fragment RegularTeam on Team {
   id
@@ -895,6 +949,36 @@ export function useDeleteChannelMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannelMutation>;
 export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
 export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
+export const UpdateReadDocument = gql`
+    mutation UpdateRead($channelId: Int!) {
+  updateRead(channelId: $channelId)
+}
+    `;
+export type UpdateReadMutationFn = Apollo.MutationFunction<UpdateReadMutation, UpdateReadMutationVariables>;
+
+/**
+ * __useUpdateReadMutation__
+ *
+ * To run a mutation, you first call `useUpdateReadMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateReadMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateReadMutation, { data, loading, error }] = useUpdateReadMutation({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useUpdateReadMutation(baseOptions?: Apollo.MutationHookOptions<UpdateReadMutation, UpdateReadMutationVariables>) {
+        return Apollo.useMutation<UpdateReadMutation, UpdateReadMutationVariables>(UpdateReadDocument, baseOptions);
+      }
+export type UpdateReadMutationHookResult = ReturnType<typeof useUpdateReadMutation>;
+export type UpdateReadMutationResult = Apollo.MutationResult<UpdateReadMutation>;
+export type UpdateReadMutationOptions = Apollo.BaseMutationOptions<UpdateReadMutation, UpdateReadMutationVariables>;
 export const DeleteDirectMessageDocument = gql`
     mutation DeleteDirectMessage($messageId: Int!) {
   deleteDirectMessage(messageId: $messageId)
@@ -925,6 +1009,37 @@ export function useDeleteDirectMessageMutation(baseOptions?: Apollo.MutationHook
 export type DeleteDirectMessageMutationHookResult = ReturnType<typeof useDeleteDirectMessageMutation>;
 export type DeleteDirectMessageMutationResult = Apollo.MutationResult<DeleteDirectMessageMutation>;
 export type DeleteDirectMessageMutationOptions = Apollo.BaseMutationOptions<DeleteDirectMessageMutation, DeleteDirectMessageMutationVariables>;
+export const EditDirectMessageDocument = gql`
+    mutation EditDirectMessage($text: String!, $messageId: Int!) {
+  editDirectMessage(text: $text, messageId: $messageId)
+}
+    `;
+export type EditDirectMessageMutationFn = Apollo.MutationFunction<EditDirectMessageMutation, EditDirectMessageMutationVariables>;
+
+/**
+ * __useEditDirectMessageMutation__
+ *
+ * To run a mutation, you first call `useEditDirectMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditDirectMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editDirectMessageMutation, { data, loading, error }] = useEditDirectMessageMutation({
+ *   variables: {
+ *      text: // value for 'text'
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useEditDirectMessageMutation(baseOptions?: Apollo.MutationHookOptions<EditDirectMessageMutation, EditDirectMessageMutationVariables>) {
+        return Apollo.useMutation<EditDirectMessageMutation, EditDirectMessageMutationVariables>(EditDirectMessageDocument, baseOptions);
+      }
+export type EditDirectMessageMutationHookResult = ReturnType<typeof useEditDirectMessageMutation>;
+export type EditDirectMessageMutationResult = Apollo.MutationResult<EditDirectMessageMutation>;
+export type EditDirectMessageMutationOptions = Apollo.BaseMutationOptions<EditDirectMessageMutation, EditDirectMessageMutationVariables>;
 export const SendDirectMessageDocument = gql`
     mutation SendDirectMessage($text: String!, $receiverId: Int!) {
   sendDirectMessage(text: $text, receiverId: $receiverId)
@@ -1167,6 +1282,37 @@ export function useDeleteMessageMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteMessageMutationHookResult = ReturnType<typeof useDeleteMessageMutation>;
 export type DeleteMessageMutationResult = Apollo.MutationResult<DeleteMessageMutation>;
 export type DeleteMessageMutationOptions = Apollo.BaseMutationOptions<DeleteMessageMutation, DeleteMessageMutationVariables>;
+export const EditMessageDocument = gql`
+    mutation EditMessage($text: String!, $messageId: Int!) {
+  editMessage(text: $text, messageId: $messageId)
+}
+    `;
+export type EditMessageMutationFn = Apollo.MutationFunction<EditMessageMutation, EditMessageMutationVariables>;
+
+/**
+ * __useEditMessageMutation__
+ *
+ * To run a mutation, you first call `useEditMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editMessageMutation, { data, loading, error }] = useEditMessageMutation({
+ *   variables: {
+ *      text: // value for 'text'
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useEditMessageMutation(baseOptions?: Apollo.MutationHookOptions<EditMessageMutation, EditMessageMutationVariables>) {
+        return Apollo.useMutation<EditMessageMutation, EditMessageMutationVariables>(EditMessageDocument, baseOptions);
+      }
+export type EditMessageMutationHookResult = ReturnType<typeof useEditMessageMutation>;
+export type EditMessageMutationResult = Apollo.MutationResult<EditMessageMutation>;
+export type EditMessageMutationOptions = Apollo.BaseMutationOptions<EditMessageMutation, EditMessageMutationVariables>;
 export const SendFileDocument = gql`
     mutation SendFile($file: Upload!, $channelId: Int!) {
   sendFile(file: $file, channelId: $channelId)

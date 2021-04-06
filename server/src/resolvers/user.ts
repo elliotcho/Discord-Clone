@@ -211,8 +211,6 @@ export class UserResolver {
             };
         }
 
-        await User.update({ id: user.id }, { online: true });
-
         req.session.uid = user.id;
         return { user };
     }
@@ -252,8 +250,6 @@ export class UserResolver {
             }
         }
 
-        await User.update({ id: user.id }, { online: true });
-  
         req.session.uid = user.id;
         return { user };
     }
@@ -288,8 +284,7 @@ export class UserResolver {
         }
 
         await User.update({ id: user.id }, { 
-            password: await argon2.hash(newPassword),
-            online: true
+            password: await argon2.hash(newPassword)
         });
         
         await redis.del(token);
@@ -349,9 +344,9 @@ export class UserResolver {
     ): Promise<boolean>{
         await getConnection().query(
             `
-            update "user"
-            set status = $1
-            where id = $2
+                update "user"
+                set status = $1
+                where id = $2
             `,
             [status, req.session.uid]
         );

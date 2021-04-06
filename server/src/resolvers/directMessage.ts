@@ -12,7 +12,7 @@ import { MyContext, GraphQLUpload, Upload } from "../types";
 import { getConnection } from "typeorm";
 import { User } from '../entities/User';
 import { DirectMessage } from "../entities/DirectMessage";
-import { createWriteStream } from 'fs';
+import fs, { createWriteStream } from 'fs';
 import path from 'path';
 import { v4 } from 'uuid';
 
@@ -59,6 +59,13 @@ export class DirectMessageResolver {
     async deleteDirectMessage(
         @Arg('messageId', () => Int) messageId: number
     ): Promise<boolean>{
+        const dm = await DirectMessage.findOne(messageId);
+
+        if(dm?.pic) {
+            const location = path.join(__dirname, `../../images/${dm.pic}`);
+            fs.unlink(location, () => {});
+        }
+
         await getConnection().query(
             `
             delete from direct_message
@@ -66,6 +73,7 @@ export class DirectMessageResolver {
             `,
             [messageId]
         );
+
         return true;
     }
 
@@ -110,4 +118,21 @@ export class DirectMessageResolver {
            .on('error', () => reject(false))
         )
     }
+
+    @Mutation(() => Boolean)
+    async editDirectMessage(
+        @Arg('text') text: string, 
+        @Arg('messageId', () => Int) messageId: number
+    ) : Promise<Boolean> {
+        await getConnection().query(
+            `
+            update direct_message
+            set text = $1
+            where id = $2
+            `, 
+            [text, messageId]
+        )
+        return true; 
+    }
 }
+
