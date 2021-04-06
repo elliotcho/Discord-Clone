@@ -42,4 +42,10 @@ export class DirectMessage extends BaseEntity{
     @Field(() => String)
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Field()
+    isRead: boolean;
+
+    @Field()
+    lastMessage: DirectMessage;
 }

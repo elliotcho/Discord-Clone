@@ -124,6 +124,13 @@ export type DirectMessage = {
   user: User;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
+  isRead: Scalars['Boolean'];
+  lastMessage: DirectMessage;
+};
+
+
+export type DirectMessageLastMessageArgs = {
+  receiverId: Scalars['Int'];
 };
 
 export type Mutation = {
@@ -145,6 +152,7 @@ export type Mutation = {
   deleteMessage: Scalars['Boolean'];
   sendFile: Scalars['Boolean'];
   editMessage: Scalars['Boolean'];
+  updateDMRead: Scalars['Boolean'];
   sendDirectMessage: Scalars['Boolean'];
   deleteDirectMessage: Scalars['Boolean'];
   sendDmFile: Scalars['Boolean'];
@@ -239,6 +247,11 @@ export type MutationSendFileArgs = {
 export type MutationEditMessageArgs = {
   messageId: Scalars['Int'];
   text: Scalars['String'];
+};
+
+
+export type MutationUpdateDmReadArgs = {
+  messageId: Scalars['Int'];
 };
 
 
@@ -435,6 +448,16 @@ export type SendDmFileMutationVariables = Exact<{
 export type SendDmFileMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'sendDmFile'>
+);
+
+export type UpdateDmReadMutationVariables = Exact<{
+  messageId: Scalars['Int'];
+}>;
+
+
+export type UpdateDmReadMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'updateDMRead'>
 );
 
 export type AcceptFriendRequestMutationVariables = Exact<{
@@ -1053,6 +1076,36 @@ export function useSendDmFileMutation(baseOptions?: Apollo.MutationHookOptions<S
 export type SendDmFileMutationHookResult = ReturnType<typeof useSendDmFileMutation>;
 export type SendDmFileMutationResult = Apollo.MutationResult<SendDmFileMutation>;
 export type SendDmFileMutationOptions = Apollo.BaseMutationOptions<SendDmFileMutation, SendDmFileMutationVariables>;
+export const UpdateDmReadDocument = gql`
+    mutation UpdateDMRead($messageId: Int!) {
+  updateDMRead(messageId: $messageId)
+}
+    `;
+export type UpdateDmReadMutationFn = Apollo.MutationFunction<UpdateDmReadMutation, UpdateDmReadMutationVariables>;
+
+/**
+ * __useUpdateDmReadMutation__
+ *
+ * To run a mutation, you first call `useUpdateDmReadMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateDmReadMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateDmReadMutation, { data, loading, error }] = useUpdateDmReadMutation({
+ *   variables: {
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useUpdateDmReadMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDmReadMutation, UpdateDmReadMutationVariables>) {
+        return Apollo.useMutation<UpdateDmReadMutation, UpdateDmReadMutationVariables>(UpdateDmReadDocument, baseOptions);
+      }
+export type UpdateDmReadMutationHookResult = ReturnType<typeof useUpdateDmReadMutation>;
+export type UpdateDmReadMutationResult = Apollo.MutationResult<UpdateDmReadMutation>;
+export type UpdateDmReadMutationOptions = Apollo.BaseMutationOptions<UpdateDmReadMutation, UpdateDmReadMutationVariables>;
 export const AcceptFriendRequestDocument = gql`
     mutation AcceptFriendRequest($senderId: Int!) {
   acceptFriendRequest(senderId: $senderId)
