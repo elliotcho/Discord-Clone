@@ -12,12 +12,28 @@ import { GraphQLUpload, MyContext, Upload } from "../types";
 import { getConnection } from "typeorm";
 import { Message } from "../entities/Message";
 import { User } from '../entities/User';
+import { Read } from '../entities/Read';
 import { v4 } from "uuid";
 import path from 'path';
 import fs, { createWriteStream } from 'fs';
 
 @Resolver(Message)
 export class MessageResolver {
+    @FieldResolver()
+    async isRead(
+        @Root() message: Message,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const isRead = await Read.findOne({
+            where: {
+                userId: req.session.uid,
+                messageId: message.id
+            }
+        });
+
+        return !!isRead;
+    } 
+
     @FieldResolver()
     async pic(
         @Root() message: Message

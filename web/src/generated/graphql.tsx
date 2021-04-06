@@ -98,7 +98,6 @@ export type Channel = {
   teamId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  read: Scalars['Boolean'];
 };
 
 export type Message = {
@@ -108,6 +107,7 @@ export type Message = {
   pic: Scalars['String'];
   senderId: Scalars['Float'];
   channelId: Scalars['Float'];
+  isRead: Scalars['Boolean'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   user: User;
@@ -327,12 +327,12 @@ export type Invite = {
 
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
-  & Pick<Channel, 'id' | 'read' | 'name'>
+  & Pick<Channel, 'id' | 'name'>
 );
 
 export type RegularMessageFragment = (
   { __typename?: 'Message' }
-  & Pick<Message, 'id' | 'text' | 'createdAt' | 'pic'>
+  & Pick<Message, 'id' | 'text' | 'createdAt' | 'isRead' | 'pic'>
   & { user: (
     { __typename?: 'User' }
     & RegularUserFragment
@@ -809,7 +809,6 @@ export type UserQuery = (
 export const RegularChannelFragmentDoc = gql`
     fragment RegularChannel on Channel {
   id
-  read
   name
 }
     `;
@@ -830,6 +829,7 @@ export const RegularMessageFragmentDoc = gql`
   id
   text
   createdAt
+  isRead
   pic
   user {
     ...RegularUser

@@ -11,23 +11,23 @@ import {
 } from "type-graphql";
 import { getConnection } from "typeorm";
 import { Channel } from "../entities/Channel";
-import {Read} from "../entities/Read";
+import { Message } from '../entities/Message';
 
 @Resolver(Channel)
 export class ChannelResolver {
-    @FieldResolver()
-    async read(
-        @Root() channel: Channel,
-        @Ctx() { req }: MyContext
-    ): Promise<boolean>{
-        const response = await Read.findOne({
-            where: {
-                channelId: channel.id, 
-                userId: req.session.uid
-            }
-        });
+    @FieldResolver(() => Message)
+    async lastMessage(
+        @Root() channel: Channel
+    ) : Promise<Message | undefined> {
+        const messages = await getConnection().query(
+            `
+                select m.* from message as m
+                inner join channel as c on m."channelId" = c.id where c.id = $1
+                order by m."createdAt" DESC
+            `[channel.id]
+        );
 
-        return !!response;
+        return messages.length? messages[0] : undefined;
     }
 
     @Query(() => [Channel])

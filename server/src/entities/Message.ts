@@ -31,6 +31,9 @@ export class Message extends BaseEntity{
     @Column()
     channelId: number;
 
+    @Field()
+    isRead: boolean;
+
     @Field(() => String)
     @CreateDateColumn()
     createdAt: Date;

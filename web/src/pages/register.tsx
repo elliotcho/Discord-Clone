@@ -31,7 +31,7 @@ const Register: React.FC<{}> = () => {
                         if(!response.data.register.user) {
                             setErrors(toErrorMap(response.data.register.errors));
                         } else {
-                            router.push('/profile');
+                            router.push('/friends');
                         }
                     }}
                 >

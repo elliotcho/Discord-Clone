@@ -42,7 +42,7 @@ const Login : React.FC<{}> = () => {
                         if(!response.data.login.user) {
                             setErrors(toErrorMap(response.data.login.errors));
                         } else {
-                            router.push('/profile');
+                            router.push('/friends');
                         }
                     }}
                 >

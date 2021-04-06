@@ -42,7 +42,7 @@ const ChangePassword: React.FC<{}> = () => {
                     if(!response.data.changePassword.user) {
                         setErrors(toErrorMap(response.data.changePassword.errors));
                     } else {
-                        router.push('/profile');
+                        router.push('/friends');
                     }
                 }}
             >

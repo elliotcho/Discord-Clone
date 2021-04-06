@@ -1,5 +1,7 @@
 fragment RegularChannel on Channel {
     id
-    read
-    name
+    name 
+    lastMessage {
+        ...RegularMessage
+    }
 }

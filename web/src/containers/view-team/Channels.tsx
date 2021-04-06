@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useChannelsQuery } from '../../generated/graphql';
+import { 
+    useChannelsQuery,
+    useDeleteTeamMutation,
+    useLeaveTeamMutation
+} from '../../generated/graphql';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
-import LeaveTeamModal from '../../components/shared/LeaveTeamModal';
-import DeleteTeamModal from '../../components/shared/DeleteTeamModal';
+import ConfirmModal from '../../components/shared/ConfirmModal';
 import Channel from '../../components/view-team/Channel';
 import UserNav from '../../components/shared/UserNav';
+import { useRouter } from 'next/router';
 
 const Container = styled.div`
     position: relative;
@@ -43,12 +47,15 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
     const[openLeaveChannel, setLeaveChannel] = useState(false);
     const[openDelete, setDelete] = useState(false);
+    const router = useRouter();
+
+    const { data } = useChannelsQuery({ variables: { teamId } });
+    const [deleteTeam] = useDeleteTeamMutation();
+    const [leaveTeam] = useLeaveTeamMutation();
 
     let settingOption = "";
 
-    const { data } = useChannelsQuery({
-        variables: { teamId }
-    });
+ 
 
     return (
         <Container>
@@ -111,18 +118,42 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                 teamId = {teamId}
             />
 
-            <LeaveTeamModal
+            <ConfirmModal
                 isOpen = {openLeaveChannel}
-                onClose = {()=> setLeaveChannel(false)}
-                teamId = {teamId}
+                onClose = {() => setLeaveChannel(false)}
+                title =  'Are you sure you want to leave this team?'
+                onSave ={async () => {
+                    const result = await leaveTeam({
+                        variables: { teamId },
+                        update: (cache) => {
+                            cache.evict({ fieldName: "teams"});
+                        }
+                    });
+
+                    if(result.data.leaveTeam){
+                        router.push('/profile')
+                    }
+                }}
             />
 
-            <DeleteTeamModal
+            <ConfirmModal
                 isOpen = {openDelete}
-                onClose = {()=> setDelete(false)}
-                teamId = {teamId}
-            />
+                onClose = {() => setDelete(false)}
+                title = 'Are you sure you want to permanently delete this team?'
+                onSave = {async () => {
+                    const result =  await deleteTeam({
+                        variables: { teamId },
+                        update: (cache) => {
+                            cache.evict({ fieldName: "teams"})
+                        }
+                    });
 
+                    if (result.data.deleteTeam){
+                        router.push('/profile')
+                    }
+                }}
+            />
+            
             <UserNav />
         </Container>
     )

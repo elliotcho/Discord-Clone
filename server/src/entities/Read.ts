@@ -7,7 +7,7 @@ import{
 @Entity()
 export class Read extends BaseEntity{
     @PrimaryColumn()
-    channelId: number;
+    messageId: number;
 
     @PrimaryColumn()
     userId: number;

@@ -8,7 +8,8 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import { Team } from '../entities/Team';
+import { Team } from './Team';
+import { Message } from './Message';
 
 @ObjectType()
 @Entity()
@@ -25,6 +26,9 @@ export class Channel extends BaseEntity {
     @Column()
     teamId: number;
 
+    @Field()
+    lastMessage: Message;
+
     @ManyToOne(() => Team, (team) => team.channels, {
         onDelete: 'CASCADE'
     })
@@ -37,8 +41,4 @@ export class Channel extends BaseEntity {
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
-
-    @Field()
-    @Column({default: false})
-    read: boolean;
 }
