@@ -13,6 +13,6 @@ export class Read extends BaseEntity{
     @PrimaryColumn()
     userId: number;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     isDM: boolean;
 }

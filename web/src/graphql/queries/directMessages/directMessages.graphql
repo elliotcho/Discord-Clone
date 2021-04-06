@@ -4,10 +4,15 @@ query DirectMessages($receiverId: Int!) {
         text
         createdAt
         senderId
+        isRead
         pic
 
         user {
             ...RegularUser
+        }
+
+        lastMessage {
+            isRead
         }
     }
 }

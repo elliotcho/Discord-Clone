@@ -26,6 +26,7 @@ export class DirectMessageResolver {
         @Ctx() { req }: MyContext
     ): Promise<boolean>{
         const isDM = true;
+
         const isRead = await Read.findOne({
             where: {
                 messageId: dm.id,
@@ -39,14 +40,15 @@ export class DirectMessageResolver {
 
     @FieldResolver()
     async lastMessage(
-        @Arg('receiverId', ()=>Int) receiverId: number,
+        @Root() { receiverId } : DirectMessage,
         @Ctx() { req }: MyContext
     ): Promise<DirectMessage | undefined>{
         const directMessages = await getConnection().query(
             `
-            select * from direct_message
-            where senderId = $1 and receiverId = $2
-            order by direct_message."createdAt" DESC
+                select * from direct_message as d
+                where (d."senderId" = $1 and d."receiverId" = $2) or
+                (d."senderId" = $2 and d."receiverId" = $1)
+                order by direct_message."createdAt" DESC
             `,
             [req.session.uid, receiverId]
         );
@@ -59,16 +61,17 @@ export class DirectMessageResolver {
         @Arg('messageId', ()=> Int) messageId: number,
         @Ctx() { req }: MyContext
     ): Promise<boolean>{
-        const read = true;
+        const isDm = true;
+
         await getConnection().query(
             `
-            update read
-            set messageId = $1 and userId = $2 and isDM = $3
+                insert into read ("messageId", "userId", "isDM")
+                values ($1, $2, $3)
             `,
-            [messageId, req.session.uid, read]
+            [messageId, req.session.uid, isDm]
         );
 
-        return read;
+        return true;
     }
 
 

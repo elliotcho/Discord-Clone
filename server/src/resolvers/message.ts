@@ -25,6 +25,7 @@ export class MessageResolver {
         @Ctx() { req } : MyContext
     ) : Promise<boolean> {
         const isDM = false;
+        
         const isRead = await Read.findOne({
             where: {
                 userId: req.session.uid,

@@ -73,7 +73,7 @@ export type User = {
   email: Scalars['String'];
   username: Scalars['String'];
   profilePic: Scalars['String'];
-  status: Scalars['String'];
+  status: Scalars['Float'];
   profileURL: Scalars['String'];
   friendStatus: Scalars['Float'];
   isMe: Scalars['Boolean'];
@@ -126,11 +126,6 @@ export type DirectMessage = {
   updatedAt: Scalars['String'];
   isRead: Scalars['Boolean'];
   lastMessage: DirectMessage;
-};
-
-
-export type DirectMessageLastMessageArgs = {
-  receiverId: Scalars['Int'];
 };
 
 export type Mutation = {
@@ -730,10 +725,13 @@ export type DirectMessagesQuery = (
   { __typename?: 'Query' }
   & { directMessages: Array<(
     { __typename?: 'DirectMessage' }
-    & Pick<DirectMessage, 'id' | 'text' | 'createdAt' | 'senderId' | 'pic'>
+    & Pick<DirectMessage, 'id' | 'text' | 'createdAt' | 'senderId' | 'isRead' | 'pic'>
     & { user: (
       { __typename?: 'User' }
       & RegularUserFragment
+    ), lastMessage: (
+      { __typename?: 'DirectMessage' }
+      & Pick<DirectMessage, 'isRead'>
     ) }
   )> }
 );
@@ -1852,9 +1850,13 @@ export const DirectMessagesDocument = gql`
     text
     createdAt
     senderId
+    isRead
     pic
     user {
       ...RegularUser
+    }
+    lastMessage {
+      isRead
     }
   }
 }
