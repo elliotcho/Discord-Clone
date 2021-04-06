@@ -24,10 +24,12 @@ export class MessageResolver {
         @Root() message: Message,
         @Ctx() { req } : MyContext
     ) : Promise<boolean> {
+        const isDM = false;
         const isRead = await Read.findOne({
             where: {
                 userId: req.session.uid,
-                messageId: message.id
+                messageId: message.id,
+                isDM
             }
         });
 

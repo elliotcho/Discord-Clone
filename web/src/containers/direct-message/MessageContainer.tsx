@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useDirectMessagesQuery } from '../../generated/graphql';
 import Message from '../../components/shared/Message';
@@ -20,6 +20,18 @@ const MessageContainer: React.FC<MessageContainerProps> = ({ userId: receiverId 
     const { data } = useDirectMessagesQuery({
         variables: { receiverId }
     });
+
+    useEffect(() => {
+        const fetchLastMessage =  async() =>{
+            await lastMessage({
+                variables: {receiverId},
+                update: (cache)=>{
+                    cache.evict({fieldName: 'direct_message'})
+                }
+            });
+        } 
+        
+    })
 
     return (
         <Container>
