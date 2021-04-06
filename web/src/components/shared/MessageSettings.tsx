@@ -112,6 +112,7 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm
                 isOpen = {isOpen}
                 content = {text}
                 onClose = {() => setIsOpen(false)}
+                title = 'Edit your message'
                 onSave = {async (newText) => {
                     if(!isDm) {
                         await editMessage({

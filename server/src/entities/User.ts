@@ -31,8 +31,8 @@ export class User extends BaseEntity {
     profilePic: string;
 
     @Field()
-    @Column({ nullable: true })
-    status: string;
+    @Column({ default: 0 })
+    status: number;
 
     @Field()
     profileURL: string;

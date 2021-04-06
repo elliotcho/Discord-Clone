@@ -17,13 +17,12 @@ interface MessageContainerProps {
 }
 
 const MessageContainer: React.FC<MessageContainerProps> = ({ userId: receiverId }) => {
-    const { data } = useDirectMessagesQuery({
-        variables: { receiverId }
-    });
+    const { data } = useDirectMessagesQuery({ variables: { receiverId } });
+    const directMessages = data?.directMessages || [];
 
     return (
         <Container>
-           {data?.directMessages.map(m => {
+           {directMessages.map(m => {
                return (
                     <Message
                         key = {m.id}

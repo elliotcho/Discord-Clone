@@ -13,6 +13,7 @@ const Card = styled.div`
 
 const Image = styled.img`
     width: 6rem;
+    border-radius: 50%;
     height: 6rem;
 `;
 

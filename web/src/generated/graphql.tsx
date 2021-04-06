@@ -96,6 +96,7 @@ export type Channel = {
   id: Scalars['Float'];
   name: Scalars['String'];
   teamId: Scalars['Float'];
+  lastMessage: Message;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
 };
@@ -328,6 +329,10 @@ export type Invite = {
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
   & Pick<Channel, 'id' | 'name'>
+  & { lastMessage: (
+    { __typename?: 'Message' }
+    & RegularMessageFragment
+  ) }
 );
 
 export type RegularMessageFragment = (
@@ -702,7 +707,7 @@ export type DirectMessagesQuery = (
   { __typename?: 'Query' }
   & { directMessages: Array<(
     { __typename?: 'DirectMessage' }
-    & Pick<DirectMessage, 'id' | 'text' | 'createdAt' | 'pic'>
+    & Pick<DirectMessage, 'id' | 'text' | 'createdAt' | 'senderId' | 'pic'>
     & { user: (
       { __typename?: 'User' }
       & RegularUserFragment
@@ -806,12 +811,6 @@ export type UserQuery = (
   ) }
 );
 
-export const RegularChannelFragmentDoc = gql`
-    fragment RegularChannel on Channel {
-  id
-  name
-}
-    `;
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
@@ -836,6 +835,15 @@ export const RegularMessageFragmentDoc = gql`
   }
 }
     ${RegularUserFragmentDoc}`;
+export const RegularChannelFragmentDoc = gql`
+    fragment RegularChannel on Channel {
+  id
+  name
+  lastMessage {
+    ...RegularMessage
+  }
+}
+    ${RegularMessageFragmentDoc}`;
 export const RegularTeamFragmentDoc = gql`
     fragment RegularTeam on Team {
   id
@@ -1790,6 +1798,7 @@ export const DirectMessagesDocument = gql`
     id
     text
     createdAt
+    senderId
     pic
     user {
       ...RegularUser

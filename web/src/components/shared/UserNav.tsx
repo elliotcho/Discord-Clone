@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog } from '@fortawesome/free-solid-svg-icons';
+import { faCircle, faCog } from '@fortawesome/free-solid-svg-icons';
 import { useMeQuery } from '../../generated/graphql';
 import { isServer } from '../../utils/isServer';
 import NextLink from 'next/link';
@@ -40,10 +40,64 @@ const Box = styled.div`
     }
 `;
 
+const Icon = styled.div`
+    position: absolute;
+    cursor: pointer;
+    left: 45px;
+    top: 45px;
+`;
+
+const Dropdown = styled.div`
+    z-index: 1;
+    display: block;
+    cursor: pointer;
+    min-width: 160px;
+    position: absolute;
+    box-shadow: 0 0 5px black;
+    background: #d9d9d9;
+    bottom: 65px;
+    left: 0px;
+`;
+
+const Option = styled.div`
+    margin: 12px;
+    display: flex;
+    padding: 10px 20px;
+    font-weight: normal;
+    font-size: 1rem;
+    &:hover {
+        background: #9999ff;
+        color: #f2f2f2;
+    }
+`;
+
+const Span = styled.span`
+    margin-left: 15px;
+    color: #404040;
+`;
+
+const icons = [
+    { color: 'green', text: 'Online' },
+    { color: '#cccc00', text: 'Idle' },
+    { color: '#cc0000', text: 'Do Not Disturb' },
+    { color: '#bfbfbf', text: 'Invisible' }
+]
+
 const UserNav: React.FC<{}> = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [iconColor, setIconColor] = useState('green');
+    
     const { data } = useMeQuery({
         skip: isServer()
     });
+
+    if(!isServer()) {
+        window.addEventListener('click', function(e: any){
+            if(!document.getElementById('icon')?.contains(e.target)){
+                setIsOpen(false);
+            }
+        });
+    }
 
     const profileURL = data?.me?.profileURL;
     const username = data?.me?.username;
@@ -52,6 +106,33 @@ const UserNav: React.FC<{}> = () => {
         <Container>
             <Flex>
                 <Image src={profileURL} alt='user'/>
+
+                <Icon 
+                    id='icon' 
+                    onClick={() => setIsOpen(true)}
+                    style = {{ color: iconColor }}
+                >
+                    <FontAwesomeIcon icon={faCircle} />
+                </Icon>
+
+                {isOpen && (
+                    <Dropdown>
+                        {icons.map(({ color, text }) => 
+                            <Option 
+                                style={{ color }}
+                                onClick = {() => {
+                                    setIconColor(color);
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faCircle}/> 
+                                
+                                <Span>
+                                    {text}
+                                </Span>
+                            </Option>  
+                        )}
+                    </Dropdown>
+                )}
 
                 <Text>
                     {username}

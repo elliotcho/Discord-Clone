@@ -51,9 +51,11 @@ interface EditModalProps {
     content: string;
     onSave(s: string): void;
     onClose() : void;
+    title: string;
 }
 
 const EditModal : React.FC<EditModalProps> = ({ 
+    title,
     isOpen, 
     content, 
     onClose, 
@@ -75,7 +77,7 @@ const EditModal : React.FC<EditModalProps> = ({
             onClose = {onClose}
         >
             <Container>
-                <Header>Create New Team</Header>
+                <Header>{title}</Header>
 
                 <Input
                     type = 'text'

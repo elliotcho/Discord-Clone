@@ -68,8 +68,8 @@ export class DirectMessageResolver {
 
         await getConnection().query(
             `
-            delete from direct_message
-            where id = $1
+                delete from direct_message
+                where id = $1
             `,
             [messageId]
         );
@@ -85,7 +85,8 @@ export class DirectMessageResolver {
         const messages = await getConnection().query(
             `
             select * from direct_message
-            where direct_message."senderId" = $1 AND direct_message."receiverId"= $2
+            where (direct_message."senderId" = $1 AND direct_message."receiverId"= $2)
+            or (direct_message."senderId" = $2 AND direct_message."receiverId"= $1)
             order by direct_message."createdAt" DESC
             `,
             [req.session.uid, receiverId]

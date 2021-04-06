@@ -42,8 +42,9 @@ const Image = styled.img`
 
 interface MessageProps {
     messageId: number;
-    profileURL: string;
     username: string;
+    profileURL: string;
+    isMe: boolean;
     isDm: boolean;
     date: string;
     text?: string;
@@ -52,8 +53,9 @@ interface MessageProps {
 
 const Message: React.FC<MessageProps> = ({
     messageId,
-    profileURL,
     username,
+    profileURL,
+    isMe, 
     isDm,
     date,
     text,
@@ -68,11 +70,13 @@ const Message: React.FC<MessageProps> = ({
                     {username} {formatDate(date)}
                 </Text>
 
-                <MessageSettings 
-                    messageId={messageId}
-                    text = {text}
-                    isDm = {isDm}
-                /> 
+                {isMe && (
+                    <MessageSettings 
+                        messageId={messageId}
+                        text = {text}
+                        isDm = {isDm}
+                    /> 
+                )}
             </Header>
 
             <Main>
