@@ -7,6 +7,7 @@ import FriendRequests from '../containers/friends/FriendRequests';
 import AddFriend from '../containers/friends/AddFriend';
 import Network from '../containers/friends/Network';
 import FriendsNav from '../components/friends/FriendsNav';
+import OnlineFriends from '../containers/friends/OnlineFriends';
 import { useRouter } from 'next/router';
 
 const Container = styled.div`
@@ -26,6 +27,7 @@ const Friends: React.FC<{}> =() => {
                     {type === 'all' && <Network />}
                     {type === 'requests' && <FriendRequests />}
                     {type === 'search' && <AddFriend />}
+                    {type === 'online' && <OnlineFriends />}
                 </Container>
             </Layout>
         </AuthWrapper>

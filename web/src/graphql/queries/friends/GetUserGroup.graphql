@@ -1,3 +1,0 @@
-query GetUserGroup($status: Int!){
-    getUserGroup(status: $status)
-}

@@ -30,6 +30,7 @@ export type Query = {
   channel: Channel;
   friendRequests: Array<User>;
   friends: Array<User>;
+  getFriendGroup: Array<User>;
 };
 
 
@@ -65,6 +66,11 @@ export type QueryChannelsArgs = {
 
 export type QueryChannelArgs = {
   channelId: Scalars['Int'];
+};
+
+
+export type QueryGetFriendGroupArgs = {
+  status: Scalars['Int'];
 };
 
 export type User = {
@@ -160,7 +166,6 @@ export type Mutation = {
   cancelFriendRequest: Scalars['Boolean'];
   declineFriendRequest: Scalars['Boolean'];
   sendFriendRequest: Scalars['Boolean'];
-  getUserGroup: Array<User>;
 };
 
 
@@ -312,11 +317,6 @@ export type MutationDeclineFriendRequestArgs = {
 
 export type MutationSendFriendRequestArgs = {
   receiverId: Scalars['Int'];
-};
-
-
-export type MutationGetUserGroupArgs = {
-  status: Scalars['Int'];
 };
 
 
@@ -739,6 +739,19 @@ export type DirectMessagesQuery = (
       { __typename?: 'DirectMessage' }
       & Pick<DirectMessage, 'isRead'>
     ) }
+  )> }
+);
+
+export type GetFriendGroupQueryVariables = Exact<{
+  status: Scalars['Int'];
+}>;
+
+
+export type GetFriendGroupQuery = (
+  { __typename?: 'Query' }
+  & { getFriendGroup: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
   )> }
 );
 
@@ -1893,6 +1906,39 @@ export function useDirectMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type DirectMessagesQueryHookResult = ReturnType<typeof useDirectMessagesQuery>;
 export type DirectMessagesLazyQueryHookResult = ReturnType<typeof useDirectMessagesLazyQuery>;
 export type DirectMessagesQueryResult = Apollo.QueryResult<DirectMessagesQuery, DirectMessagesQueryVariables>;
+export const GetFriendGroupDocument = gql`
+    query GetFriendGroup($status: Int!) {
+  getFriendGroup(status: $status) {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useGetFriendGroupQuery__
+ *
+ * To run a query within a React component, call `useGetFriendGroupQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFriendGroupQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFriendGroupQuery({
+ *   variables: {
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useGetFriendGroupQuery(baseOptions: Apollo.QueryHookOptions<GetFriendGroupQuery, GetFriendGroupQueryVariables>) {
+        return Apollo.useQuery<GetFriendGroupQuery, GetFriendGroupQueryVariables>(GetFriendGroupDocument, baseOptions);
+      }
+export function useGetFriendGroupLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFriendGroupQuery, GetFriendGroupQueryVariables>) {
+          return Apollo.useLazyQuery<GetFriendGroupQuery, GetFriendGroupQueryVariables>(GetFriendGroupDocument, baseOptions);
+        }
+export type GetFriendGroupQueryHookResult = ReturnType<typeof useGetFriendGroupQuery>;
+export type GetFriendGroupLazyQueryHookResult = ReturnType<typeof useGetFriendGroupLazyQuery>;
+export type GetFriendGroupQueryResult = Apollo.QueryResult<GetFriendGroupQuery, GetFriendGroupQueryVariables>;
 export const FriendRequestsDocument = gql`
     query FriendRequests {
   friendRequests {
