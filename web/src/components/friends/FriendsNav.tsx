@@ -42,7 +42,12 @@ const FriendsNav: React.FC<FriendsNavProps> = ({ type }) => {
         <Container>
             <Nav>Friends</Nav>
 
-            <Nav>Online</Nav>
+            <NextLink href='/friends'>
+                <Nav style={!type ? style: {}}>
+                    Online
+                </Nav>
+            </NextLink>
+
 
             <NextLink href='/friends/all'>
                 <Nav style={type === 'all' ? style: {}}>

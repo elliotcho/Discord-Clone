@@ -151,4 +151,21 @@ export class FriendResolver {
 
         return true;
     }
+
+    @Query(() => [User])
+    async getFriendGroup(
+        @Arg('status', () => Int) status: number,
+        @Ctx() { req } : MyContext
+    ): Promise<User[]>{
+        const friendsGroup = await getConnection().query(
+            `
+                select u.* from "user" as u inner join friend as f 
+                on u.id = f."senderId" or u.id = f."receiverId"
+                where (f."senderId" = $1 or f."receiverId" = $1) and u.id != $1
+                and f.status = true and u.status = $2
+            `,[req.session.uid, status]
+        );
+
+        return friendsGroup;
+    }
 }

@@ -1,0 +1,5 @@
+query GetFriendGroup($status: Int!){
+    getFriendGroup(status: $status){
+        ...RegularUser
+    }
+}

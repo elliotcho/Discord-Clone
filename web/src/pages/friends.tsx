@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { withApollo } from '../utils/withApollo';
 import Layout from '../containers/shared/MainLayout';
 import AuthWrapper from '../containers/shared/AuthWrapper';
+import OnlineFriends from '../containers/friends/OnlineFriends';
 import FriendRequests from '../containers/friends/FriendRequests';
 import AddFriend from '../containers/friends/AddFriend';
 import Network from '../containers/friends/Network';
@@ -23,6 +24,7 @@ const Friends: React.FC<{}> =() => {
                 <Container>
                     <FriendsNav type={type}/>
 
+                    {!type && <OnlineFriends />}
                     {type === 'all' && <Network />}
                     {type === 'requests' && <FriendRequests />}
                     {type === 'search' && <AddFriend />}

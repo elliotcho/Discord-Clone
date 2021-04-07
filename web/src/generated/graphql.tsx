@@ -21,7 +21,7 @@ export type Query = {
   __typename?: 'Query';
   user: User;
   searchResults: Array<User>;
-  me: User;
+  me?: Maybe<User>;
   team: Team;
   teams: Array<Team>;
   messages: Array<Message>;
@@ -30,6 +30,7 @@ export type Query = {
   channel: Channel;
   friendRequests: Array<User>;
   friends: Array<User>;
+  getFriendGroup: Array<User>;
 };
 
 
@@ -65,6 +66,11 @@ export type QueryChannelsArgs = {
 
 export type QueryChannelArgs = {
   channelId: Scalars['Int'];
+};
+
+
+export type QueryGetFriendGroupArgs = {
+  status: Scalars['Int'];
 };
 
 export type User = {
@@ -198,7 +204,7 @@ export type MutationChangeUsernameArgs = {
 
 
 export type MutationSetStatusArgs = {
-  status: Scalars['String'];
+  status: Scalars['Int'];
 };
 
 
@@ -667,7 +673,7 @@ export type RemoveProfilePicMutation = (
 );
 
 export type SetStatusMutationVariables = Exact<{
-  status: Scalars['String'];
+  status: Scalars['Int'];
 }>;
 
 
@@ -754,6 +760,19 @@ export type FriendsQuery = (
   )> }
 );
 
+export type GetFriendGroupQueryVariables = Exact<{
+  status: Scalars['Int'];
+}>;
+
+
+export type GetFriendGroupQuery = (
+  { __typename?: 'Query' }
+  & { getFriendGroup: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
+);
+
 export type MessagesQueryVariables = Exact<{
   channelId: Scalars['Int'];
 }>;
@@ -796,10 +815,10 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQuery = (
   { __typename?: 'Query' }
-  & { me: (
+  & { me?: Maybe<(
     { __typename?: 'User' }
     & RegularUserFragment
-  ) }
+  )> }
 );
 
 export type SearchResultsQueryVariables = Exact<{
@@ -1711,7 +1730,7 @@ export type RemoveProfilePicMutationHookResult = ReturnType<typeof useRemoveProf
 export type RemoveProfilePicMutationResult = Apollo.MutationResult<RemoveProfilePicMutation>;
 export type RemoveProfilePicMutationOptions = Apollo.BaseMutationOptions<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>;
 export const SetStatusDocument = gql`
-    mutation SetStatus($status: String!) {
+    mutation SetStatus($status: Int!) {
   setStatus(status: $status)
 }
     `;
@@ -1944,6 +1963,39 @@ export function useFriendsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Fr
 export type FriendsQueryHookResult = ReturnType<typeof useFriendsQuery>;
 export type FriendsLazyQueryHookResult = ReturnType<typeof useFriendsLazyQuery>;
 export type FriendsQueryResult = Apollo.QueryResult<FriendsQuery, FriendsQueryVariables>;
+export const GetFriendGroupDocument = gql`
+    query GetFriendGroup($status: Int!) {
+  getFriendGroup(status: $status) {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useGetFriendGroupQuery__
+ *
+ * To run a query within a React component, call `useGetFriendGroupQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFriendGroupQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFriendGroupQuery({
+ *   variables: {
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useGetFriendGroupQuery(baseOptions: Apollo.QueryHookOptions<GetFriendGroupQuery, GetFriendGroupQueryVariables>) {
+        return Apollo.useQuery<GetFriendGroupQuery, GetFriendGroupQueryVariables>(GetFriendGroupDocument, baseOptions);
+      }
+export function useGetFriendGroupLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFriendGroupQuery, GetFriendGroupQueryVariables>) {
+          return Apollo.useLazyQuery<GetFriendGroupQuery, GetFriendGroupQueryVariables>(GetFriendGroupDocument, baseOptions);
+        }
+export type GetFriendGroupQueryHookResult = ReturnType<typeof useGetFriendGroupQuery>;
+export type GetFriendGroupLazyQueryHookResult = ReturnType<typeof useGetFriendGroupLazyQuery>;
+export type GetFriendGroupQueryResult = Apollo.QueryResult<GetFriendGroupQuery, GetFriendGroupQueryVariables>;
 export const MessagesDocument = gql`
     query Messages($channelId: Int!) {
   messages(channelId: $channelId) {
