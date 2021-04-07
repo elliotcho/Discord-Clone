@@ -115,7 +115,7 @@ export class UserResolver {
         return users;
     }
 
-    @Query(() => User)
+    @Query(() => User, { nullable: true })
     async me(
         @Ctx() { req } : MyContext
     ) : Promise<User | undefined> {

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import ProfileContainer from './ProfileContainer';
+import Sidebar from './ProfileSidebar';
+import MyAccount from './MyAccount';
 
 const Container = styled.div`
     display: grid;
@@ -11,14 +12,11 @@ const Container = styled.div`
 const ProfileLayout : React.FC<{}> =() => {
     return (
         <Container>
-            <div style={{
-                background: 'black'
-            }}>
-
-            </div>
-
-
-            <ProfileContainer />
+            <Sidebar />
+            
+            <>
+                <MyAccount />
+            </>
         </Container>
     )
 }
