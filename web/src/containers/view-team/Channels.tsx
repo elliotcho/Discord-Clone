@@ -102,7 +102,7 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                 return (
                     <Channel 
                         key = {c.id}
-                        isRead = {c.read}
+                        isRead = {true}
                         channelId = {c.id}
                         numChannels = {numChannels}
                         active = {active}

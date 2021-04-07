@@ -337,10 +337,6 @@ export type Invite = {
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
   & Pick<Channel, 'id' | 'name'>
-  & { lastMessage: (
-    { __typename?: 'Message' }
-    & RegularMessageFragment
-  ) }
 );
 
 export type RegularMessageFragment = (
@@ -832,6 +828,12 @@ export type UserQuery = (
   ) }
 );
 
+export const RegularChannelFragmentDoc = gql`
+    fragment RegularChannel on Channel {
+  id
+  name
+}
+    `;
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
@@ -856,15 +858,6 @@ export const RegularMessageFragmentDoc = gql`
   }
 }
     ${RegularUserFragmentDoc}`;
-export const RegularChannelFragmentDoc = gql`
-    fragment RegularChannel on Channel {
-  id
-  name
-  lastMessage {
-    ...RegularMessage
-  }
-}
-    ${RegularMessageFragmentDoc}`;
 export const RegularTeamFragmentDoc = gql`
     fragment RegularTeam on Team {
   id

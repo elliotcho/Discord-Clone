@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useFriendsQuery } from '../../generated/graphql';
-import FriendButtonWrapper from '../shared/FriendButtonWrapper';
 import UserCard from '../shared/UserCard';
 import NextLink from 'next/link';
 

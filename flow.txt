@@ -1,5 +1,17 @@
-Server                           Web
- 
-Entities                         GraphQL
-Resolvers                        Generated
-Utils
+DM     
+id: 
+receiverId: 5
+
+[{rId: 5, id: 1}, {rid: 5, id: 2}, {rId:5 id:3}, {rId:5, id:4}]
+
+let total =0;
+
+for(each dm in list) {
+    const read = await Read.findOne({ userId: rId, messageId: id, isDm: true });
+
+    if(!read) {
+        total++;
+    }
+}
+
+return total;

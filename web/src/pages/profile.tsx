@@ -1,15 +1,12 @@
 import React from 'react';
 import { withApollo } from '../utils/withApollo';
-import Layout from '../containers/shared/MainLayout';
-import ProfileContainer from '../containers/profile/ProfileContainer';
+import ProfileLayout from '../containers/profile/ProfileLayout';
 import AuthWrapper from '../containers/shared/AuthWrapper';
 
 const Profile: React.FC<{}> = () => {
     return (
         <AuthWrapper requiresAuth>
-            <Layout>
-                <ProfileContainer />
-            </Layout>
+            <ProfileLayout />
         </AuthWrapper>
     )
 }

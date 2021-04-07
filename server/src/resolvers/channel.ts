@@ -6,29 +6,28 @@ import {
     Int,
     Mutation,
     Ctx,
-    FieldResolver,
-    Root
+    // FieldResolver,
+    // Root
 } from "type-graphql";
 import { getConnection } from "typeorm";
 import { Channel } from "../entities/Channel";
-import { Message } from '../entities/Message';
+// import { Message } from '../entities/Message';
 
 @Resolver(Channel)
 export class ChannelResolver {
-    @FieldResolver(() => Message)
-    async lastMessage(
-        @Root() channel: Channel
-    ) : Promise<Message | undefined> {
-        const messages = await getConnection().query(
-            `
-                select m.* from message as m
-                inner join channel as c on m."channelId" = c.id where c.id = $1
-                order by m."createdAt" DESC
-            `[channel.id]
-        );
+    // @FieldResolver(() => Message)
+    // async lastMessage(
+    //     @Root() channel: Channel
+    // ) : Promise<Message | undefined> {
+    //     const messages = await getConnection().query(
+    //         `
+    //             select m.* from message as m
+    //             inner join channel as c on m."channelId" = c.id 
+    //         `[channel.id]
+    //     );
 
-        return messages.length? messages[0] : undefined;
-    }
+    //     return messages.length? messages[0] : undefined;
+    // }
 
     @Query(() => [Channel])
     async channels(
@@ -42,7 +41,6 @@ export class ChannelResolver {
         @Arg('channelName') channelName: string,
         @Arg('teamId', () => Int) teamId: number
     ): Promise<Boolean> {
-        
         await getConnection().query(
             `
                 insert into channel (name, "teamId")

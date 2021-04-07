@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { useTeamsQuery, useLogoutMutation } from '../../generated/graphql';
 import CreateTeamModal from './CreateTeamModal';
 import NextLink from 'next/link';
@@ -35,7 +37,7 @@ const Teams: React.FC<{}> = () => {
         <Container>
             <NextLink href='/friends'>
                 <TeamIcon>
-                   
+                    <FontAwesomeIcon icon={faDiscord}/>
                 </TeamIcon>
             </NextLink>
 
