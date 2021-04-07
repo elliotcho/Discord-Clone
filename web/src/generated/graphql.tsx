@@ -160,6 +160,7 @@ export type Mutation = {
   cancelFriendRequest: Scalars['Boolean'];
   declineFriendRequest: Scalars['Boolean'];
   sendFriendRequest: Scalars['Boolean'];
+  getUserGroup: Array<User>;
 };
 
 
@@ -198,7 +199,7 @@ export type MutationChangeUsernameArgs = {
 
 
 export type MutationSetStatusArgs = {
-  status: Scalars['String'];
+  status: Scalars['Int'];
 };
 
 
@@ -311,6 +312,11 @@ export type MutationDeclineFriendRequestArgs = {
 
 export type MutationSendFriendRequestArgs = {
   receiverId: Scalars['Int'];
+};
+
+
+export type MutationGetUserGroupArgs = {
+  status: Scalars['Int'];
 };
 
 
@@ -671,7 +677,7 @@ export type RemoveProfilePicMutation = (
 );
 
 export type SetStatusMutationVariables = Exact<{
-  status: Scalars['String'];
+  status: Scalars['Int'];
 }>;
 
 
@@ -1718,7 +1724,7 @@ export type RemoveProfilePicMutationHookResult = ReturnType<typeof useRemoveProf
 export type RemoveProfilePicMutationResult = Apollo.MutationResult<RemoveProfilePicMutation>;
 export type RemoveProfilePicMutationOptions = Apollo.BaseMutationOptions<RemoveProfilePicMutation, RemoveProfilePicMutationVariables>;
 export const SetStatusDocument = gql`
-    mutation SetStatus($status: String!) {
+    mutation SetStatus($status: Int!) {
   setStatus(status: $status)
 }
     `;

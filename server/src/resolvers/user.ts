@@ -339,7 +339,7 @@ export class UserResolver {
 
     @Mutation(() => Boolean)
     async setStatus(
-        @Arg('status') status: string,
+        @Arg('status', ()=>Int) status: number,
         @Ctx() {req}: MyContext
     ): Promise<boolean>{
         await getConnection().query(

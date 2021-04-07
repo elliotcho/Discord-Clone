@@ -151,4 +151,18 @@ export class FriendResolver {
 
         return true;
     }
+
+    @Query(() => [User])
+    async getUserGroup(
+        @Arg('status', () => Int) status: number,
+    ): Promise<User[]>{
+        const group = await getConnection().query(
+            `
+            select * from user
+            where status = $1
+            `,
+            [status]
+        );
+        return group;
+    }
 }

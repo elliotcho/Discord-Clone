@@ -1,3 +1,3 @@
-mutation SetStatus($status: String!){
+mutation SetStatus($status: Int!){
     setStatus(status: $status)
 }

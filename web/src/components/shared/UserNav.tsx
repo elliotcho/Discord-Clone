@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faCog } from '@fortawesome/free-solid-svg-icons';
-import { useMeQuery } from '../../generated/graphql';
+import { useMeQuery, useSetStatusMutation } from '../../generated/graphql';
 import { isServer } from '../../utils/isServer';
 import NextLink from 'next/link';
 
@@ -77,15 +77,16 @@ const Span = styled.span`
 `;
 
 const icons = [
-    { color: 'green', text: 'Online' },
-    { color: '#cccc00', text: 'Idle' },
-    { color: '#cc0000', text: 'Do Not Disturb' },
-    { color: '#bfbfbf', text: 'Invisible' }
+    { color: 'green', text: 'Online', value: 0 },
+    { color: '#cccc00', text: 'Idle', value: 1 },
+    { color: '#cc0000', text: 'Do Not Disturb', value: 2 },
+    { color: '#bfbfbf', text: 'Invisible', value: 3 }
 ]
 
 const UserNav: React.FC<{}> = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [iconColor, setIconColor] = useState('green');
+    const [setStatus] = useSetStatusMutation();
     
     const { data } = useMeQuery({
         skip: isServer()
@@ -117,11 +118,16 @@ const UserNav: React.FC<{}> = () => {
 
                 {isOpen && (
                     <Dropdown>
-                        {icons.map(({ color, text }) => 
+                        {icons.map(({ color, text, value }) => 
                             <Option 
                                 style={{ color }}
-                                onClick = {() => {
+                                onClick = {async () => {
                                     setIconColor(color);
+                                    
+                                    const status = value;
+                                    await setStatus({
+                                        variables: { status  }
+                                    });
                                 }}
                             >
                                 <FontAwesomeIcon icon={faCircle}/> 

@@ -48,7 +48,7 @@ export class DirectMessageResolver {
                 select * from direct_message as d
                 where (d."senderId" = $1 and d."receiverId" = $2) or
                 (d."senderId" = $2 and d."receiverId" = $1)
-                order by direct_message."createdAt" DESC
+                order by d."createdAt" DESC
             `,
             [req.session.uid, receiverId]
         );
