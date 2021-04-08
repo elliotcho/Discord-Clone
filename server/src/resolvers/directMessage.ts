@@ -10,13 +10,12 @@ import{
 } from 'type-graphql';
 import { MyContext, GraphQLUpload, Upload } from "../types";
 import { getConnection } from "typeorm";
-import { User } from '../entities/User';
 import { DirectMessage } from "../entities/DirectMessage";
+import { User } from '../entities/User';
 import { Read } from "../entities/Read";
 import fs, { createWriteStream } from 'fs';
 import path from 'path';
 import { v4 } from 'uuid';
-
 
 @Resolver(DirectMessage)
 export class DirectMessageResolver {
@@ -25,61 +24,22 @@ export class DirectMessageResolver {
         @Root() dm : DirectMessage,
         @Ctx() { req }: MyContext
     ): Promise<boolean>{
-        const isDM = true;
-
         const isRead = await Read.findOne({
             where: {
                 messageId: dm.id,
                 userId: req.session.uid,
-                isDM
+                isDM: true
             }
         });
 
         return !!isRead;
     }
 
-    @FieldResolver()
-    async lastMessage(
-        @Root() { receiverId } : DirectMessage,
-        @Ctx() { req }: MyContext
-    ): Promise<DirectMessage | undefined>{
-        const directMessages = await getConnection().query(
-            `
-                select * from direct_message as d
-                where (d."senderId" = $1 and d."receiverId" = $2) or
-                (d."senderId" = $2 and d."receiverId" = $1)
-                order by d."createdAt" DESC
-            `,
-            [req.session.uid, receiverId]
-        );
-
-        return directMessages.length? directMessages[0] : undefined;
-    }
-
-    @Mutation(() => Boolean)
-    async updateDMRead(
-        @Arg('messageId', ()=> Int) messageId: number,
-        @Ctx() { req }: MyContext
-    ): Promise<boolean>{
-        const isDm = true;
-
-        await getConnection().query(
-            `
-                insert into read ("messageId", "userId", "isDM")
-                values ($1, $2, $3)
-            `,
-            [messageId, req.session.uid, isDm]
-        );
-
-        return true;
-    }
-
-
-    @FieldResolver()
+    @FieldResolver(() => User)
     async user(
-        @Root() dm: DirectMessage
+        @Root() { senderId } : DirectMessage
     ) : Promise<User | undefined> {
-        return User.findOne(dm.senderId);
+        return User.findOne(senderId);
     }
 
     @FieldResolver()
@@ -91,6 +51,21 @@ export class DirectMessageResolver {
         }
 
         return `${process.env.SERVER_URL}/images/${dm.pic}`;
+    }
+
+    @Mutation(() => Boolean)
+    async editDirectMessage(
+        @Arg('text') text: string,
+        @Arg('messageId', () => Int) messageId: number
+    ) : Promise<boolean> {
+        await getConnection().query(
+            `
+                update direct_message set text = $1 
+                where id = $2
+            `,[text, messageId]
+        );
+
+        return true;
     }
 
     @Mutation(() => Boolean)
@@ -141,10 +116,10 @@ export class DirectMessageResolver {
     ): Promise<DirectMessage[]>{
         const messages = await getConnection().query(
             `
-            select * from direct_message
-            where (direct_message."senderId" = $1 AND direct_message."receiverId"= $2)
-            or (direct_message."senderId" = $2 AND direct_message."receiverId"= $1)
-            order by direct_message."createdAt" DESC
+                select * from direct_message
+                where (direct_message."senderId" = $1 AND direct_message."receiverId"= $2)
+                or (direct_message."senderId" = $2 AND direct_message."receiverId"= $1)
+                order by direct_message."createdAt" DESC
             `,
             [req.session.uid, receiverId]
         );
@@ -152,7 +127,7 @@ export class DirectMessageResolver {
         return messages;
     }
 
-    @Mutation(()=> Boolean)
+    @Mutation(() => Boolean)
     async sendDmFile(
         @Arg('file', () => GraphQLUpload) { createReadStream, filename }: Upload,
         @Arg('receiverId', ()=> Int) receiverId: number,

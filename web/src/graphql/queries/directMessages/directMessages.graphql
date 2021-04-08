@@ -10,9 +10,5 @@ query DirectMessages($receiverId: Int!) {
         user {
             ...RegularUser
         }
-
-        lastMessage {
-            isRead
-        }
     }
 }

@@ -21,7 +21,7 @@ export type Query = {
   __typename?: 'Query';
   user: User;
   searchResults: Array<User>;
-  me?: Maybe<User>;
+  me: User;
   team: Team;
   teams: Array<Team>;
   messages: Array<Message>;
@@ -128,10 +128,9 @@ export type DirectMessage = {
   senderId: Scalars['Float'];
   receiverId: Scalars['Float'];
   user: User;
+  isRead: Scalars['Boolean'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
-  isRead: Scalars['Boolean'];
-  lastMessage: DirectMessage;
 };
 
 export type Mutation = {
@@ -153,7 +152,7 @@ export type Mutation = {
   deleteMessage: Scalars['Boolean'];
   sendFile: Scalars['Boolean'];
   editMessage: Scalars['Boolean'];
-  updateDMRead: Scalars['Boolean'];
+  editDirectMessage: Scalars['Boolean'];
   sendDirectMessage: Scalars['Boolean'];
   deleteDirectMessage: Scalars['Boolean'];
   sendDmFile: Scalars['Boolean'];
@@ -251,8 +250,9 @@ export type MutationEditMessageArgs = {
 };
 
 
-export type MutationUpdateDmReadArgs = {
+export type MutationEditDirectMessageArgs = {
   messageId: Scalars['Int'];
+  text: Scalars['String'];
 };
 
 
@@ -425,6 +425,17 @@ export type DeleteDirectMessageMutation = (
   & Pick<Mutation, 'deleteDirectMessage'>
 );
 
+export type EditDirectMessageMutationVariables = Exact<{
+  text: Scalars['String'];
+  messageId: Scalars['Int'];
+}>;
+
+
+export type EditDirectMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'editDirectMessage'>
+);
+
 export type SendDirectMessageMutationVariables = Exact<{
   text: Scalars['String'];
   receiverId: Scalars['Int'];
@@ -445,16 +456,6 @@ export type SendDmFileMutationVariables = Exact<{
 export type SendDmFileMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'sendDmFile'>
-);
-
-export type UpdateDmReadMutationVariables = Exact<{
-  messageId: Scalars['Int'];
-}>;
-
-
-export type UpdateDmReadMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'updateDMRead'>
 );
 
 export type AcceptFriendRequestMutationVariables = Exact<{
@@ -731,9 +732,6 @@ export type DirectMessagesQuery = (
     & { user: (
       { __typename?: 'User' }
       & RegularUserFragment
-    ), lastMessage: (
-      { __typename?: 'DirectMessage' }
-      & Pick<DirectMessage, 'isRead'>
     ) }
   )> }
 );
@@ -815,10 +813,10 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQuery = (
   { __typename?: 'Query' }
-  & { me?: Maybe<(
+  & { me: (
     { __typename?: 'User' }
     & RegularUserFragment
-  )> }
+  ) }
 );
 
 export type SearchResultsQueryVariables = Exact<{
@@ -1024,6 +1022,37 @@ export function useDeleteDirectMessageMutation(baseOptions?: Apollo.MutationHook
 export type DeleteDirectMessageMutationHookResult = ReturnType<typeof useDeleteDirectMessageMutation>;
 export type DeleteDirectMessageMutationResult = Apollo.MutationResult<DeleteDirectMessageMutation>;
 export type DeleteDirectMessageMutationOptions = Apollo.BaseMutationOptions<DeleteDirectMessageMutation, DeleteDirectMessageMutationVariables>;
+export const EditDirectMessageDocument = gql`
+    mutation EditDirectMessage($text: String!, $messageId: Int!) {
+  editDirectMessage(text: $text, messageId: $messageId)
+}
+    `;
+export type EditDirectMessageMutationFn = Apollo.MutationFunction<EditDirectMessageMutation, EditDirectMessageMutationVariables>;
+
+/**
+ * __useEditDirectMessageMutation__
+ *
+ * To run a mutation, you first call `useEditDirectMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditDirectMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editDirectMessageMutation, { data, loading, error }] = useEditDirectMessageMutation({
+ *   variables: {
+ *      text: // value for 'text'
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useEditDirectMessageMutation(baseOptions?: Apollo.MutationHookOptions<EditDirectMessageMutation, EditDirectMessageMutationVariables>) {
+        return Apollo.useMutation<EditDirectMessageMutation, EditDirectMessageMutationVariables>(EditDirectMessageDocument, baseOptions);
+      }
+export type EditDirectMessageMutationHookResult = ReturnType<typeof useEditDirectMessageMutation>;
+export type EditDirectMessageMutationResult = Apollo.MutationResult<EditDirectMessageMutation>;
+export type EditDirectMessageMutationOptions = Apollo.BaseMutationOptions<EditDirectMessageMutation, EditDirectMessageMutationVariables>;
 export const SendDirectMessageDocument = gql`
     mutation SendDirectMessage($text: String!, $receiverId: Int!) {
   sendDirectMessage(text: $text, receiverId: $receiverId)
@@ -1086,36 +1115,6 @@ export function useSendDmFileMutation(baseOptions?: Apollo.MutationHookOptions<S
 export type SendDmFileMutationHookResult = ReturnType<typeof useSendDmFileMutation>;
 export type SendDmFileMutationResult = Apollo.MutationResult<SendDmFileMutation>;
 export type SendDmFileMutationOptions = Apollo.BaseMutationOptions<SendDmFileMutation, SendDmFileMutationVariables>;
-export const UpdateDmReadDocument = gql`
-    mutation UpdateDMRead($messageId: Int!) {
-  updateDMRead(messageId: $messageId)
-}
-    `;
-export type UpdateDmReadMutationFn = Apollo.MutationFunction<UpdateDmReadMutation, UpdateDmReadMutationVariables>;
-
-/**
- * __useUpdateDmReadMutation__
- *
- * To run a mutation, you first call `useUpdateDmReadMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateDmReadMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateDmReadMutation, { data, loading, error }] = useUpdateDmReadMutation({
- *   variables: {
- *      messageId: // value for 'messageId'
- *   },
- * });
- */
-export function useUpdateDmReadMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDmReadMutation, UpdateDmReadMutationVariables>) {
-        return Apollo.useMutation<UpdateDmReadMutation, UpdateDmReadMutationVariables>(UpdateDmReadDocument, baseOptions);
-      }
-export type UpdateDmReadMutationHookResult = ReturnType<typeof useUpdateDmReadMutation>;
-export type UpdateDmReadMutationResult = Apollo.MutationResult<UpdateDmReadMutation>;
-export type UpdateDmReadMutationOptions = Apollo.BaseMutationOptions<UpdateDmReadMutation, UpdateDmReadMutationVariables>;
 export const AcceptFriendRequestDocument = gql`
     mutation AcceptFriendRequest($senderId: Int!) {
   acceptFriendRequest(senderId: $senderId)
@@ -1866,9 +1865,6 @@ export const DirectMessagesDocument = gql`
     pic
     user {
       ...RegularUser
-    }
-    lastMessage {
-      isRead
     }
   }
 }

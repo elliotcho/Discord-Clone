@@ -172,9 +172,23 @@ export class UserResolver {
         @Arg('file', () => GraphQLUpload) { createReadStream, filename } : Upload,
         @Ctx() { req } : MyContext
     ): Promise<boolean> {
+        let user;
         const name = 'PROFILE-' + v4() + path.extname(filename);
+        const { uid } = req.session;
 
-        await User.update({ id: req.session.uid }, { profilePic: name });
+        user = await User.findOne(uid);
+
+        if(user && user.profilePic) {
+            const location = path.join(__dirname, `../../images/${user.profilePic}`);
+
+            fs.unlink(location, err => {
+                if(err) {
+                     console.log(err);
+                }
+            });
+        }
+        
+        await User.update({ id: uid }, { profilePic: name });
 
         return new Promise(async (resolve, reject) =>
             createReadStream()

@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { useUpdateReadMutation, useDeleteChannelMutation } from '../../generated/graphql';
 import NextLink from 'next/link';
 
 const Container = styled.div`
@@ -12,10 +11,6 @@ const Container = styled.div`
     &:hover {
         background: #808080;
     }
-`;
-
-const Options = styled.div`
-    margin-left: auto;
 `;
 
 interface ChannelProps {
@@ -36,53 +31,15 @@ const Channel: React.FC<ChannelProps> = ({
     name
 }) => {
     let style = {};
-    const [deleteChannel] = useDeleteChannelMutation();
-    const [read] = useUpdateReadMutation();
-
-    useEffect(() => {
-
-        // const fetchData = async () => {
-        //     await read({
-        //         variables: { channelId },
-        //         update: (cache) => {
-        //             cache.evict({ fieldName: 'channels' });
-        //         }
-        //     });
-        // }
-
-        // if(active) {
-        //     //fetchData();
-        // }
-
-    }, [channelId])
-
+   
     if(active) {
         style = { background: '#808080' };
     }
-
-    // if(!isRead) {
-    //     style = { color: 'red' };
-    // }
 
     return (
         <NextLink href={route}>
             <Container style={style}>
                 # {name}
-                
-                {numChannels > 1 && (
-                    <Options
-                        onClick = {async () => {
-                            await deleteChannel({
-                                variables: { channelId },
-                                update: (cache) => {
-                                    cache.evict({ fieldName: 'channels' });
-                                }
-                            })
-                        }}
-                    >
-                        X
-                    </Options>
-                )}
             </Container> 
         </NextLink>
     )

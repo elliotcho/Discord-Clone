@@ -1,3 +1,0 @@
-mutation UpdateDMRead($messageId: Int!){
-    updateDMRead(messageId: $messageId)
-}

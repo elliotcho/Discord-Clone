@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { 
+    useEditDirectMessageMutation,
     useDeleteDirectMessageMutation,
     useDeleteMessageMutation,
     useEditMessageMutation 
@@ -59,6 +60,7 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm
     const [editMessage] = useEditMessageMutation();
     const [deleteMessage] = useDeleteMessageMutation();
     const [deleteDm] = useDeleteDirectMessageMutation();
+    const [editDm] = useEditDirectMessageMutation();
 
     return (
         <Box>
@@ -121,7 +123,16 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm
                                 cache.evict({ fieldName: 'messages' });
                             }
                         });
+
+                        return;
                     }
+
+                    await editDm({
+                        variables: { messageId, text: newText },
+                        update: (cache) => {
+                            cache.evict({ fieldName: 'directMessages' });
+                        }
+                    })
                 }}
             />
         </Box>
