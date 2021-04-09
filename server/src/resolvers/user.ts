@@ -132,6 +132,8 @@ export class UserResolver {
         @Ctx() { req, res } : MyContext
     ) : Promise<boolean> {
         return new Promise(resolve => {
+            User.update({ id: req.session.uid }, { activeStatus: 0 });
+
             req.session.destroy(err => {
                 res.clearCookie('cid');
 
@@ -225,6 +227,8 @@ export class UserResolver {
                 }]
             };
         }
+        
+        await User.update({ id: user.id }, { activeStatus: 2 });
 
         req.session.uid = user.id;
         return { user };
@@ -265,6 +269,8 @@ export class UserResolver {
             }
         }
 
+        await User.update({ id: user.id }, { activeStatus: 2 });
+
         req.session.uid = user.id;
         return { user };
     }
@@ -299,7 +305,8 @@ export class UserResolver {
         }
 
         await User.update({ id: user.id }, { 
-            password: await argon2.hash(newPassword)
+            password: await argon2.hash(newPassword),
+            activeStatus: 2
         });
         
         await redis.del(token);
@@ -355,16 +362,17 @@ export class UserResolver {
     @Mutation(() => Boolean)
     async setStatus(
         @Arg('status', ()=>Int) status: number,
-        @Ctx() {req}: MyContext
+        @Ctx() { req }: MyContext
     ): Promise<boolean>{
         await getConnection().query(
             `
                 update "user"
-                set status = $1
+                set "activeStatus" = $1
                 where id = $2
             `,
             [status, req.session.uid]
         );
+
         return true;
     }
 }

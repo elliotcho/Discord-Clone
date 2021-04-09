@@ -27,6 +27,7 @@ const Friends: React.FC<{}> =() => {
             {data?.friends?.map(u =>
                 <UserCard 
                     key = {u.id}
+                    activeStatus = {u.activeStatus}
                     profileURL = {u.profileURL}
                     username = {u.username}
                 >

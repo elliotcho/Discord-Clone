@@ -28,9 +28,9 @@ export type Query = {
   directMessages: Array<DirectMessage>;
   channels: Array<Channel>;
   channel: Channel;
+  onlineFriends: Array<User>;
   friendRequests: Array<User>;
   friends: Array<User>;
-  getFriendGroup: Array<User>;
 };
 
 
@@ -68,18 +68,13 @@ export type QueryChannelArgs = {
   channelId: Scalars['Int'];
 };
 
-
-export type QueryGetFriendGroupArgs = {
-  status: Scalars['Int'];
-};
-
 export type User = {
   __typename?: 'User';
   id: Scalars['Float'];
   email: Scalars['String'];
   username: Scalars['String'];
   profilePic: Scalars['String'];
-  status: Scalars['Float'];
+  activeStatus: Scalars['Float'];
   profileURL: Scalars['String'];
   friendStatus: Scalars['Float'];
   isMe: Scalars['Boolean'];
@@ -370,7 +365,7 @@ export type RegularErrorFragment = (
 
 export type RegularUserFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'isMe' | 'email' | 'username' | 'friendStatus' | 'profileURL' | 'createdAt' | 'updatedAt'>
+  & Pick<User, 'id' | 'isMe' | 'email' | 'username' | 'friendStatus' | 'activeStatus' | 'profileURL' | 'createdAt' | 'updatedAt'>
 );
 
 export type RegularUserResponseFragment = (
@@ -758,14 +753,12 @@ export type FriendsQuery = (
   )> }
 );
 
-export type GetFriendGroupQueryVariables = Exact<{
-  status: Scalars['Int'];
-}>;
+export type OnlineFriendsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetFriendGroupQuery = (
+export type OnlineFriendsQuery = (
   { __typename?: 'Query' }
-  & { getFriendGroup: Array<(
+  & { onlineFriends: Array<(
     { __typename?: 'User' }
     & RegularUserFragment
   )> }
@@ -858,6 +851,7 @@ export const RegularUserFragmentDoc = gql`
   email
   username
   friendStatus
+  activeStatus
   profileURL
   createdAt
   updatedAt
@@ -1959,39 +1953,38 @@ export function useFriendsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Fr
 export type FriendsQueryHookResult = ReturnType<typeof useFriendsQuery>;
 export type FriendsLazyQueryHookResult = ReturnType<typeof useFriendsLazyQuery>;
 export type FriendsQueryResult = Apollo.QueryResult<FriendsQuery, FriendsQueryVariables>;
-export const GetFriendGroupDocument = gql`
-    query GetFriendGroup($status: Int!) {
-  getFriendGroup(status: $status) {
+export const OnlineFriendsDocument = gql`
+    query OnlineFriends {
+  onlineFriends {
     ...RegularUser
   }
 }
     ${RegularUserFragmentDoc}`;
 
 /**
- * __useGetFriendGroupQuery__
+ * __useOnlineFriendsQuery__
  *
- * To run a query within a React component, call `useGetFriendGroupQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetFriendGroupQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useOnlineFriendsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOnlineFriendsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetFriendGroupQuery({
+ * const { data, loading, error } = useOnlineFriendsQuery({
  *   variables: {
- *      status: // value for 'status'
  *   },
  * });
  */
-export function useGetFriendGroupQuery(baseOptions: Apollo.QueryHookOptions<GetFriendGroupQuery, GetFriendGroupQueryVariables>) {
-        return Apollo.useQuery<GetFriendGroupQuery, GetFriendGroupQueryVariables>(GetFriendGroupDocument, baseOptions);
+export function useOnlineFriendsQuery(baseOptions?: Apollo.QueryHookOptions<OnlineFriendsQuery, OnlineFriendsQueryVariables>) {
+        return Apollo.useQuery<OnlineFriendsQuery, OnlineFriendsQueryVariables>(OnlineFriendsDocument, baseOptions);
       }
-export function useGetFriendGroupLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFriendGroupQuery, GetFriendGroupQueryVariables>) {
-          return Apollo.useLazyQuery<GetFriendGroupQuery, GetFriendGroupQueryVariables>(GetFriendGroupDocument, baseOptions);
+export function useOnlineFriendsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OnlineFriendsQuery, OnlineFriendsQueryVariables>) {
+          return Apollo.useLazyQuery<OnlineFriendsQuery, OnlineFriendsQueryVariables>(OnlineFriendsDocument, baseOptions);
         }
-export type GetFriendGroupQueryHookResult = ReturnType<typeof useGetFriendGroupQuery>;
-export type GetFriendGroupLazyQueryHookResult = ReturnType<typeof useGetFriendGroupLazyQuery>;
-export type GetFriendGroupQueryResult = Apollo.QueryResult<GetFriendGroupQuery, GetFriendGroupQueryVariables>;
+export type OnlineFriendsQueryHookResult = ReturnType<typeof useOnlineFriendsQuery>;
+export type OnlineFriendsLazyQueryHookResult = ReturnType<typeof useOnlineFriendsLazyQuery>;
+export type OnlineFriendsQueryResult = Apollo.QueryResult<OnlineFriendsQuery, OnlineFriendsQueryVariables>;
 export const MessagesDocument = gql`
     query Messages($channelId: Int!) {
   messages(channelId: $channelId) {

@@ -32,7 +32,7 @@ export class User extends BaseEntity {
 
     @Field()
     @Column({ default: 0 })
-    status: number;
+    activeStatus: number;
 
     @Field()
     profileURL: string;

@@ -4,6 +4,7 @@ fragment RegularUser on User {
     email
     username
     friendStatus
+    activeStatus
     profileURL
     createdAt
     updatedAt

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useMeQuery } from '../../generated/graphql';
+import { isServer } from '../../utils/isServer';
 import { useRouter } from 'next/router';
 
 interface AuthWrapperProps {
@@ -8,7 +9,10 @@ interface AuthWrapperProps {
 
 const AuthWrapper : React.FC<AuthWrapperProps> = ({ children, requiresAuth = false }) => {
     const router = useRouter();
-    const { data, loading } = useMeQuery();
+
+    const { data, loading } = useMeQuery({
+        skip: isServer()
+    });
 
     if(!loading) {
         if(data?.me && !requiresAuth) {

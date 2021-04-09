@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faCog } from '@fortawesome/free-solid-svg-icons';
-import { useMeQuery } from '../../generated/graphql';
+import { useMeQuery, useSetStatusMutation } from '../../generated/graphql';
 import { isServer } from '../../utils/isServer';
 import NextLink from 'next/link';
 
@@ -77,19 +77,34 @@ const Span = styled.span`
 `;
 
 const icons = [
-    { color: 'green', text: 'Online' },
-    { color: '#cccc00', text: 'Idle' },
-    { color: '#cc0000', text: 'Do Not Disturb' },
-    { color: '#bfbfbf', text: 'Invisible' }
+    { color: '#bfbfbf', text: 'Invisible', status: 0 },
+    { color: '#cc0000', text: 'Do Not Disturb', status: 3 },
+    { color: '#cccc00', text: 'Idle', status: 1 },
+    { color: 'green', text: 'Online', status: 2 },
 ]
 
 const UserNav: React.FC<{}> = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [iconColor, setIconColor] = useState('green');
+    const [iconColor, setIconColor] = useState('#bfbfbf');
+    const [setStatus] = useSetStatusMutation();
     
     const { data } = useMeQuery({
         skip: isServer()
     });
+
+    useEffect(() => {
+
+        const status = data?.me?.activeStatus;
+
+        if(status) {
+            icons.forEach(i => {
+                if(i.status === status) {
+                    setIconColor(i.color);
+                }
+            });
+        }
+
+    }, [data])
 
     if(!isServer()) {
         window.addEventListener('click', function(e: any){
@@ -119,11 +134,15 @@ const UserNav: React.FC<{}> = () => {
 
                 {isOpen && (
                     <Dropdown id='status-dropdown'>
-                        {icons.map(({ color, text }) => 
+                        {icons.map(({ status, color, text }) => 
                             <Option 
                                 style={{ color }}
-                                onClick = {() => {
+                                onClick = {async () => {
                                     setIconColor(color);
+
+                                    await setStatus({
+                                        variables: { status }
+                                    });
                                 }}
                             >
                                 <FontAwesomeIcon icon={faCircle}/> 
