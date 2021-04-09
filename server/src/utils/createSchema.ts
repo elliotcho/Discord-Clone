@@ -4,7 +4,6 @@ import { TeamResolver } from '../resolvers/team';
 import { MessageResolver } from '../resolvers/message';
 import { DirectMessageResolver }from '../resolvers/directMessage';
 import { ChannelResolver } from '../resolvers/channel';
-import { InviteResolver } from '../resolvers/invite';
 import { FriendResolver } from '../resolvers/friend';
 
 export const createSchema = async () => (
@@ -16,7 +15,6 @@ export const createSchema = async () => (
             TeamResolver,
             UserResolver,
             ChannelResolver,
-            InviteResolver,
             FriendResolver
         ]
     })

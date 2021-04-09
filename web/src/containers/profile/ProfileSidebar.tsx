@@ -2,6 +2,7 @@ import React from 'react';
 import { useApolloClient } from '@apollo/client';
 import styled from 'styled-components';
 import { useLogoutMutation } from '../../generated/graphql';
+import { useRouter } from 'next/router';
 
 const Container = styled.div`
     background: #262626;
@@ -33,6 +34,7 @@ const Li = styled.li`
 const ProfileSidebar: React.FC<{}> = () => {
     const [logout] = useLogoutMutation();
     const apolloClient = useApolloClient();
+    const router = useRouter();
 
     return (
         <Container>
@@ -45,6 +47,8 @@ const ProfileSidebar: React.FC<{}> = () => {
 
                             await logout();
                             await apolloClient.resetStore();
+
+                            router.push('/');
                         }}
                     >
                         Log Out

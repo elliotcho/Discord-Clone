@@ -1,10 +1,9 @@
 import React from 'react';
 import { Formik, Form } from 'formik';
-import { MeDocument, MeQuery, useChangePasswordMutation } from '../../generated/graphql';
+import { useChangePasswordMutation } from '../../generated/graphql';
 import { withApollo } from '../../utils/withApollo';
 import { toErrorMap } from '../../utils/toErrorMap';
 import Layout from '../../containers/shared/AuthLayout';
-import AuthWrapper from '../../containers/shared/AuthWrapper';
 import FormContainer from '../../containers/auth/FormContainer';
 import Title from '../../components/auth/Title';
 import InputField from '../../components/auth/InputField';
@@ -29,13 +28,9 @@ const ChangePassword: React.FC<{}> = () => {
                             newPassword
                         },
                         update: (cache, { data }) => {
-                            cache.writeQuery<MeQuery>({
-                                query: MeDocument,
-                                data: {
-                                    __typename: 'Query',
-                                    me: data?.changePassword.user
-                                }
-                            });
+                            if(data?.changePassword.user) {
+                                cache.evict({ fieldName: 'me' });
+                            }
                         }
                     });
 

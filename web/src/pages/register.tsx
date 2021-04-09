@@ -25,7 +25,12 @@ const Register: React.FC<{}> = () => {
                         const { username, password, email } = values;
 
                         const response = await register({
-                            variables: { username, password, email }
+                            variables: { username, password, email },
+                            update: (cache, { data }) => {
+                                if(data?.register.user) {
+                                    cache.evict({ fieldName: 'me' });
+                                }
+                            }
                         });
 
                         if(!response.data.register.user) {

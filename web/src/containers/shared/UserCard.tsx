@@ -68,7 +68,7 @@ const UserCard: React.FC<UserCardProps> = ({
         <Card>
             <Image src={profileURL} alt='profile pic' />
 
-            {activeStatus && (
+            {!!activeStatus && (
                 <Icon style={{ color }}>
                     <FontAwesomeIcon icon={faCircle} />
                 </Icon>
