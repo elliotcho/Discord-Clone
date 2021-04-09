@@ -14,18 +14,12 @@ const Container = styled.div`
 `;
 
 interface ChannelProps {
-    numChannels: number;
-    channelId: number;
     active: boolean;
-    isRead: boolean;
     route: string;
     name: string;
 }
 
 const Channel: React.FC<ChannelProps> = ({
-    numChannels,
-    channelId,
-    isRead,
     active,
     route,
     name

@@ -93,7 +93,9 @@ const UserNav: React.FC<{}> = () => {
 
     if(!isServer()) {
         window.addEventListener('click', function(e: any){
-            if(!document.getElementById('icon')?.contains(e.target)){
+            if(!document.getElementById('status-dropdown')?.contains(e.target)
+                && !document.getElementById('icon')?.contains(e.target)
+            ) {
                 setIsOpen(false);
             }
         });
@@ -116,7 +118,7 @@ const UserNav: React.FC<{}> = () => {
                 </Icon>
 
                 {isOpen && (
-                    <Dropdown>
+                    <Dropdown id='status-dropdown'>
                         {icons.map(({ color, text }) => 
                             <Option 
                                 style={{ color }}
