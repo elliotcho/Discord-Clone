@@ -12,6 +12,21 @@ const Header = styled.h2`
     color: black;
 `;
 
+const Button = styled.button`
+    color: #fff;
+    padding: 5px 10px;
+    background: #40bf40;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    outline: none;
+    border: none;
+
+    &:hover {
+        background: green;
+    }
+`;
+
 interface InvitePeopleModalProps {
     isOpen: boolean;
     onClose(): void;
@@ -44,7 +59,18 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
                             profileURL = {u.profileURL}
                             username = {u.username}
                         >
-                            
+                            <Button
+                                onClick = {async () => {
+                                    await addMember({
+                                        variables: { teamId, userId: u.id },
+                                        update: (cache) => {
+                                            cache.evict({ fieldName: 'invitees' });
+                                        }
+                                    });
+                                }}
+                            >
+                                +
+                            </Button>
                         </UserCard>
                     )}
                 </Container>
