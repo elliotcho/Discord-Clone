@@ -5,30 +5,13 @@ import {
     Arg,
     Int,
     Mutation,
-    Ctx,
-    // FieldResolver,
-    // Root
+    Ctx
 } from "type-graphql";
 import { getConnection } from "typeorm";
 import { Channel } from "../entities/Channel";
-// import { Message } from '../entities/Message';
 
 @Resolver(Channel)
 export class ChannelResolver {
-    // @FieldResolver(() => Message)
-    // async lastMessage(
-    //     @Root() channel: Channel
-    // ) : Promise<Message | undefined> {
-    //     const messages = await getConnection().query(
-    //         `
-    //             select m.* from message as m
-    //             inner join channel as c on m."channelId" = c.id 
-    //         `[channel.id]
-    //     );
-
-    //     return messages.length? messages[0] : undefined;
-    // }
-
     @Query(() => [Channel])
     async channels(
         @Arg('teamId', () => Int) teamId: number
@@ -43,10 +26,10 @@ export class ChannelResolver {
     ): Promise<Boolean> {
         await getConnection().query(
             `
-                insert into channel (name, "teamId")
-                values ($1, $2)
+                insert into channel (name, "teamId", "isOriginal")
+                values ($1, $2, $3)
             `,
-            [channelName, teamId] 
+            [channelName, teamId, false] 
         );
         
         return true;

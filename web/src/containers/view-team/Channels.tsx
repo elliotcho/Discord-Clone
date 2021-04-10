@@ -5,6 +5,7 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useChannelsQuery } from '../../generated/graphql';
 import { isServer } from '../../utils/isServer';
 import CreateChannelModal from '../../components/view-team/CreateChannelModal';
+import InvitePeopleModal from '../../components/view-team/InvitePeopleModal';
 import Channel from '../../components/view-team/Channel';
 import UserNav from '../../components/shared/UserNav';
 
@@ -59,7 +60,11 @@ interface ChannelsProps {
 const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [createChannel, setCreateChannel] = useState(false);
-    const { data } = useChannelsQuery({ variables: { teamId } });
+    const [invitePeople, setInvitePeople] = useState(false);
+
+    const { data } = useChannelsQuery({ 
+        variables: { teamId } 
+    });
 
     if(!isServer()) {
         window.addEventListener('click', function(e: any){
@@ -83,6 +88,10 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                         <Dropdown id='channel-dropdown'>
                             <Option onClick={() => setCreateChannel(true)}>
                                 Create Channel
+                            </Option>
+
+                            <Option onClick={() => setInvitePeople(true)}>
+                                Invite People
                             </Option>
                         </Dropdown>
                     )}
@@ -110,6 +119,12 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
             <CreateChannelModal
                 isOpen = {createChannel}
                 onClose = {() => setCreateChannel(false)}
+                teamId = {teamId}
+            />
+
+            <InvitePeopleModal
+                isOpen = {invitePeople}
+                onClose = {() => setInvitePeople(false)}
                 teamId = {teamId}
             />
    

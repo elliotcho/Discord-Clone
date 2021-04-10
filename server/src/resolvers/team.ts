@@ -9,8 +9,10 @@ import {
     Root
 } from "type-graphql";
 import { getConnection } from "typeorm";
+import { Member } from "../entities/Member";
 import { Channel } from '../entities/Channel';
 import { Team } from "../entities/Team";
+import { User } from '../entities/User';
 import { MyContext } from "../types";
 
 @Resolver(Team)
@@ -20,6 +22,75 @@ export class TeamResolver {
         @Root() team: Team
     ) : Promise<Channel[]> {
         return Channel.find({ teamId: team.id });
+    }
+
+    @Query(() => [User])
+    async invitees(
+        @Arg('teamId', () => Int) teamId: number,
+        @Ctx() { req } : MyContext
+    ) : Promise<User[]> {
+        const result = [] as any[];
+
+        const friends = await getConnection().query(
+            `
+                select u.* from "user" as u inner join friend as f 
+                on u.id = f."senderId" or u.id = f."receiverId"
+                where (f."senderId" = $1 or f."receiverId" = $1) 
+                and u.id != $1 and f.status = true
+            `, [req.session.uid]
+        );
+
+        for(let i=0;i<friends.length;i++) {
+            const user = friends[i];
+
+            const member = await Member.findOne({ where: { 
+                userId: user.id,
+                teamId
+            }});
+
+            if(!member) result.push(user);
+        }
+
+        return result;
+    }
+
+    @Query(() => [User])
+    async onlineMembers(
+        @Arg('teamId', () => Int) teamId: number
+    ) : Promise<User[]> {
+        const users = await getConnection().query(
+            `
+                select u.* from "user" as u
+                inner join member as m on u.id = m."userId"
+                where m."teamId" = $1 and 
+                u."activeStatus" = 2
+            `, [teamId]
+        );
+
+        return users;
+    }
+
+    @Mutation(() => Boolean)
+    async addMember(
+        @Arg('userId', () => Int) userId: number,
+        @Arg('teamId', () => Int) teamId: number,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const team = await Team.findOne(teamId);
+
+        if(team?.ownerId !== req.session.uid) {
+            return false;
+        }
+
+        await getConnection().query(
+            `
+                insert into member ("userId", "teamId")
+                values ($1, $2)
+            `, 
+            [userId, teamId]
+        );
+
+        return true;
     }
 
     @Query(() => Team)
@@ -35,10 +106,10 @@ export class TeamResolver {
     ) : Promise<[Team]> {
         const teams = await getConnection().query(
             `
-                select * from team 
-                inner join member on team.id = member."teamId"
-                where member."userId" = $1 
-                order by team."createdAt" DESC
+                select * from team as t
+                inner join member on t.id = member."teamId"
+                where member."userId" = $1 order by 
+                t."createdAt" DESC
             `, [req.session.uid]
         );
 
@@ -50,13 +121,15 @@ export class TeamResolver {
         @Arg('teamName') teamName: string,
         @Ctx() { req } : MyContext
     ) : Promise<boolean> {
+        const { uid } = req.session;
+
         await getConnection().transaction(async (tm) => {
             const result = await tm.createQueryBuilder()
                                   .insert()
                                   .into(Team)
                                   .values({ 
                                       name: teamName,
-                                        // ownerId: req.session.uid 
+                                      ownerId: uid
                                    })
                                   .returning('*')
                                   .execute();
@@ -65,86 +138,20 @@ export class TeamResolver {
 
             await tm.query(
                 `
-                  insert into member ("userId", "teamId")
+                  insert into member ("teamId", "userId")
                   values ($1, $2)
-                `, [req.session.uid, teamId]
+                `, [teamId, uid]
             );
 
             await tm.query(
                 `
-                    insert into channel (name, "teamId")
-                    values  ($1, $2)
-                `, ["general", teamId]
+                    insert into channel (name, "teamId", "isOriginal")
+                    values  ($1, $2, $3)
+                `, 
+                ["general", teamId, true]
             );
         });
 
         return true;
-    }
-
-    @Mutation(() => Team)
-    async addUserToTeam(
-        @Arg('teamId', () => Int) teamId: number,
-        @Ctx() {req}: MyContext
-    ): Promise<Team | undefined>{
-       return await getConnection().query(
-            `
-            INSERT INTO MEMBER
-            WHERE teamId = $1 AND userId= $2
-
-            `,[teamId,req.session.uid]
-        );
-    }
-
-
-    @Mutation(() => Boolean)
-    async leaveTeam(
-        @Arg('teamId', ()=> Int) teamId: number,
-        @Ctx() {req}: MyContext
-    ): Promise<boolean>{
-        let success = false;
-
-        const teams = await getConnection().query(
-            `
-            select t.* from team as t
-            where id = $1
-            `,[teamId]
-        );
-
-        if( !(teams.length && teams[0].ownerId === req.session.uid) ){
-            await getConnection().query(
-                `
-                delete from member where id = $1
-                `, [ teamId]
-            );
-            success = true;
-        }
-        return success;
-    }
-
-    @Mutation(()=> Boolean)
-    async deleteTeam(
-        @Arg('teamId', ()=> Int) teamId:number,
-        @Ctx() {req}: MyContext
-    ): Promise<boolean>{
-        let success= false;
-
-        const teams = await getConnection().query(
-            `
-                select t.* from team as t
-                where id = $1
-            `,[teamId]
-        );
-
-        if(teams.length && teams[0].ownerId === req.session.uid){
-            await getConnection().query(
-                `
-                    delete from team where id = $1
-                `, [teamId]
-            );
-
-            success = true;
-        }
-
-        return success;
     }
 }

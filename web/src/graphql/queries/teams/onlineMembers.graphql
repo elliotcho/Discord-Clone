@@ -1,0 +1,5 @@
+query OnlineMembers($teamId: Int!) {
+    onlineMembers(teamId: $teamId) {
+        ...RegularUser
+    }
+}
