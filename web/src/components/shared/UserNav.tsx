@@ -143,7 +143,8 @@ const UserNav: React.FC<{}> = () => {
                                     await setStatus({
                                         variables: { status },
                                         update: (cache) => {
-                                            cache.evict({ fieldName: 'members' });
+                                            cache.evict({ fieldName: 'offlineMembers' });
+                                            cache.evict({ fieldName: 'onlineMembers' });
                                         }
                                     });
                                 }}

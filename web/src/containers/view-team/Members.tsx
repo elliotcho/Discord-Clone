@@ -24,9 +24,11 @@ const Members: React.FC<MembersProps> = ({ teamId }) => {
 
     return (
         <Container>
-            <Header>
-                ONLINE - {onlineMembers.length}
-            </Header>
+            {!!onlineMembers.length && (
+                <Header>
+                    ONLINE - {onlineMembers.length}
+                </Header>
+            )}
 
             {onlineMembers.map(u => 
                 <MemberCard 
@@ -36,9 +38,11 @@ const Members: React.FC<MembersProps> = ({ teamId }) => {
                 />
             )}
 
-            <Header>
-                OFFLINE - {offlineMembers.length}
-            </Header>
+            {!!offlineMembers.length && (
+                <Header>
+                    OFFLINE - {offlineMembers.length}
+                </Header>
+            )}
 
             {offlineMembers.map(u => 
                 <MemberCard key={u.id} {...u} />
