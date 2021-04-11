@@ -358,7 +358,7 @@ export type RegularErrorFragment = (
 
 export type RegularUserFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'isMe' | 'email' | 'username' | 'friendStatus' | 'activeStatus' | 'profileURL' | 'createdAt' | 'updatedAt'>
+  & Pick<User, 'id' | 'isMe' | 'email' | 'username' | 'friendStatus' | 'activeStatus' | 'profilePic' | 'profileURL' | 'createdAt' | 'updatedAt'>
 );
 
 export type RegularUserResponseFragment = (
@@ -862,6 +862,7 @@ export const RegularUserFragmentDoc = gql`
   username
   friendStatus
   activeStatus
+  profilePic
   profileURL
   createdAt
   updatedAt

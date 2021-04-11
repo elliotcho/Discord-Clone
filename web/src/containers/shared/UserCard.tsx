@@ -87,7 +87,7 @@ const UserCard: React.FC<UserCardProps> = ({
                 }} 
             />
 
-            {!!activeStatus && (
+            {!!color && (
                 <Icon style={{ color }}>
                     <FontAwesomeIcon icon={faCircle} />
                 </Icon>

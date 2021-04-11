@@ -2,26 +2,27 @@ import React from 'react';
 import styled from 'styled-components';
 import { 
     useMeQuery,
-    useUpdateProfilePicMutation
+    useUpdateProfilePicMutation,
+    useRemoveProfilePicMutation
 } from '../../generated/graphql';
 import { isServer } from '../../utils/isServer';
 
 const Container = styled.div`
     display: flex;
+    position: relative;
     background: #262626;
     min-height: 160px;
-    width: 50%;
     padding: 12px;
 `;
 
 const Image = styled.img`
-    border-radus: 50%;
+    border-radius: 50%;
     height: 5rem;
     width: 5rem;
 `;
 
 const Header = styled.h2`
-    margin-left: 15px;
+    margin-left: 25px;
     color: #f2f2f2;
 `;
 
@@ -34,15 +35,36 @@ const Button = styled.button`
     font-size: 1.2rem;
     background: #6c757d;
     box-shadow: 0 0 5px black;
-    margin: 10px 15px;
     cursor: pointer;
     color: #f2f2f2;
-    padding: 10px;
+    margin: 15px;
+    padding: 5px;
 
     &:focus {
         outline: none;
     }
+
+    &:hover {
+        background: #999;
+    }
 `;  
+
+const Remove = styled.button`
+    position: absolute;
+    background: #d9d9d9;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    left: 70px;
+    top: 5px;
+
+    &:hover {
+        background: #a6a6a6;
+        color: white;
+    }
+`;
 
 const Input = styled.input`
     display: none;
@@ -54,13 +76,29 @@ const ProfileCard: React.FC<{}> = () => {
     });
 
     const [updatePic] = useUpdateProfilePicMutation();
+    const [removePic] = useRemoveProfilePicMutation();
 
+    const hasProfilePic = !!data?.me?.profilePic;
     const profileURL = data?.me?.profileURL;
     const username = data?.me?.username;
 
     return (
         <Container>
             <Image src={profileURL} alt='pic'/>
+
+            {hasProfilePic && (
+                <Remove
+                    onClick = {async () => {
+                        await removePic({
+                            update: (cache) => {
+                                cache.evict({ fieldName: 'me' });
+                            }
+                        })
+                    }}
+                >
+                    X
+                </Remove>
+            )}
 
             <Header>
                 {username}
