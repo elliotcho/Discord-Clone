@@ -141,7 +141,10 @@ const UserNav: React.FC<{}> = () => {
                                     setIconColor(color);
 
                                     await setStatus({
-                                        variables: { status }
+                                        variables: { status },
+                                        update: (cache) => {
+                                            cache.evict({ fieldName: 'members' });
+                                        }
                                     });
                                 }}
                             >

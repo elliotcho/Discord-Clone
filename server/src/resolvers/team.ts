@@ -55,14 +55,31 @@ export class TeamResolver {
     }
 
     @Query(() => [User])
-    async members(
+    async onlineMembers(
         @Arg('teamId', () => Int) teamId: number
     ) : Promise<User[]> {
         const users = await getConnection().query(
             `
                 select u.* from "user" as u
                 inner join member as m on u.id = m."userId"
-                where m."teamId" = $1
+                where u."activeStatus" != 0 and
+                m."teamId" = $1
+            `, [teamId]
+        );
+
+        return users;
+    }
+
+    @Query(() => [User])
+    async offlineMembers(
+        @Arg('teamId', () => Int) teamId: number
+    ) : Promise<User[]> {
+        const users = await getConnection().query(
+            `
+                select u.* from "user" as u
+                inner join member as m on u.id = m."userId"
+                where u."activeStatus" = 0 and
+                m."teamId" = $1
             `, [teamId]
         );
 
