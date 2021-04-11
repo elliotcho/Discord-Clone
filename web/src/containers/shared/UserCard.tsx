@@ -40,15 +40,20 @@ interface UserCardProps {
     profileURL: string;
     activeStatus?: number;
     username: string;
+    size?: string;
 }
 
 const UserCard: React.FC<UserCardProps> = ({ 
     children, 
     profileURL, 
     activeStatus,
-    username
+    username,
+    size
 }) => {
     let color = '';
+    let dimensions = '';
+    let fontSize = '';
+    let margin = '';
 
     switch(activeStatus) {
         case 0: 
@@ -64,9 +69,23 @@ const UserCard: React.FC<UserCardProps> = ({
             color = 'green';
     }
 
+    switch(size) {
+        case 'sm':
+            dimensions = '2rem';
+            fontSize = '0.8rem';
+            margin = '0';
+    }
+
     return (
-        <Card>
-            <Image src={profileURL} alt='profile pic' />
+        <Card style = {{ margin }}>
+            <Image 
+                src={profileURL} 
+                alt='profile pic'
+                style = {{ 
+                    height: dimensions,
+                    width: dimensions
+                }} 
+            />
 
             {!!activeStatus && (
                 <Icon style={{ color }}>
@@ -74,7 +93,7 @@ const UserCard: React.FC<UserCardProps> = ({
                 </Icon>
             )}
 
-            <Primary>
+            <Primary style={{ fontSize }}>
                 {username}
             </Primary>
 

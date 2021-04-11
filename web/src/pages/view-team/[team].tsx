@@ -7,12 +7,13 @@ import Channels from '../../containers/view-team/Channels';
 import ChatHeader from '../../components/view-team/ChatHeader';
 import ChatContainer from '../../containers/view-team/ChatContainer';
 import SendMessage from '../../components/view-team/SendMessage';
+import Members from '../../containers/view-team/Members';
 import AuthWrapper from '../../containers/shared/AuthWrapper';
 import { useRouter } from 'next/router';
 
 const Container = styled.div`
     height: 100vh;
-    grid-template-columns: 100px 250px 1fr;
+    grid-template-columns: 100px 250px 1fr 250px;
     display: grid;
 `;
 
@@ -45,7 +46,7 @@ const ViewTeams: React.FC<{}> = () => {
             <Container>
                 <Teams />
 
-                <Channels teamId={teamId} channelId={channelId}/>
+                <Channels channelId={channelId} teamId={teamId}/>
 
                 <Chat>
                     <ChatHeader channelId={channelId}/>
@@ -54,6 +55,8 @@ const ViewTeams: React.FC<{}> = () => {
 
                     <SendMessage channelId={channelId}/>
                 </Chat>
+
+                <Members teamId={teamId} />
             </Container>
         </AuthWrapper>
     )

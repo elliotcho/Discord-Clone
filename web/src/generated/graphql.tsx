@@ -23,7 +23,7 @@ export type Query = {
   searchResults: Array<User>;
   me?: Maybe<User>;
   invitees: Array<User>;
-  onlineMembers: Array<User>;
+  members: Array<User>;
   team: Team;
   teams: Array<Team>;
   messages: Array<Message>;
@@ -51,7 +51,7 @@ export type QueryInviteesArgs = {
 };
 
 
-export type QueryOnlineMembersArgs = {
+export type QueryMembersArgs = {
   teamId: Scalars['Int'];
 };
 
@@ -755,14 +755,14 @@ export type InviteesQuery = (
   )> }
 );
 
-export type OnlineMembersQueryVariables = Exact<{
+export type MembersQueryVariables = Exact<{
   teamId: Scalars['Int'];
 }>;
 
 
-export type OnlineMembersQuery = (
+export type MembersQuery = (
   { __typename?: 'Query' }
-  & { onlineMembers: Array<(
+  & { members: Array<(
     { __typename?: 'User' }
     & RegularUserFragment
   )> }
@@ -1981,39 +1981,39 @@ export function useInviteesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<I
 export type InviteesQueryHookResult = ReturnType<typeof useInviteesQuery>;
 export type InviteesLazyQueryHookResult = ReturnType<typeof useInviteesLazyQuery>;
 export type InviteesQueryResult = Apollo.QueryResult<InviteesQuery, InviteesQueryVariables>;
-export const OnlineMembersDocument = gql`
-    query OnlineMembers($teamId: Int!) {
-  onlineMembers(teamId: $teamId) {
+export const MembersDocument = gql`
+    query Members($teamId: Int!) {
+  members(teamId: $teamId) {
     ...RegularUser
   }
 }
     ${RegularUserFragmentDoc}`;
 
 /**
- * __useOnlineMembersQuery__
+ * __useMembersQuery__
  *
- * To run a query within a React component, call `useOnlineMembersQuery` and pass it any options that fit your needs.
- * When your component renders, `useOnlineMembersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useMembersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMembersQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useOnlineMembersQuery({
+ * const { data, loading, error } = useMembersQuery({
  *   variables: {
  *      teamId: // value for 'teamId'
  *   },
  * });
  */
-export function useOnlineMembersQuery(baseOptions: Apollo.QueryHookOptions<OnlineMembersQuery, OnlineMembersQueryVariables>) {
-        return Apollo.useQuery<OnlineMembersQuery, OnlineMembersQueryVariables>(OnlineMembersDocument, baseOptions);
+export function useMembersQuery(baseOptions: Apollo.QueryHookOptions<MembersQuery, MembersQueryVariables>) {
+        return Apollo.useQuery<MembersQuery, MembersQueryVariables>(MembersDocument, baseOptions);
       }
-export function useOnlineMembersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OnlineMembersQuery, OnlineMembersQueryVariables>) {
-          return Apollo.useLazyQuery<OnlineMembersQuery, OnlineMembersQueryVariables>(OnlineMembersDocument, baseOptions);
+export function useMembersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MembersQuery, MembersQueryVariables>) {
+          return Apollo.useLazyQuery<MembersQuery, MembersQueryVariables>(MembersDocument, baseOptions);
         }
-export type OnlineMembersQueryHookResult = ReturnType<typeof useOnlineMembersQuery>;
-export type OnlineMembersLazyQueryHookResult = ReturnType<typeof useOnlineMembersLazyQuery>;
-export type OnlineMembersQueryResult = Apollo.QueryResult<OnlineMembersQuery, OnlineMembersQueryVariables>;
+export type MembersQueryHookResult = ReturnType<typeof useMembersQuery>;
+export type MembersLazyQueryHookResult = ReturnType<typeof useMembersLazyQuery>;
+export type MembersQueryResult = Apollo.QueryResult<MembersQuery, MembersQueryVariables>;
 export const TeamDocument = gql`
     query Team($teamId: Int!) {
   team(teamId: $teamId) {

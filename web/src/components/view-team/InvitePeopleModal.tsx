@@ -58,6 +58,7 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
                             key = {u.id}
                             profileURL = {u.profileURL}
                             username = {u.username}
+                            size = 'sm'
                         >
                             <Button
                                 onClick = {async () => {
@@ -65,6 +66,29 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
                                         variables: { teamId, userId: u.id },
                                         update: (cache) => {
                                             cache.evict({ fieldName: 'invitees' });
+                                            cache.evict({ fieldName: 'members' });
+                                        }
+                                    });
+                                }}
+                            >
+                                +
+                            </Button>
+                        </UserCard>
+                    )}
+                    {data?.invitees.map(u => 
+                        <UserCard
+                            key = {u.id}
+                            profileURL = {u.profileURL}
+                            username = {u.username}
+                            size = 'sm'
+                        >
+                            <Button
+                                onClick = {async () => {
+                                    await addMember({
+                                        variables: { teamId, userId: u.id },
+                                        update: (cache) => {
+                                            cache.evict({ fieldName: 'invitees' });
+                                            cache.evict({ fieldName: 'members' });
                                         }
                                     });
                                 }}
