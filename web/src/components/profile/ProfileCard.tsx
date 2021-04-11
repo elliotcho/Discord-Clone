@@ -15,6 +15,10 @@ const Container = styled.div`
     padding: 12px;
 `;
 
+const ImageWrapper = styled.div`
+    cursor: pointer;
+`;
+
 const Image = styled.img`
     border-radius: 50%;
     height: 5rem;
@@ -36,14 +40,10 @@ const Button = styled.button`
     background: #6c757d;
     box-shadow: 0 0 5px black;
     cursor: pointer;
+    outline: none;
     color: #f2f2f2;
     margin: 15px;
     padding: 5px;
-
-    &:focus {
-        outline: none;
-    }
-
     &:hover {
         background: #999;
     }
@@ -66,6 +66,24 @@ const Remove = styled.button`
     }
 `;
 
+const Update = styled.div`
+    opacity: 0.7;
+    display: none;
+    cursor: pointer;
+    text-align: center;
+    position: absolute;
+    border-bottom-left-radius: 75px;
+    border-bottom-right-radius: 75px;
+    background: #d9d9d9;
+    height: 2.5rem;
+    width: 5rem;
+    top: 53px;
+
+    ${ImageWrapper}:hover & {
+        display: block;
+    }
+`;
+
 const Input = styled.input`
     display: none;
 `;
@@ -82,9 +100,24 @@ const ProfileCard: React.FC<{}> = () => {
     const profileURL = data?.me?.profileURL;
     const username = data?.me?.username;
 
+    const openFile = (e: any) => {
+        e.preventDefault();
+
+        document
+            .getElementById('profilePic')
+                .click();
+    }
+
     return (
         <Container>
-            <Image src={profileURL} alt='pic'/>
+            <ImageWrapper onClick = {openFile}>  
+                <Image src={profileURL} alt='pic'/>
+
+                <Update>
+                    Update
+                </Update>
+            </ImageWrapper>
+
 
             {hasProfilePic && (
                 <Remove
@@ -105,13 +138,7 @@ const ProfileCard: React.FC<{}> = () => {
             </Header>
 
             <Box>
-                <Button
-                    onClick = {() => {
-                        document
-                            .getElementById('profilePic')
-                            .click();
-                    }}
-                >
+                <Button onClick={openFile}>
                     Upload
                 </Button>
             </Box>
