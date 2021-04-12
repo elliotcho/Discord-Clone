@@ -57,23 +57,31 @@ export class DirectMessageResolver {
     async recentChats(
         @Ctx() { req } : MyContext
     ) : Promise<User[]> {
+        const result = [];
+
         const users = await getConnection().query(
             `
                 select u.*, (
 
                     select max(d."createdAt") from direct_message as d
                     where (d."receiverId" = u.id or d."senderId" = u.id)
-                    and (d."receiverId" = $1 or d."senderId" = $1)
+                    and (u.id != $1 or (d."receiverId" = $1 and d."senderId" = $1))
+                    and (d."receiverId" = $1 or d."senderId" = $1) 
 
-                ) as latest 
-                from "user" as u 
+                ) as latest from "user" as u 
                 order by latest DESC 
                 limit 5
             `, 
             [req.session.uid]
         );
 
-        return users;
+        for(let i=0;i<users.length;i++) {
+            if(users[i].latest) {
+                result.push(users[i]);
+            }
+        }
+
+        return result;
     }
 
     @Mutation(() => Boolean)
