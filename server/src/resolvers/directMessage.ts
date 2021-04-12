@@ -59,11 +59,18 @@ export class DirectMessageResolver {
     ) : Promise<User[]> {
         const users = await getConnection().query(
             `
-                select distinct(u.*) from "user" as u
-                inner join direct_message as d on d."receiverId" = u.id
-                where d."senderId" = $1 group by d."receiverId", u.id
-              
-            `, [req.session.uid]
+                select u.*, (
+
+                    select max(d."createdAt") from direct_message as d
+                    where (d."receiverId" = u.id or d."senderId" = u.id)
+                    and (d."receiverId" = $1 or d."senderId" = $1)
+
+                ) as latest 
+                from "user" as u 
+                order by latest DESC 
+                limit 5
+            `, 
+            [req.session.uid]
         );
 
         return users;

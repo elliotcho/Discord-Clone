@@ -33,7 +33,7 @@ const Members: React.FC<MembersProps> = ({ teamId }) => {
             {onlineMembers.map(u => 
                 <UserCard 
                     key={u.id} 
-                    online = {true}
+                    showStatus = {true}
                     {...u} 
                 />
             )}

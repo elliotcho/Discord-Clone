@@ -37,17 +37,19 @@ const Icon = styled.div`
 `;
 
 interface UserCardProps {
-    activeStatus: number;
-    profileURL: string;
     username: string;
-    online?: boolean;
+    profileURL: string;
+    activeStatus: number;
+    handleClick?(): void;
+    showStatus?: boolean;
 }
 
 const UserCard: React.FC<UserCardProps> = ({
-    online,
-    activeStatus,
+    username,
     profileURL,
-    username
+    activeStatus,
+    handleClick,
+    showStatus
 }) => {
     let color = '';
 
@@ -66,10 +68,10 @@ const UserCard: React.FC<UserCardProps> = ({
     }
 
     return (
-        <Card>
+        <Card onClick = {handleClick}>
             <Image src={profileURL} alt='profile pic'/>
 
-            {!!online && (
+            {!!showStatus && (
                 <Icon style={{ color }}>
                     <FontAwesomeIcon icon={faCircle} />
                 </Icon>
