@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useFriendsQuery } from '../../generated/graphql';
-import UserCard from '../shared/UserCard';
+import FriendCard from '../shared/FriendCard';
 import NextLink from 'next/link';
 
 const Button = styled.button`
@@ -25,7 +25,7 @@ const Friends: React.FC<{}> =() => {
     return (
         <>
             {data?.friends?.map(u =>
-                <UserCard 
+                <FriendCard 
                     key = {u.id}
                     activeStatus = {u.activeStatus}
                     profileURL = {u.profileURL}
@@ -36,7 +36,7 @@ const Friends: React.FC<{}> =() => {
                             Message
                         </Button>
                     </NextLink>
-                </UserCard>
+                </FriendCard>
             )}
         </> 
     )

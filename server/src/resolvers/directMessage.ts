@@ -53,6 +53,22 @@ export class DirectMessageResolver {
         return `${process.env.SERVER_URL}/images/${dm.pic}`;
     }
 
+    @Query(() => [User])
+    async recentChats(
+        @Ctx() { req } : MyContext
+    ) : Promise<User[]> {
+        const users = await getConnection().query(
+            `
+                select distinct(u.*) from "user" as u
+                inner join direct_message as d on d."receiverId" = u.id
+                where d."senderId" = $1 group by d."receiverId", u.id
+              
+            `, [req.session.uid]
+        );
+
+        return users;
+    }
+
     @Mutation(() => Boolean)
     async editDirectMessage(
         @Arg('text') text: string,

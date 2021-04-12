@@ -28,6 +28,7 @@ export type Query = {
   team: Team;
   teams: Array<Team>;
   messages: Array<Message>;
+  recentChats: Array<User>;
   directMessages: Array<DirectMessage>;
   channels: Array<Channel>;
   channel: Channel;
@@ -699,6 +700,17 @@ export type DirectMessagesQuery = (
       { __typename?: 'User' }
       & RegularUserFragment
     ) }
+  )> }
+);
+
+export type RecentChatsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RecentChatsQuery = (
+  { __typename?: 'Query' }
+  & { recentChats: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
   )> }
 );
 
@@ -1839,6 +1851,38 @@ export function useDirectMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type DirectMessagesQueryHookResult = ReturnType<typeof useDirectMessagesQuery>;
 export type DirectMessagesLazyQueryHookResult = ReturnType<typeof useDirectMessagesLazyQuery>;
 export type DirectMessagesQueryResult = Apollo.QueryResult<DirectMessagesQuery, DirectMessagesQueryVariables>;
+export const RecentChatsDocument = gql`
+    query RecentChats {
+  recentChats {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useRecentChatsQuery__
+ *
+ * To run a query within a React component, call `useRecentChatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRecentChatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRecentChatsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRecentChatsQuery(baseOptions?: Apollo.QueryHookOptions<RecentChatsQuery, RecentChatsQueryVariables>) {
+        return Apollo.useQuery<RecentChatsQuery, RecentChatsQueryVariables>(RecentChatsDocument, baseOptions);
+      }
+export function useRecentChatsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RecentChatsQuery, RecentChatsQueryVariables>) {
+          return Apollo.useLazyQuery<RecentChatsQuery, RecentChatsQueryVariables>(RecentChatsDocument, baseOptions);
+        }
+export type RecentChatsQueryHookResult = ReturnType<typeof useRecentChatsQuery>;
+export type RecentChatsLazyQueryHookResult = ReturnType<typeof useRecentChatsLazyQuery>;
+export type RecentChatsQueryResult = Apollo.QueryResult<RecentChatsQuery, RecentChatsQueryVariables>;
 export const FriendRequestsDocument = gql`
     query FriendRequests {
   friendRequests {

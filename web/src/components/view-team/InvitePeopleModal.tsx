@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Modal } from 'react-responsive-modal';
 import { useInviteesQuery, useAddMemberMutation } from '../../generated/graphql';
-import UserCard from '../../containers/shared/UserCard';
+import FriendCard from '../../containers/shared/FriendCard';
 
 const Container = styled.div`
     width: 400px;
@@ -54,7 +54,7 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
                     </Header>
 
                     {data?.invitees.map(u => 
-                        <UserCard
+                        <FriendCard
                             key = {u.id}
                             profileURL = {u.profileURL}
                             username = {u.username}
@@ -73,7 +73,7 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
                             >
                                 +
                             </Button>
-                        </UserCard>
+                        </FriendCard>
                     )}
                 </Container>
         </Modal>

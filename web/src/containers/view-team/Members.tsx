@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useOnlineMembersQuery, useOfflineMembersQuery } from '../../generated/graphql';
-import MemberCard from '../../components/view-team/MemberCard';
+import UserCard from '../../components/shared/UserCard';
 
 const Container = styled.div`
     background: #333;
@@ -31,7 +31,7 @@ const Members: React.FC<MembersProps> = ({ teamId }) => {
             )}
 
             {onlineMembers.map(u => 
-                <MemberCard 
+                <UserCard 
                     key={u.id} 
                     online = {true}
                     {...u} 
@@ -45,7 +45,7 @@ const Members: React.FC<MembersProps> = ({ teamId }) => {
             )}
 
             {offlineMembers.map(u => 
-                <MemberCard key={u.id} {...u} />
+                <UserCard key={u.id} {...u} />
             )}
         </Container>
     )

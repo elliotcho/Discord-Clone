@@ -5,55 +5,51 @@ import { faCircle } from '@fortawesome/free-solid-svg-icons';
 
 const Card = styled.div`
     display: flex;
+    cursor: pointer;
     position: relative;
     align-items: center;
-    border: 1px solid black;
     background: #404040;
     max-width: 600px;
     padding: 15px;
-    margin: 30px;
+    margin: 15px;
+
+    &:hover {
+        box-shadow: 0 0 0 1px #fff;
+    }
 `;
 
 const Image = styled.img`
-    width: 6rem;
+    width: 2rem;
     border-radius: 50%;
-    height: 6rem;
+    height: 2rem;
 `;
 
 const Primary = styled.h2`
     margin-left: 20px;
+    font-size: 0.8rem;
     color: #e6e6e6;
-`;
-
-const Box = styled.div`
-    margin-left: auto;
 `;
 
 const Icon = styled.div`
     position: absolute;
-    font-size: 1.4rem;
-    left: 5.5rem;
-    top: 5.5rem;
+    left: 2.4rem;
+    top: 2.4rem;
 `;
 
 interface UserCardProps {
+    activeStatus: number;
     profileURL: string;
-    activeStatus?: number;
     username: string;
-    size?: string;
+    online?: boolean;
 }
 
-const UserCard: React.FC<UserCardProps> = ({ 
-    children, 
-    profileURL, 
+const UserCard: React.FC<UserCardProps> = ({
+    online,
     activeStatus,
-    username,
-    size
+    profileURL,
+    username
 }) => {
     let color = '';
-    let dimensions = '';
-    let fontSize = '';
-    let margin = '';
 
     switch(activeStatus) {
         case 0: 
@@ -65,41 +61,23 @@ const UserCard: React.FC<UserCardProps> = ({
         case 1: 
             color = '#cccc00';
             break;
-        default: 
+        case 2: 
             color = 'green';
     }
 
-    switch(size) {
-        case 'sm':
-            dimensions = '2rem';
-            fontSize = '0.8rem';
-            margin = '0';
-    }
-
     return (
-        <Card style = {{ margin }}>
-            <Image 
-                src={profileURL} 
-                alt='profile pic'
-                style = {{ 
-                    height: dimensions,
-                    width: dimensions
-                }} 
-            />
+        <Card>
+            <Image src={profileURL} alt='profile pic'/>
 
-            {!!color && (
+            {!!online && (
                 <Icon style={{ color }}>
                     <FontAwesomeIcon icon={faCircle} />
                 </Icon>
             )}
 
-            <Primary style={{ fontSize }}>
+            <Primary>
                 {username}
             </Primary>
-
-            <Box>
-                {children}
-            </Box>
         </Card>
     )
 }

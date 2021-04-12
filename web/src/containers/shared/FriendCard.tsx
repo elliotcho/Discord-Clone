@@ -7,44 +7,53 @@ const Card = styled.div`
     display: flex;
     position: relative;
     align-items: center;
+    border: 1px solid black;
     background: #404040;
     max-width: 600px;
     padding: 15px;
-    margin: 15px;
+    margin: 30px;
 `;
 
 const Image = styled.img`
-    width: 2rem;
+    width: 6rem;
     border-radius: 50%;
-    height: 2rem;
+    height: 6rem;
 `;
 
 const Primary = styled.h2`
     margin-left: 20px;
-    font-size: 0.8rem;
     color: #e6e6e6;
+`;
+
+const Box = styled.div`
+    margin-left: auto;
 `;
 
 const Icon = styled.div`
     position: absolute;
-    left: 2.4rem;
-    top: 2.4rem;
+    font-size: 1.4rem;
+    left: 5.5rem;
+    top: 5.5rem;
 `;
 
-interface MemberCardProps {
-    activeStatus: number;
+interface FriendCardProps {
     profileURL: string;
+    activeStatus?: number;
     username: string;
-    online?: boolean;
+    size?: string;
 }
 
-const MemberCard: React.FC<MemberCardProps> = ({
-    online,
+const FriendCard: React.FC<FriendCardProps> = ({ 
+    children, 
+    profileURL, 
     activeStatus,
-    profileURL,
-    username
+    username,
+    size
 }) => {
     let color = '';
+    let dimensions = '';
+    let fontSize = '';
+    let margin = '';
 
     switch(activeStatus) {
         case 0: 
@@ -56,25 +65,43 @@ const MemberCard: React.FC<MemberCardProps> = ({
         case 1: 
             color = '#cccc00';
             break;
-        default: 
+        case 2: 
             color = 'green';
     }
 
-    return (
-        <Card>
-            <Image src={profileURL} alt='profile pic'/>
+    switch(size) {
+        case 'sm':
+            dimensions = '2rem';
+            fontSize = '0.8rem';
+            margin = '0';
+    }
 
-            {!!online && (
+    return (
+        <Card style = {{ margin }}>
+            <Image 
+                src={profileURL} 
+                alt='profile pic'
+                style = {{ 
+                    height: dimensions,
+                    width: dimensions
+                }} 
+            />
+
+            {!!color && (
                 <Icon style={{ color }}>
                     <FontAwesomeIcon icon={faCircle} />
                 </Icon>
             )}
 
-            <Primary>
+            <Primary style={{ fontSize }}>
                 {username}
             </Primary>
+
+            <Box>
+                {children}
+            </Box>
         </Card>
     )
 }
 
-export default MemberCard;
+export default FriendCard;

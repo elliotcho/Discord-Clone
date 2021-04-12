@@ -8,7 +8,7 @@ import {
     useDeclineFriendRequestMutation, 
     useFriendRequestsQuery 
 } from '../../generated/graphql';
-import UserCard from '../shared/UserCard';
+import FriendCard from '../shared/FriendCard';
 
 const Button = styled.button`
     color: #f2f2f2;
@@ -43,7 +43,7 @@ const FriendRequests: React.FC<{}> =() => {
     return (
         <>
             {data?.friendRequests?.map(u =>
-                <UserCard 
+                <FriendCard 
                     key = {u.id}
                     profileURL = {u.profileURL}
                     username = {u.username}
@@ -69,7 +69,7 @@ const FriendRequests: React.FC<{}> =() => {
                     >
                         Accept
                     </Button>
-                </UserCard>
+                </FriendCard>
             )}
         </> 
     )
