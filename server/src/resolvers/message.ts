@@ -4,18 +4,30 @@ import {
     FieldResolver,
     Int,
     Mutation,
+    PubSub,
+    PubSubEngine,
     Query,
     Resolver,
     Root,
+    Subscription,
 } from "type-graphql";
-import { GraphQLUpload, MyContext, Upload } from "../types";
+import { v4 } from 'uuid'; 
 import { getConnection } from "typeorm";
 import { Message } from "../entities/Message";
+import { Channel } from "../entities/Channel";
 import { User } from '../entities/User';
 import { Read } from '../entities/Read';
-import { v4 } from "uuid";
-import path from 'path';
+import { filterSubscription } from '../utils/filterSubscription';
+import { 
+    SubscriptionPayload,
+    GraphQLUpload, 
+    MyContext, 
+    Upload 
+} from "../types";
 import fs, { createWriteStream } from 'fs';
+import path from 'path';
+
+const NEW_MESSAGE_EVENT = 'NEW_MESSAGE_EVENT';
 
 @Resolver(Message)
 export class MessageResolver {
@@ -55,21 +67,43 @@ export class MessageResolver {
         return User.findOne(message.senderId);
     }
 
+    @Subscription(() => Message, {
+        topics: NEW_MESSAGE_EVENT,
+        filter: filterSubscription
+    })
+    async newMessage (
+        @Root() { senderId, receiverId } : SubscriptionPayload
+    ): Promise<Message | undefined> {
+        return Message.findOne({ where: { 
+            channelId: receiverId,
+            senderId
+        }});
+    }
+
     @Mutation(() => Boolean)
     async sendMessage(
+        @PubSub() pubsub: PubSubEngine,
         @Arg('text') text: string,
         @Arg('channelId', () => Int) channelId: number,
         @Ctx() { req } : MyContext 
     ): Promise<boolean>{
-        const senderId = req.session.uid; 
+        const channel = await Channel.findOne(channelId);
+        const teamId = channel?.teamId;
 
         await getConnection().query(
             `
-             insert into message (text, "channelId", "senderId")
+             insert into message ("channelId", "senderId", text)
              values ($1, $2, $3)
             `, 
-            [text, channelId, senderId]
+            [channelId, req.session.uid, text]
         );
+
+        await pubsub.publish(NEW_MESSAGE_EVENT, {
+            senderId: req.session.uid,
+            receiverId: channelId,
+            isDm: false,
+            teamId
+        });
 
         return true;
     }

@@ -6,9 +6,10 @@ import { GraphQLError, GraphQLScalarType } from 'graphql';
 import { Stream } from 'stream';
 
 export type MyContext = {
-    req: Request & { session: Session & { uid? : number} },
-    res: Response,
-    redis: Redis
+    req: Request & { session: Session & { uid? : number} };
+    res: Response;
+    connection: any;
+    redis: Redis;
 }
 
 export type Upload = {
@@ -30,4 +31,11 @@ export const GraphQLUpload =  new GraphQLScalarType({
     serialize() {
         throw new GraphQLError('Upload serialization unsupported.');
     },
-})
+});
+
+export type SubscriptionPayload = {
+    senderId: number;
+    receiverId: number;
+    teamId?: number;
+    isDm: boolean;
+}
