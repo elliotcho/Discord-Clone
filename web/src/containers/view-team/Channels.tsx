@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import { useChannelsQuery } from '../../generated/graphql';
+import { useChannelsQuery, useCreateChannelMutation } from '../../generated/graphql';
 import { isServer } from '../../utils/isServer';
-import CreateChannelModal from '../../components/view-team/CreateChannelModal';
 import InvitePeopleModal from '../../components/view-team/InvitePeopleModal';
+import EditModal from '../../components/shared/EditModal';
 import Channel from '../../components/view-team/Channel';
 import UserNav from '../../components/shared/UserNav';
 
@@ -59,8 +59,9 @@ interface ChannelsProps {
 
 const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [createChannel, setCreateChannel] = useState(false);
+    const [openCreateChannel, setOpenCreateChannel] = useState(false);
     const [invitePeople, setInvitePeople] = useState(false);
+    const [createChannel] = useCreateChannelMutation();
 
     const { data } = useChannelsQuery({ 
         variables: { teamId } 
@@ -86,7 +87,7 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
 
                     {isOpen && (
                         <Dropdown id='channel-dropdown'>
-                            <Option onClick={() => setCreateChannel(true)}>
+                            <Option onClick={() => setOpenCreateChannel(true)}>
                                 Create Channel
                             </Option>
 
@@ -116,10 +117,19 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                 ) 
             })} 
 
-            <CreateChannelModal
-                isOpen = {createChannel}
-                onClose = {() => setCreateChannel(false)}
-                teamId = {teamId}
+            <EditModal
+                size = 'sm'
+                title = 'Create Channel'
+                isOpen = {openCreateChannel}
+                onClose = {() => setOpenCreateChannel(false)}
+                onSave = {async (channelName) => {
+                    await createChannel({ 
+                        variables: { channelName, teamId },
+                        update: (cache) => {
+                            cache.evict({ fieldName: "channels" });
+                        }
+                    });
+                }}
             />
 
             <InvitePeopleModal

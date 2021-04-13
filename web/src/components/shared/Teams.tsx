@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
-import { useTeamsQuery } from '../../generated/graphql';
-import CreateTeamModal from './CreateTeamModal';
+import { useTeamsQuery, useCreateTeamMutation } from '../../generated/graphql';
+import EditModal from './EditModal';
 import NextLink from 'next/link';
 
 const Container = styled.div`
@@ -30,6 +30,7 @@ const TeamIcon = styled.div`
 
 const Teams: React.FC<{}> = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [createTeam] = useCreateTeamMutation();
     const { data } = useTeamsQuery();
 
     return (
@@ -56,9 +57,19 @@ const Teams: React.FC<{}> = () => {
                 +
             </TeamIcon>
 
-            <CreateTeamModal
-                isOpen={isOpen}
+            <EditModal
+                size = 'sm'
+                isOpen = {isOpen}
+                title = 'Create Team'
                 onClose = {() => setIsOpen(false)}
+                onSave = {async (teamName) => {
+                    await createTeam({ 
+                        variables: { teamName },
+                        update: (cache) => {
+                            cache.evict({ fieldName: "teams" });
+                        }
+                    }
+                )}}
             />
         </Container>
     )

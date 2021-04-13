@@ -25,5 +25,4 @@ export const createDbConnection = async () => {
             Read
         ] 
     });
-
 }

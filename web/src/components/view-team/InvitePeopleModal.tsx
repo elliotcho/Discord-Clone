@@ -9,7 +9,7 @@ const Container = styled.div`
 `;
 
 const Header = styled.h2`
-    color: black;
+    color: #404040;
 `;
 
 const Button = styled.button`
@@ -43,10 +43,13 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
     return(
         <Modal
             open = {isOpen}
+            onClose = {onClose}
             closeOnEsc = {false}
             closeOnOverlayClick = {false}
-            styles = {{closeButton: {outline: 'none'}}}
-            onClose = {onClose}
+            styles = {{
+                closeButton: { outline: 'none' },
+                modal: { background: '#b3b3b3' }
+            }}
         >
                 <Container>
                     <Header>

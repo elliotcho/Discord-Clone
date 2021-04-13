@@ -1,3 +1,4 @@
+import 'react-responsive-modal/styles.css';
 import '../styles.css';
 
 function MyApp({ Component, pageProps }) {
