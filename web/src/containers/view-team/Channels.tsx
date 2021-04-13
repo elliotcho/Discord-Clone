@@ -64,7 +64,8 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [createChannel] = useCreateChannelMutation();
 
     const { data } = useChannelsQuery({ 
-        variables: { teamId } 
+        variables: { teamId },
+        skip: !teamId
     });
 
     if(!isServer()) {

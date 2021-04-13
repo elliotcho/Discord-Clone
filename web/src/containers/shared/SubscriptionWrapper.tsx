@@ -6,7 +6,6 @@ import {
 
 const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
     const { cache } = useApolloClient();
-
     const { data: newMessageData } = useNewMessageSubscription();
 
     const subscriptionData = [

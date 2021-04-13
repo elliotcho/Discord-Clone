@@ -37,7 +37,8 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
     const [addMember] = useAddMemberMutation();
 
     const { data } = useInviteesQuery({
-        variables: { teamId }
+        variables: { teamId },
+        skip: !teamId
     });
 
     return(

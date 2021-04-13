@@ -30,9 +30,10 @@ const ViewTeams: React.FC<{}> = () => {
     let channel = router.query.channel as string;
     let teamId = parseInt(team);
     let channelId = -1;
-
+    
     const { data } = useTeamQuery({
-        variables: { teamId }
+        variables: { teamId },
+        skip: !teamId
     });
 
     if(!channel) {

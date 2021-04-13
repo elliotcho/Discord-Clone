@@ -20,7 +20,8 @@ interface ChatContainerProps {
 
 const ChatContainer: React.FC<ChatContainerProps> = ({ channelId }) => {
     const { data } = useMessagesQuery({
-        variables: { channelId }
+        variables: { channelId },
+        skip: !channelId
     });
 
     return (

@@ -17,8 +17,13 @@ interface MembersProps {
 }
 
 const Members: React.FC<MembersProps> = ({ teamId }) => {
-    const { data: onlineData } = useOnlineMembersQuery({ variables: { teamId } });
-    const { data: offlineData } = useOfflineMembersQuery({ variables: { teamId }});
+    const payload = { 
+        variables: { teamId },
+        skip: !teamId
+    };
+
+    const { data: onlineData } = useOnlineMembersQuery(payload);
+    const { data: offlineData } = useOfflineMembersQuery(payload);
     const offlineMembers = offlineData?.offlineMembers || [];
     const onlineMembers = onlineData?.onlineMembers || [];
 

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { 
-    MessagesDocument, 
     useSendFileMutation, 
     useSendMessageMutation 
 } from '../../generated/graphql';
@@ -60,14 +59,8 @@ interface SendMessageProps {
 
 const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
     const [text, setText] = useState('');
-
     const [sendPicture] = useSendFileMutation();
-    const [sendMessage] = useSendMessageMutation({
-        refetchQueries: [ 
-            { query: MessagesDocument, variables: { channelId } }
-        ]
-    });
-
+    const [sendMessage] = useSendMessageMutation();
 
     return (
         <Container>
@@ -85,7 +78,7 @@ const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
                     const file = e.target.files[0]
 
                     await sendPicture({
-                        variables: {file, channelId},
+                        variables: { file, channelId },
                         update: (cache) => {
                             cache.evict({ fieldName: 'messages'})
                         }
@@ -104,7 +97,10 @@ const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
                         e.preventDefault();
 
                         await sendMessage({
-                            variables: { text, channelId }
+                            variables: { text, channelId },
+                            update: (cache) => {
+                                cache.evict({ fieldName: 'messages'})
+                            }
                         });
 
                         setText('');
