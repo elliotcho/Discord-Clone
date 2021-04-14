@@ -1,6 +1,9 @@
 import { Member } from '../entities/Member';
+import { SubscriptionPayload } from '../types'; 
 
-export const filterSubscription = async ({ context, payload } : any) => {
+export const filterSubscription = async (
+    { context, payload } : { context: any, payload: SubscriptionPayload }
+) => {
     const { req } = context.connection.context;
     const { uid } = req.session;
 

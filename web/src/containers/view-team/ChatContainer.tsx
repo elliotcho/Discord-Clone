@@ -31,7 +31,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ channelId }) => {
                     key = {m.id}
                     messageId = {m.id}
                     date = {m.createdAt}
-                    isDm = {false}
+                    channelId = {channelId}
                     {...m.user}
                     {...m}
                 />

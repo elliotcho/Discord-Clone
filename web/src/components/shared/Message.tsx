@@ -44,8 +44,8 @@ interface MessageProps {
     messageId: number;
     username: string;
     profileURL: string;
+    channelId?: number;
     isMe: boolean;
-    isDm: boolean;
     date: string;
     text?: string;
     pic?: string;
@@ -55,8 +55,8 @@ const Message: React.FC<MessageProps> = ({
     messageId,
     username,
     profileURL,
+    channelId,
     isMe, 
-    isDm,
     date,
     text,
     pic
@@ -73,8 +73,8 @@ const Message: React.FC<MessageProps> = ({
                 {isMe && (
                     <MessageSettings 
                         messageId={messageId}
+                        channelId = {channelId}
                         text = {text}
-                        isDm = {isDm}
                     /> 
                 )}
             </Header>

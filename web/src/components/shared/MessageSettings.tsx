@@ -50,11 +50,11 @@ const Text = styled.div`
 
 interface MessageSettingsProps {
     messageId: number;
+    channelId: number | undefined;
     text: string;
-    isDm: boolean;
 }
 
-const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm }) => {
+const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, channelId, text }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const [editMessage] = useEditMessageMutation();
@@ -69,7 +69,7 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm
             <Dropdown>
                 <Option
                     onClick = {async () => {
-                        if(isDm) {
+                        if(!channelId) {
                             await deleteDm({
                                 variables: { messageId },
                                 update: (cache) => {
@@ -81,7 +81,7 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm
                         } 
 
                         await deleteMessage({
-                            variables: { messageId },
+                            variables: { messageId, channelId },
                             update: (cache) => {
                                 cache.evict({ fieldName: 'messages' });
                             }
@@ -116,9 +116,13 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm
                 onClose = {() => setIsOpen(false)}
                 title = 'Edit your message'
                 onSave = {async (newText) => {
-                    if(!isDm) {
+                    if(channelId) {
                         await editMessage({
-                            variables: { messageId, text: newText },
+                            variables: { 
+                                text: newText,
+                                messageId,
+                                channelId
+                            },
                             update: (cache) => {
                                 cache.evict({ fieldName: 'messages' });
                             }

@@ -1,5 +1,3 @@
 subscription NewMessage {
-    newMessage {
-        ...RegularMessage
-    }
+    newMessage 
 }

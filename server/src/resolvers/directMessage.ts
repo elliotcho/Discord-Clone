@@ -4,18 +4,29 @@ import{
     FieldResolver,
     Int,
     Mutation,
+    PubSub,
+    PubSubEngine,
     Query,
     Resolver,
-    Root
+    Root,
+    Subscription
 } from 'type-graphql';
-import { MyContext, GraphQLUpload, Upload } from "../types";
+import { v4 } from 'uuid';
 import { getConnection } from "typeorm";
 import { DirectMessage } from "../entities/DirectMessage";
 import { User } from '../entities/User';
 import { Read } from "../entities/Read";
+import { filterSubscription } from '../utils/filterSubscription';
+import { 
+    MyContext, 
+    GraphQLUpload,
+    Upload 
+} from "../types";
 import fs, { createWriteStream } from 'fs';
 import path from 'path';
-import { v4 } from 'uuid';
+
+
+const NEW_DIRECT_MESSAGE_EVENT = 'NEW_DIRECT_MESSAGE_EVENT';
 
 @Resolver(DirectMessage)
 export class DirectMessageResolver {
@@ -53,6 +64,14 @@ export class DirectMessageResolver {
         return `${process.env.SERVER_URL}/images/${dm.pic}`;
     }
 
+    @Subscription(() => Boolean, {
+        topics: NEW_DIRECT_MESSAGE_EVENT,
+        filter: filterSubscription
+    })
+    newDirectMessage(): boolean {
+        return true;
+    }
+
     @Query(() => [User])
     async recentChats(
         @Ctx() { req } : MyContext
@@ -69,6 +88,8 @@ export class DirectMessageResolver {
                     and (d."receiverId" = $1 or d."senderId" = $1) 
 
                 ) as latest from "user" as u 
+                inner join friend as f on (f."receiverId" = u.id or f."senderId" = u.id)
+                where (f."receiverId" = $1 or f."senderId" = $1)
                 order by latest DESC 
                 limit 5
             `, 
@@ -86,23 +107,36 @@ export class DirectMessageResolver {
 
     @Mutation(() => Boolean)
     async editDirectMessage(
-        @Arg('text') text: string,
-        @Arg('messageId', () => Int) messageId: number
+        @PubSub() pubsub: PubSubEngine,
+        @Arg('messageId', () => Int) messageId: number,
+        @Arg('text') text: string
     ) : Promise<boolean> {
+        const dm = await DirectMessage.findOne(messageId);
+        const receiverId = dm?.receiverId;
+        const senderId = dm?.senderId;
+
         await getConnection().query(
             `
                 update direct_message set text = $1 
                 where id = $2
-            `,[text, messageId]
+            `,
+            [text, messageId]
         );
+
+        await pubsub.publish(NEW_DIRECT_MESSAGE_EVENT, {
+            senderId,
+            receiverId,
+            isDm: true
+        });
 
         return true;
     }
 
     @Mutation(() => Boolean)
     async sendDirectMessage(
-        @Arg('text') text: string,
+        @PubSub() pubsub: PubSubEngine,
         @Arg('receiverId', () => Int) receiverId: number,
+        @Arg('text') text: string,
         @Ctx() { req }: MyContext
     ): Promise<boolean>{
         const senderId = req.session.uid;
@@ -115,14 +149,23 @@ export class DirectMessageResolver {
             [senderId, receiverId, text]
         );
 
+        await pubsub.publish(NEW_DIRECT_MESSAGE_EVENT, {
+            senderId,
+            receiverId,
+            isDm: true
+        });
+
         return true;
     }
 
     @Mutation(() => Boolean)
     async deleteDirectMessage(
+        @PubSub() pubsub: PubSubEngine,
         @Arg('messageId', () => Int) messageId: number
     ): Promise<boolean>{
         const dm = await DirectMessage.findOne(messageId);
+        const receiverId = dm?.receiverId;
+        const senderId = dm?.senderId;
 
         if(dm?.pic) {
             const location = path.join(__dirname, `../../images/${dm.pic}`);
@@ -136,6 +179,12 @@ export class DirectMessageResolver {
             `,
             [messageId]
         );
+
+        await pubsub.publish(NEW_DIRECT_MESSAGE_EVENT, {
+            senderId,
+            receiverId,
+            isDm: true
+        });
 
         return true;
     }
@@ -160,9 +209,10 @@ export class DirectMessageResolver {
 
     @Mutation(() => Boolean)
     async sendDmFile(
+        @PubSub() pubsub: PubSubEngine,
         @Arg('file', () => GraphQLUpload) { createReadStream, filename }: Upload,
         @Arg('receiverId', ()=> Int) receiverId: number,
-        @Ctx() {req}: MyContext
+        @Ctx() { req }: MyContext
     ): Promise<boolean>{
         const name = 'DM-' + v4() + path.extname(filename);
         const senderId = req.session.uid;
@@ -174,6 +224,12 @@ export class DirectMessageResolver {
             `,
             [senderId, receiverId, name]
         );
+
+        await pubsub.publish(NEW_DIRECT_MESSAGE_EVENT, {
+            senderId,
+            receiverId,
+            isDm: true
+        });
 
         return new Promise(async (resolve, reject) =>
             createReadStream()

@@ -238,6 +238,7 @@ export type MutationSendMessageArgs = {
 
 export type MutationDeleteMessageArgs = {
   messageId: Scalars['Int'];
+  channelId: Scalars['Int'];
 };
 
 
@@ -248,20 +249,21 @@ export type MutationSendFileArgs = {
 
 
 export type MutationEditMessageArgs = {
-  messageId: Scalars['Int'];
   text: Scalars['String'];
+  messageId: Scalars['Int'];
+  channelId: Scalars['Int'];
 };
 
 
 export type MutationEditDirectMessageArgs = {
-  messageId: Scalars['Int'];
   text: Scalars['String'];
+  messageId: Scalars['Int'];
 };
 
 
 export type MutationSendDirectMessageArgs = {
-  receiverId: Scalars['Int'];
   text: Scalars['String'];
+  receiverId: Scalars['Int'];
 };
 
 
@@ -331,7 +333,8 @@ export type FieldError = {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  newMessage: Message;
+  newMessage: Scalars['Boolean'];
+  newDirectMessage: Scalars['Boolean'];
 };
 
 export type RegularChannelFragment = (
@@ -504,6 +507,7 @@ export type SendFriendRequestMutation = (
 
 export type DeleteMessageMutationVariables = Exact<{
   messageId: Scalars['Int'];
+  channelId: Scalars['Int'];
 }>;
 
 
@@ -515,6 +519,7 @@ export type DeleteMessageMutation = (
 export type EditMessageMutationVariables = Exact<{
   text: Scalars['String'];
   messageId: Scalars['Int'];
+  channelId: Scalars['Int'];
 }>;
 
 
@@ -865,15 +870,20 @@ export type UserQuery = (
   ) }
 );
 
+export type NewDirectMessageSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NewDirectMessageSubscription = (
+  { __typename?: 'Subscription' }
+  & Pick<Subscription, 'newDirectMessage'>
+);
+
 export type NewMessageSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
 export type NewMessageSubscription = (
   { __typename?: 'Subscription' }
-  & { newMessage: (
-    { __typename?: 'Message' }
-    & RegularMessageFragment
-  ) }
+  & Pick<Subscription, 'newMessage'>
 );
 
 export const RegularChannelFragmentDoc = gql`
@@ -1299,8 +1309,8 @@ export type SendFriendRequestMutationHookResult = ReturnType<typeof useSendFrien
 export type SendFriendRequestMutationResult = Apollo.MutationResult<SendFriendRequestMutation>;
 export type SendFriendRequestMutationOptions = Apollo.BaseMutationOptions<SendFriendRequestMutation, SendFriendRequestMutationVariables>;
 export const DeleteMessageDocument = gql`
-    mutation DeleteMessage($messageId: Int!) {
-  deleteMessage(messageId: $messageId)
+    mutation DeleteMessage($messageId: Int!, $channelId: Int!) {
+  deleteMessage(messageId: $messageId, channelId: $channelId)
 }
     `;
 export type DeleteMessageMutationFn = Apollo.MutationFunction<DeleteMessageMutation, DeleteMessageMutationVariables>;
@@ -1319,6 +1329,7 @@ export type DeleteMessageMutationFn = Apollo.MutationFunction<DeleteMessageMutat
  * const [deleteMessageMutation, { data, loading, error }] = useDeleteMessageMutation({
  *   variables: {
  *      messageId: // value for 'messageId'
+ *      channelId: // value for 'channelId'
  *   },
  * });
  */
@@ -1329,8 +1340,8 @@ export type DeleteMessageMutationHookResult = ReturnType<typeof useDeleteMessage
 export type DeleteMessageMutationResult = Apollo.MutationResult<DeleteMessageMutation>;
 export type DeleteMessageMutationOptions = Apollo.BaseMutationOptions<DeleteMessageMutation, DeleteMessageMutationVariables>;
 export const EditMessageDocument = gql`
-    mutation EditMessage($text: String!, $messageId: Int!) {
-  editMessage(text: $text, messageId: $messageId)
+    mutation EditMessage($text: String!, $messageId: Int!, $channelId: Int!) {
+  editMessage(text: $text, messageId: $messageId, channelId: $channelId)
 }
     `;
 export type EditMessageMutationFn = Apollo.MutationFunction<EditMessageMutation, EditMessageMutationVariables>;
@@ -1350,6 +1361,7 @@ export type EditMessageMutationFn = Apollo.MutationFunction<EditMessageMutation,
  *   variables: {
  *      text: // value for 'text'
  *      messageId: // value for 'messageId'
+ *      channelId: // value for 'channelId'
  *   },
  * });
  */
@@ -2290,13 +2302,37 @@ export function useUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserQ
 export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
 export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
 export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;
+export const NewDirectMessageDocument = gql`
+    subscription NewDirectMessage {
+  newDirectMessage
+}
+    `;
+
+/**
+ * __useNewDirectMessageSubscription__
+ *
+ * To run a query within a React component, call `useNewDirectMessageSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewDirectMessageSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewDirectMessageSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewDirectMessageSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewDirectMessageSubscription, NewDirectMessageSubscriptionVariables>) {
+        return Apollo.useSubscription<NewDirectMessageSubscription, NewDirectMessageSubscriptionVariables>(NewDirectMessageDocument, baseOptions);
+      }
+export type NewDirectMessageSubscriptionHookResult = ReturnType<typeof useNewDirectMessageSubscription>;
+export type NewDirectMessageSubscriptionResult = Apollo.SubscriptionResult<NewDirectMessageSubscription>;
 export const NewMessageDocument = gql`
     subscription NewMessage {
-  newMessage {
-    ...RegularMessage
-  }
+  newMessage
 }
-    ${RegularMessageFragmentDoc}`;
+    `;
 
 /**
  * __useNewMessageSubscription__

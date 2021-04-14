@@ -19,7 +19,6 @@ import { User } from '../entities/User';
 import { Read } from '../entities/Read';
 import { filterSubscription } from '../utils/filterSubscription';
 import { 
-    SubscriptionPayload,
     GraphQLUpload, 
     MyContext, 
     Upload 
@@ -67,17 +66,12 @@ export class MessageResolver {
         return User.findOne(message.senderId);
     }
 
-    @Subscription(() => Message, {
+    @Subscription(() => Boolean, {
         topics: NEW_MESSAGE_EVENT,
         filter: filterSubscription
     })
-    async newMessage (
-        @Root() { senderId, receiverId } : SubscriptionPayload
-    ): Promise<Message | undefined> {
-        return Message.findOne({ where: { 
-            channelId: receiverId,
-            senderId
-        }});
+    newMessage(): boolean {
+        return true;
     }
 
     @Mutation(() => Boolean)
@@ -125,9 +119,14 @@ export class MessageResolver {
 
     @Mutation(() => Boolean)
     async deleteMessage(
-        @Arg('messageId', () => Int) messageId: number
+        @PubSub() pubsub: PubSubEngine,
+        @Arg('channelId', () => Int) channelId: number,
+        @Arg('messageId', () => Int) messageId: number,
+        @Ctx() { req } : MyContext
     ) : Promise<Boolean> {
         const message = await Message.findOne(messageId);
+        const channel = await Channel.findOne(channelId);
+        const teamId = channel?.teamId;
 
         if(message?.pic) {
             const location = path.join(__dirname, `../../images/${message.pic}`);
@@ -142,25 +141,43 @@ export class MessageResolver {
             [messageId]
         );
 
+        await pubsub.publish(NEW_MESSAGE_EVENT, {
+            senderId: req.session.uid,
+            receiverId: channelId,
+            isDm: false,
+            teamId
+        });
+
         return true; 
     }
 
     @Mutation(() => Boolean)
     async sendFile(
+        @PubSub() pubsub: PubSubEngine,
         @Arg('file', () => GraphQLUpload) {createReadStream, filename}: Upload,
-        @Arg('channelId', ()=> Int) channelId: number,
-        @Ctx() {req}: MyContext
+        @Arg('channelId', () => Int) channelId: number,
+        @Ctx() { req }: MyContext
     ): Promise<boolean>{
+        const channel = await Channel.findOne(channelId);
+        const teamId = channel?.teamId;
+
         const name = 'MESSAGE-' +v4() + path.extname(filename);
-        const senderId = req.session.uid;
 
         await getConnection().query(
             `
-            insert into message ("senderId", "channelId", pic)
-            values ($1, $2, $3)
-            `,
-            [senderId, channelId, name]
+             insert into message ("channelId", "senderId", pic)
+             values ($1, $2, $3)
+            `, 
+            [channelId, req.session.uid, name]
         );
+
+        await pubsub.publish(NEW_MESSAGE_EVENT, {
+            senderId: req.session.uid,
+            receiverId: channelId,
+            isDm: false,
+            teamId
+        });
+
 
         return new Promise(async (resolve, reject) =>
             createReadStream()
@@ -172,9 +189,14 @@ export class MessageResolver {
 
     @Mutation(() => Boolean)
     async editMessage(
+        @PubSub() pubsub: PubSubEngine,
+        @Arg('channelId', () => Int) channelId: number,
+        @Arg('messageId', () => Int) messageId: number,
         @Arg('text') text: string,
-        @Arg('messageId', () => Int) messageId: number
+        @Ctx() { req } : MyContext
     ) : Promise<Boolean> {
+        const channel = await Channel.findOne(channelId);
+        const teamId = channel?.teamId;
 
         await getConnection().query(
             `
@@ -183,7 +205,14 @@ export class MessageResolver {
                 where id = $2
             `, 
             [text, messageId]
-        )
+        );
+
+        await pubsub.publish(NEW_MESSAGE_EVENT, {
+            senderId: req.session.uid,
+            receiverId: channelId,
+            isDm: false,
+            teamId
+        });
 
         return true; 
     }
