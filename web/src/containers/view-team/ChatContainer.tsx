@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useMessagesQuery } from '../../generated/graphql';
+// import TypingSnippet from '../../components/shared/TypingSnippet';
 import Message from '../../components/shared/Message';
 
 const Container = styled.div`
@@ -26,6 +27,8 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ channelId }) => {
 
     return (
         <Container>
+            {/* <TypingSnippet /> */}
+
             {data?.messages.map(m => 
                 <Message
                     key = {m.id}
