@@ -1,0 +1,3 @@
+mutation StopTypingMessage($channelId: Int!) {
+    stopTypingMessage(channelId: $channelId)
+}

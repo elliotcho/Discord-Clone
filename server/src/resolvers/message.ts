@@ -26,6 +26,8 @@ import {
 import fs, { createWriteStream } from 'fs';
 import path from 'path';
 
+const IS_TYPING_MESSAGE_PREFIX = 'IS_TYPING_MESSAGE_PREFIX';
+const NEW_TYPING_MESSAGE_EVENT = 'NEW_TYPING_MESSAGE_EVENT';
 const NEW_MESSAGE_EVENT = 'NEW_MESSAGE_EVENT';
 
 @Resolver(Message)
@@ -67,10 +69,90 @@ export class MessageResolver {
     }
 
     @Subscription(() => Boolean, {
+        topics: NEW_TYPING_MESSAGE_EVENT,
+        filter: filterSubscription
+    }) 
+    newUserTypingMessage() : boolean {
+        return true;
+    }
+
+    @Subscription(() => Boolean, {
         topics: NEW_MESSAGE_EVENT,
         filter: filterSubscription
     })
     newMessage(): boolean {
+        return true;
+    }
+
+    @Query(() => [User])
+    async usersTypingMessage(
+        @Arg('channelId', () => Int) channelId: number,
+        @Ctx() { req, redis } : MyContext
+    ) : Promise<User[]> {
+        const result = [] as User[];
+
+        const members = await getConnection().query(
+            `
+                select * from member as m
+                where m."userId" != $1
+                and m."channelId" = $2
+            `, [req.session.uid, channelId]
+        );
+
+        for(let i=0;i<members.length;i++){
+            const key = IS_TYPING_MESSAGE_PREFIX + req.session.uid;
+            const cachedId  = await redis.get(key);
+
+            if(parseInt(cachedId!) === channelId) {
+                const user = await User.findOne(members[i].userId);
+                result.push(user!);
+            }
+        }
+
+        return result;
+    }
+
+    @Mutation(() => Boolean)
+    async stopTypingMessage(
+        @PubSub() pubsub: PubSubEngine,
+        @Arg('channelId', () => Int) channelId: number,
+        @Ctx() { req, redis } : MyContext
+    ) : Promise<boolean> {
+        const key = IS_TYPING_MESSAGE_PREFIX + req.session.uid;
+        const channel = await Channel.findOne(channelId);
+        const teamId = channel?.teamId;
+
+        await redis.del(key);
+
+        await pubsub.publish(NEW_TYPING_MESSAGE_EVENT, {
+            senderId: req.session.uid,
+            receiverId: channelId,
+            isDm: false,
+            teamId
+        });
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async startTypingMessage(
+        @PubSub() pubsub: PubSubEngine,
+        @Arg('channelId', () => Int) channelId: number,
+        @Ctx() { req, redis } : MyContext
+    ) : Promise<boolean> {
+        const key = IS_TYPING_MESSAGE_PREFIX + req.session.uid;
+        const channel = await Channel.findOne(channelId);
+        const teamId = channel?.teamId;
+
+        await redis.set(key, channelId);
+
+        await pubsub.publish(NEW_TYPING_MESSAGE_EVENT, {
+            senderId: req.session.uid,
+            receiverId: channelId,
+            isDm: false,
+            teamId
+        });
+
         return true;
     }
 

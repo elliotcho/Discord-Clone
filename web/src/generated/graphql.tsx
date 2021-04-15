@@ -27,6 +27,7 @@ export type Query = {
   offlineMembers: Array<User>;
   team: Team;
   teams: Array<Team>;
+  usersTypingMessage: Array<User>;
   messages: Array<Message>;
   recentChats: Array<User>;
   directMessages: Array<DirectMessage>;
@@ -65,6 +66,11 @@ export type QueryOfflineMembersArgs = {
 
 export type QueryTeamArgs = {
   teamId: Scalars['Int'];
+};
+
+
+export type QueryUsersTypingMessageArgs = {
+  channelId: Scalars['Int'];
 };
 
 
@@ -161,6 +167,8 @@ export type Mutation = {
   setStatus: Scalars['Boolean'];
   addMember: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
+  stopTypingMessage: Scalars['Boolean'];
+  startTypingMessage: Scalars['Boolean'];
   sendMessage: Scalars['Boolean'];
   deleteMessage: Scalars['Boolean'];
   sendFile: Scalars['Boolean'];
@@ -227,6 +235,16 @@ export type MutationAddMemberArgs = {
 
 export type MutationCreateTeamArgs = {
   teamName: Scalars['String'];
+};
+
+
+export type MutationStopTypingMessageArgs = {
+  channelId: Scalars['Int'];
+};
+
+
+export type MutationStartTypingMessageArgs = {
+  channelId: Scalars['Int'];
 };
 
 
@@ -333,6 +351,7 @@ export type FieldError = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  newUserTypingMessage: Scalars['Boolean'];
   newMessage: Scalars['Boolean'];
   newDirectMessage: Scalars['Boolean'];
 };
@@ -548,6 +567,26 @@ export type SendMessageMutationVariables = Exact<{
 export type SendMessageMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'sendMessage'>
+);
+
+export type StartTypingMessageMutationVariables = Exact<{
+  channelId: Scalars['Int'];
+}>;
+
+
+export type StartTypingMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'startTypingMessage'>
+);
+
+export type StopTypingMessageMutationVariables = Exact<{
+  channelId: Scalars['Int'];
+}>;
+
+
+export type StopTypingMessageMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'stopTypingMessage'>
 );
 
 export type AddMemberMutationVariables = Exact<{
@@ -770,6 +809,19 @@ export type MessagesQuery = (
   )> }
 );
 
+export type UsersTypingMessageQueryVariables = Exact<{
+  channelId: Scalars['Int'];
+}>;
+
+
+export type UsersTypingMessageQuery = (
+  { __typename?: 'Query' }
+  & { usersTypingMessage: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
+);
+
 export type InviteesQueryVariables = Exact<{
   teamId: Scalars['Int'];
 }>;
@@ -884,6 +936,14 @@ export type NewMessageSubscriptionVariables = Exact<{ [key: string]: never; }>;
 export type NewMessageSubscription = (
   { __typename?: 'Subscription' }
   & Pick<Subscription, 'newMessage'>
+);
+
+export type NewUserTypingMessageSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NewUserTypingMessageSubscription = (
+  { __typename?: 'Subscription' }
+  & Pick<Subscription, 'newUserTypingMessage'>
 );
 
 export const RegularChannelFragmentDoc = gql`
@@ -1433,6 +1493,66 @@ export function useSendMessageMutation(baseOptions?: Apollo.MutationHookOptions<
 export type SendMessageMutationHookResult = ReturnType<typeof useSendMessageMutation>;
 export type SendMessageMutationResult = Apollo.MutationResult<SendMessageMutation>;
 export type SendMessageMutationOptions = Apollo.BaseMutationOptions<SendMessageMutation, SendMessageMutationVariables>;
+export const StartTypingMessageDocument = gql`
+    mutation StartTypingMessage($channelId: Int!) {
+  startTypingMessage(channelId: $channelId)
+}
+    `;
+export type StartTypingMessageMutationFn = Apollo.MutationFunction<StartTypingMessageMutation, StartTypingMessageMutationVariables>;
+
+/**
+ * __useStartTypingMessageMutation__
+ *
+ * To run a mutation, you first call `useStartTypingMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStartTypingMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [startTypingMessageMutation, { data, loading, error }] = useStartTypingMessageMutation({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useStartTypingMessageMutation(baseOptions?: Apollo.MutationHookOptions<StartTypingMessageMutation, StartTypingMessageMutationVariables>) {
+        return Apollo.useMutation<StartTypingMessageMutation, StartTypingMessageMutationVariables>(StartTypingMessageDocument, baseOptions);
+      }
+export type StartTypingMessageMutationHookResult = ReturnType<typeof useStartTypingMessageMutation>;
+export type StartTypingMessageMutationResult = Apollo.MutationResult<StartTypingMessageMutation>;
+export type StartTypingMessageMutationOptions = Apollo.BaseMutationOptions<StartTypingMessageMutation, StartTypingMessageMutationVariables>;
+export const StopTypingMessageDocument = gql`
+    mutation StopTypingMessage($channelId: Int!) {
+  stopTypingMessage(channelId: $channelId)
+}
+    `;
+export type StopTypingMessageMutationFn = Apollo.MutationFunction<StopTypingMessageMutation, StopTypingMessageMutationVariables>;
+
+/**
+ * __useStopTypingMessageMutation__
+ *
+ * To run a mutation, you first call `useStopTypingMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStopTypingMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [stopTypingMessageMutation, { data, loading, error }] = useStopTypingMessageMutation({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useStopTypingMessageMutation(baseOptions?: Apollo.MutationHookOptions<StopTypingMessageMutation, StopTypingMessageMutationVariables>) {
+        return Apollo.useMutation<StopTypingMessageMutation, StopTypingMessageMutationVariables>(StopTypingMessageDocument, baseOptions);
+      }
+export type StopTypingMessageMutationHookResult = ReturnType<typeof useStopTypingMessageMutation>;
+export type StopTypingMessageMutationResult = Apollo.MutationResult<StopTypingMessageMutation>;
+export type StopTypingMessageMutationOptions = Apollo.BaseMutationOptions<StopTypingMessageMutation, StopTypingMessageMutationVariables>;
 export const AddMemberDocument = gql`
     mutation AddMember($userId: Int!, $teamId: Int!) {
   addMember(userId: $userId, teamId: $teamId)
@@ -2040,6 +2160,39 @@ export function useMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<M
 export type MessagesQueryHookResult = ReturnType<typeof useMessagesQuery>;
 export type MessagesLazyQueryHookResult = ReturnType<typeof useMessagesLazyQuery>;
 export type MessagesQueryResult = Apollo.QueryResult<MessagesQuery, MessagesQueryVariables>;
+export const UsersTypingMessageDocument = gql`
+    query UsersTypingMessage($channelId: Int!) {
+  usersTypingMessage(channelId: $channelId) {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useUsersTypingMessageQuery__
+ *
+ * To run a query within a React component, call `useUsersTypingMessageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUsersTypingMessageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUsersTypingMessageQuery({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useUsersTypingMessageQuery(baseOptions: Apollo.QueryHookOptions<UsersTypingMessageQuery, UsersTypingMessageQueryVariables>) {
+        return Apollo.useQuery<UsersTypingMessageQuery, UsersTypingMessageQueryVariables>(UsersTypingMessageDocument, baseOptions);
+      }
+export function useUsersTypingMessageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UsersTypingMessageQuery, UsersTypingMessageQueryVariables>) {
+          return Apollo.useLazyQuery<UsersTypingMessageQuery, UsersTypingMessageQueryVariables>(UsersTypingMessageDocument, baseOptions);
+        }
+export type UsersTypingMessageQueryHookResult = ReturnType<typeof useUsersTypingMessageQuery>;
+export type UsersTypingMessageLazyQueryHookResult = ReturnType<typeof useUsersTypingMessageLazyQuery>;
+export type UsersTypingMessageQueryResult = Apollo.QueryResult<UsersTypingMessageQuery, UsersTypingMessageQueryVariables>;
 export const InviteesDocument = gql`
     query Invitees($teamId: Int!) {
   invitees(teamId: $teamId) {
@@ -2354,3 +2507,29 @@ export function useNewMessageSubscription(baseOptions?: Apollo.SubscriptionHookO
       }
 export type NewMessageSubscriptionHookResult = ReturnType<typeof useNewMessageSubscription>;
 export type NewMessageSubscriptionResult = Apollo.SubscriptionResult<NewMessageSubscription>;
+export const NewUserTypingMessageDocument = gql`
+    subscription NewUserTypingMessage {
+  newUserTypingMessage
+}
+    `;
+
+/**
+ * __useNewUserTypingMessageSubscription__
+ *
+ * To run a query within a React component, call `useNewUserTypingMessageSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewUserTypingMessageSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewUserTypingMessageSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewUserTypingMessageSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewUserTypingMessageSubscription, NewUserTypingMessageSubscriptionVariables>) {
+        return Apollo.useSubscription<NewUserTypingMessageSubscription, NewUserTypingMessageSubscriptionVariables>(NewUserTypingMessageDocument, baseOptions);
+      }
+export type NewUserTypingMessageSubscriptionHookResult = ReturnType<typeof useNewUserTypingMessageSubscription>;
+export type NewUserTypingMessageSubscriptionResult = Apollo.SubscriptionResult<NewUserTypingMessageSubscription>;

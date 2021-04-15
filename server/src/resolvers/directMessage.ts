@@ -26,7 +26,7 @@ import fs, { createWriteStream } from 'fs';
 import path from 'path';
 
 
-const NEW_DIRECT_MESSAGE_EVENT = 'NEW_DIRECT_MESSAGE_EVENT';
+const NEW_DM_EVENT = 'NEW_DM_EVENT';
 
 @Resolver(DirectMessage)
 export class DirectMessageResolver {
@@ -65,7 +65,7 @@ export class DirectMessageResolver {
     }
 
     @Subscription(() => Boolean, {
-        topics: NEW_DIRECT_MESSAGE_EVENT,
+        topics: NEW_DM_EVENT,
         filter: filterSubscription
     })
     newDirectMessage(): boolean {
@@ -123,7 +123,7 @@ export class DirectMessageResolver {
             [text, messageId]
         );
 
-        await pubsub.publish(NEW_DIRECT_MESSAGE_EVENT, {
+        await pubsub.publish(NEW_DM_EVENT, {
             senderId,
             receiverId,
             isDm: true
@@ -149,7 +149,7 @@ export class DirectMessageResolver {
             [senderId, receiverId, text]
         );
 
-        await pubsub.publish(NEW_DIRECT_MESSAGE_EVENT, {
+        await pubsub.publish(NEW_DM_EVENT, {
             senderId,
             receiverId,
             isDm: true
@@ -180,7 +180,7 @@ export class DirectMessageResolver {
             [messageId]
         );
 
-        await pubsub.publish(NEW_DIRECT_MESSAGE_EVENT, {
+        await pubsub.publish(NEW_DM_EVENT, {
             senderId,
             receiverId,
             isDm: true
@@ -225,7 +225,7 @@ export class DirectMessageResolver {
             [senderId, receiverId, name]
         );
 
-        await pubsub.publish(NEW_DIRECT_MESSAGE_EVENT, {
+        await pubsub.publish(NEW_DM_EVENT, {
             senderId,
             receiverId,
             isDm: true
