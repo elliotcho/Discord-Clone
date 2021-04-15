@@ -3,34 +3,41 @@ import { useApolloClient } from '@apollo/client';
 import {
     useNewMessageSubscription,
     useNewDirectMessageSubscription,
-    useNewUserTypingMessageSubscription
+    useNewUserTypingMessageSubscription,
+    useNewUserTypingDmSubscription
 } from '../../generated/graphql';   
 
 const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
     const { cache } = useApolloClient();
     
-    const { data: newMessageData } = useNewMessageSubscription();
-    const { data: newDirectMessageData } = useNewDirectMessageSubscription();
+    const { data: newDmData } = useNewDirectMessageSubscription();
+    const { data: newTypingDmData } = useNewUserTypingDmSubscription();
     const { data: newTypingMessageData } = useNewUserTypingMessageSubscription();
+    const { data: newMessageData } = useNewMessageSubscription();
 
     const subscriptionData = [
-        newMessageData,
-        newDirectMessageData,
-        newTypingMessageData
+        newDmData,
+        newTypingDmData,
+        newTypingMessageData,
+        newMessageData
     ];
 
     useEffect(() => {
 
-        if(newMessageData) {
-            cache.evict({ fieldName: 'messages' });
+        if(newDmData) {
+            cache.evict({ fieldName: 'directMessages' });
         }
 
-        if(newDirectMessageData) {
-            cache.evict({ fieldName: 'directMessages' });
+        if(newTypingDmData) {
+            cache.evict({ fieldName: 'userTypingDm' });
         }
 
         if(newTypingMessageData) {
             cache.evict({ fieldName: 'usersTypingMessage' });
+        }
+
+        if(newMessageData) {
+            cache.evict({ fieldName: 'messages' });
         }
 
     }, subscriptionData);

@@ -96,12 +96,11 @@ export class DirectMessageResolver {
         );
 
         for(let i=0;i<users.length;i++){
-            const key = IS_TYPING_DM_PREFIX + users[i];
+            const key = IS_TYPING_DM_PREFIX + users[i].id;
             const cachedId  = await redis.get(key);
 
             if(parseInt(cachedId!) === req.session.uid) {
-                const user = await User.findOne(users[i].userId);
-                return user;
+                return users[i];
             }
         }
 
@@ -120,7 +119,7 @@ export class DirectMessageResolver {
 
         await pubsub.publish(NEW_TYPING_DM_EVENT, {
             senderId: req.session.uid,
-            receiverId: receiverId,
+            receiverId,
             isDm: true
         });
 
@@ -139,7 +138,7 @@ export class DirectMessageResolver {
 
         await pubsub.publish(NEW_TYPING_DM_EVENT, {
             senderId: req.session.uid,
-            receiverId: receiverId,
+            receiverId,
             isDm: true
         });
 

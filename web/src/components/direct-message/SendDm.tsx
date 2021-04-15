@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useSendDirectMessageMutation, useSendDmFileMutation } from '../../generated/graphql';
+import { 
+    useSendDmFileMutation,
+    useSendDirectMessageMutation, 
+    useStartTypingDmMutation,
+    useStopTypingDmMutation
+} from '../../generated/graphql';
 import { handleEnterPress } from '../../utils/handleEnterPress';
 
 const Container = styled.div`
@@ -50,6 +55,8 @@ const Textarea = styled.textarea`
     }
 `;
 
+let tO: any;
+
 interface SendDmProps {
     userId: number;
 }
@@ -57,8 +64,16 @@ interface SendDmProps {
 const SendDm: React.FC<SendDmProps> = ({ userId: receiverId }) => {
     const [text, setText] = useState('');
     
-    const [sendText] = useSendDirectMessageMutation();
     const [sendFile] = useSendDmFileMutation();
+    const [sendText] = useSendDirectMessageMutation();
+    const [startTyping] = useStartTypingDmMutation();
+    const [stopTyping] = useStopTypingDmMutation();
+
+    const handleStopTyping = async () => {
+        await stopTyping({
+            variables: { receiverId }
+        });
+    }
 
     return (
         <Container>
@@ -87,7 +102,22 @@ const SendDm: React.FC<SendDmProps> = ({ userId: receiverId }) => {
 
             <Textarea
                 value = {text}
-                onChange = {(e) => setText(e.target.value)}
+                onChange = {async (e) => {
+
+                    setText(e.target.value);
+
+                    if(e.target.value) {
+                        await startTyping({ variables: { receiverId }});
+                        if(tO) clearTimeout(tO);
+
+                        tO = setTimeout(handleStopTyping, 5000);
+                    }
+
+                    else {
+                        await handleStopTyping();
+                    }
+
+                }}
                 onKeyDown = {async (e) => {
                     const submit = handleEnterPress(e, 130);
 
