@@ -90,17 +90,19 @@ export class MessageResolver {
         @Ctx() { req, redis } : MyContext
     ) : Promise<User[]> {
         const result = [] as User[];
+        const channel = await Channel.findOne(channelId);
+        const teamId = channel?.teamId;
 
         const members = await getConnection().query(
             `
                 select * from member as m
                 where m."userId" != $1
-                and m."channelId" = $2
-            `, [req.session.uid, channelId]
+                and m."teamId" = $2
+            `, [req.session.uid, teamId]
         );
 
         for(let i=0;i<members.length;i++){
-            const key = IS_TYPING_MESSAGE_PREFIX + req.session.uid;
+            const key = IS_TYPING_MESSAGE_PREFIX + members[i].userId;
             const cachedId  = await redis.get(key);
 
             if(parseInt(cachedId!) === channelId) {

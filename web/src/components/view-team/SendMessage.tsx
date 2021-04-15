@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { 
     useSendFileMutation, 
-    useSendMessageMutation 
+    useSendMessageMutation,
+    useStartTypingMessageMutation,
+    useStopTypingMessageMutation
 } from '../../generated/graphql';
 import { handleEnterPress } from '../../utils/handleEnterPress';
 
@@ -53,14 +55,25 @@ const Textarea = styled.textarea`
     }
 `;
 
+let tO: any;
+
 interface SendMessageProps {
     channelId: number;
 }
 
 const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
     const [text, setText] = useState('');
+
     const [sendPicture] = useSendFileMutation();
     const [sendMessage] = useSendMessageMutation();
+    const [startTyping] = useStartTypingMessageMutation();
+    const [stopTyping] = useStopTypingMessageMutation();
+
+    const handleStopTyping = async () => {
+        await stopTyping({
+            variables: { channelId }
+        });
+    }
 
     return (
         <Container>
@@ -89,7 +102,22 @@ const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
             <Textarea
                 value = {text}
                 placeholder = 'Text Here'
-                onChange = {(e) => setText(e.target.value)}
+                onChange = {async (e) => {
+
+                    setText(e.target.value);
+
+                    if(e.target.value) {
+                        await startTyping({ variables: { channelId }});
+                        if(tO) clearTimeout(tO);
+
+                        tO = setTimeout(handleStopTyping, 5000);
+                    }
+
+                    else {
+                        await handleStopTyping();
+                    }
+
+                }}
                 onKeyDown = {async (e: any) => {
                     const submit = handleEnterPress(e);
 

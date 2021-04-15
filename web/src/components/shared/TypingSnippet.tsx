@@ -12,11 +12,15 @@ const Span = styled.span`
     font-weight: bold;
 `;
 
-const TypingSnippet: React.FC<{}> = () => {
+interface TypingSnippetProps {
+    username: string;
+}
+
+const TypingSnippet: React.FC<TypingSnippetProps> = ({ username }) => {
     return (
         <Container>
             <Span>
-                Giggsy
+                {username}
             </Span>
 
             is typing...

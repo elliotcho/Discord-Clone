@@ -2,17 +2,21 @@ import React, { useEffect } from 'react';
 import { useApolloClient } from '@apollo/client';
 import {
     useNewMessageSubscription,
-    useNewDirectMessageSubscription
+    useNewDirectMessageSubscription,
+    useNewUserTypingMessageSubscription
 } from '../../generated/graphql';   
 
 const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
     const { cache } = useApolloClient();
+    
     const { data: newMessageData } = useNewMessageSubscription();
     const { data: newDirectMessageData } = useNewDirectMessageSubscription();
+    const { data: newTypingMessageData } = useNewUserTypingMessageSubscription();
 
     const subscriptionData = [
         newMessageData,
         newDirectMessageData,
+        newTypingMessageData
     ];
 
     useEffect(() => {
@@ -23,6 +27,10 @@ const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
 
         if(newDirectMessageData) {
             cache.evict({ fieldName: 'directMessages' });
+        }
+
+        if(newTypingMessageData) {
+            cache.evict({ fieldName: 'usersTypingMessage' });
         }
 
     }, subscriptionData);
