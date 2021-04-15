@@ -1,0 +1,3 @@
+mutation StartTypingDm($receiverId: Int!) {
+    startTypingDm(receiverId: $receiverId)
+}

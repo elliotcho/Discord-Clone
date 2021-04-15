@@ -27,6 +27,8 @@ import path from 'path';
 
 
 const NEW_DM_EVENT = 'NEW_DM_EVENT';
+const NEW_TYPING_DM_EVENT = 'NEW_TYPING_DM_EVENT';
+const IS_TYPING_DM_PREFIX = 'IS_TYPING_DM_PREFIX';
 
 @Resolver(DirectMessage)
 export class DirectMessageResolver {
@@ -65,10 +67,82 @@ export class DirectMessageResolver {
     }
 
     @Subscription(() => Boolean, {
+        topics: NEW_TYPING_DM_EVENT,
+        filter: filterSubscription 
+    })
+    newUserTypingDm() : boolean {
+        return true;
+    }
+
+    @Subscription(() => Boolean, {
         topics: NEW_DM_EVENT,
         filter: filterSubscription
     })
     newDirectMessage(): boolean {
+        return true;
+    }
+
+    @Query(() => User, { nullable: true })
+    async userTypingDm(
+        @Ctx() { req, redis } : MyContext
+    ) : Promise<User | undefined> {
+        const users = await getConnection().query(
+            `
+                select distinct(u.*) from "user" as u
+                inner join direct_message as d on (d."receiverId" = u.id or d."senderId" = u.id)
+                and (d."receiverId" = $1 or d."senderId" = $1) 
+                and u.id != $1
+            `, [req.session.uid]
+        );
+
+        for(let i=0;i<users.length;i++){
+            const key = IS_TYPING_DM_PREFIX + users[i];
+            const cachedId  = await redis.get(key);
+
+            if(parseInt(cachedId!) === req.session.uid) {
+                const user = await User.findOne(users[i].userId);
+                return user;
+            }
+        }
+
+        return undefined;
+    }
+
+    @Mutation(() => Boolean)
+    async stopTypingDm(
+        @PubSub() pubsub: PubSubEngine,
+        @Arg('receiverId', () => Int) receiverId: number,
+        @Ctx() { req, redis } : MyContext
+    ) : Promise<boolean> {
+        const key = IS_TYPING_DM_PREFIX + req.session.uid;
+
+        await redis.del(key);
+
+        await pubsub.publish(NEW_TYPING_DM_EVENT, {
+            senderId: req.session.uid,
+            receiverId: receiverId,
+            isDm: true
+        });
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async startTypingDm(
+        @PubSub() pubsub: PubSubEngine,
+        @Arg('receiverId', () => Int) receiverId: number,
+        @Ctx() { req, redis } : MyContext
+    ) : Promise<boolean> {
+        const key = IS_TYPING_DM_PREFIX + req.session.uid;
+    
+        await redis.set(key, receiverId);
+
+        await pubsub.publish(NEW_TYPING_DM_EVENT, {
+            senderId: req.session.uid,
+            receiverId: receiverId,
+            isDm: true
+        });
+
         return true;
     }
 
