@@ -93,6 +93,11 @@ export class UserResolver {
         topics: CHANGE_ACTIVE_STATUS_EVENT,
         filter: async ({ payload, context }) => {
             const { req } = context.connection.context;
+            context.req = req;
+
+            if(req.session.uid === payload.userId) {
+                return false;
+            }
         
             const isFriend = await getConnection().query(
                 `

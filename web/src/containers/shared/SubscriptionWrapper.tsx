@@ -28,8 +28,6 @@ const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
     useEffect(() => {
 
         if(newStatusData) {
-            alert("HI")
-
             const user = newStatusData?.newStatusUpdate;
             const activeStatus = user?.activeStatus;
             const userId = user?.id;
