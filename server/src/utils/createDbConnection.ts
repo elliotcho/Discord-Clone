@@ -13,7 +13,7 @@ export const createDbConnection = async () => {
         type: 'postgres',
         url: process.env.DB_URL,
         synchronize: true,
-        logging: false,
+        logging: true,
         entities: [
             User,
             Member,

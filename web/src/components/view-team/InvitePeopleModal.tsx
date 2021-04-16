@@ -70,8 +70,7 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
                                         variables: { teamId, userId: u.id },
                                         update: (cache) => {
                                             cache.evict({ fieldName: 'invitees' });
-                                            cache.evict({ fieldName: 'offlineMembers' });
-                                            cache.evict({ fieldName: 'onlineMembers' });
+                                            cache.evict({ fieldName: 'members' });
                                         }
                                     });
                                 }}

@@ -25,18 +25,20 @@ const Friends: React.FC<{}> =() => {
     return (
         <>
             {data?.onlineFriends?.map(u =>
-                <FriendCard 
-                    key = {u.id}
-                    activeStatus = {u.activeStatus}
-                    profileURL = {u.profileURL}
-                    username = {u.username}
-                >
-                    <NextLink href={`/direct-message/${u.id}`}>
-                        <Button>
-                            Message
-                        </Button>
-                    </NextLink>
-                </FriendCard>
+               !!u.activeStatus && (
+                    <FriendCard 
+                        key = {u.id}
+                        activeStatus = {u.activeStatus}
+                        profileURL = {u.profileURL}
+                        username = {u.username}
+                    >
+                        <NextLink href={`/direct-message/${u.id}`}>
+                            <Button>
+                                Message
+                            </Button>
+                        </NextLink>
+                    </FriendCard>
+               )
             )}
         </> 
     )
