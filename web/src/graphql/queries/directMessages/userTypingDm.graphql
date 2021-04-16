@@ -1,0 +1,5 @@
+query UserTypingDm {
+    userTypingDm {
+        ...RegularUser
+    }
+}

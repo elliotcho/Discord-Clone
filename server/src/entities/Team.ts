@@ -21,6 +21,10 @@ export class Team extends BaseEntity {
     @Column()
     name: string;
 
+    @Field()
+    @Column()
+    ownerId: number;
+
     @OneToMany(() => Channel, (channel) => channel.team)
     channels: Channel[];
 
@@ -31,8 +35,4 @@ export class Team extends BaseEntity {
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
-
-    // @Field()
-    // @Column()
-    // ownerId: number
 }

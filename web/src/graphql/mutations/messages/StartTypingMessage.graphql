@@ -1,0 +1,3 @@
+mutation StartTypingMessage($channelId: Int!) {
+    startTypingMessage(channelId: $channelId)
+}

@@ -1,4 +1,3 @@
 mutation EditDirectMessage($text: String!, $messageId: Int!) {
     editDirectMessage(text: $text, messageId: $messageId)
 }
-

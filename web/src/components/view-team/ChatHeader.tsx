@@ -18,16 +18,19 @@ interface ChatHeaderProps {
     channelId: number;
 }
 
-const ChatHeader: React.FC<ChatHeaderProps> = ({channelId}) => {
-    const {data} = useChannelQuery({
-        variables: {channelId}
-    }) 
+const ChatHeader: React.FC<ChatHeaderProps> = ({ channelId }) => {
+    const { data } = useChannelQuery({
+        variables: { channelId },
+        skip: !channelId
+    }); 
 
     return (
         <Header>
-            <Span>
-                #{data?.channel?.name}
-            </Span>
+            {data?.channel && (
+                <Span>
+                  # {data?.channel?.name}
+                </Span>
+            )}
         </Header>
     )
 }

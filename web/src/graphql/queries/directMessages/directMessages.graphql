@@ -3,6 +3,8 @@ query DirectMessages($receiverId: Int!) {
         id
         text
         createdAt
+        senderId
+        isRead
         pic
 
         user {

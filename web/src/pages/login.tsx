@@ -36,7 +36,12 @@ const Login : React.FC<{}> = () => {
                         const { username, password } = values;
 
                         const response = await login({
-                            variables: { username, password }
+                            variables: { username, password },
+                            update: (cache, { data }) => {
+                                if(data?.login.user) {
+                                    cache.evict({ fieldName: 'me' });
+                                }
+                            }
                         })
 
                         if(!response.data.login.user) {

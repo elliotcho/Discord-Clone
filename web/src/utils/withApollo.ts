@@ -21,7 +21,7 @@ const uploadLink = (ctx: NextPageContext) => createUploadLink({
     uri: 'http://localhost:4000/graphql',
     credentials: 'include',
     headers: {
-        cookie:
+        cookie: 
             (isServer() ?
                 ctx?.req?.headers?.cookie :
                 undefined
@@ -46,8 +46,8 @@ const link = (ctx: NextPageContext) => split(
 
 const client = (ctx: NextPageContext) => (
     new ApolloClient({
-        link: link(ctx) as any,
-        cache: new InMemoryCache
+        cache: new InMemoryCache,
+        link: link(ctx) as any
     })
 );
 

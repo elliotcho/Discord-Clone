@@ -41,5 +41,4 @@ export class Message extends BaseEntity{
     @Field()
     @UpdateDateColumn()
     updatedAt: Date;
-
 }

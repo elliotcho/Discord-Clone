@@ -1,5 +1,0 @@
-Server                           Web
- 
-Entities                         GraphQL
-Resolvers                        Generated
-Utils

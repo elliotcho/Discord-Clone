@@ -1,0 +1,5 @@
+query UsersTypingMessage($channelId: Int!) {
+    usersTypingMessage(channelId: $channelId) {
+        ...RegularUser
+    }
+}

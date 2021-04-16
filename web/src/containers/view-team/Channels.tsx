@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { 
-    useChannelsQuery,
-    useDeleteTeamMutation,
-    useLeaveTeamMutation
-} from '../../generated/graphql';
-import CreateChannelModal from '../../components/view-team/CreateChannelModal';
-import ConfirmModal from '../../components/shared/ConfirmModal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { useChannelsQuery, useCreateChannelMutation } from '../../generated/graphql';
+import { isServer } from '../../utils/isServer';
+import InvitePeopleModal from '../../components/view-team/InvitePeopleModal';
+import EditModal from '../../components/shared/EditModal';
 import Channel from '../../components/view-team/Channel';
 import UserNav from '../../components/shared/UserNav';
-import { useRouter } from 'next/router';
 
 const Container = styled.div`
     position: relative;
@@ -27,14 +25,30 @@ const Title = styled.h3`
 `;
 
 const Box = styled.div`
-    margin-left: auto;
-    font-size: 1.4rem;
-    margin-top: 18px;
+    margin: 20px 15px 0 auto;
     cursor: pointer;
-    position: relative;
+`;
+
+const Dropdown = styled.div`
+    z-index: 1;
+    min-width: 160px;
+    position: absolute;
+    background: #000;
+    color: white;
+    box-shadow: 0 0 5px black;
     right: 15px;
+    top: 45px;
+`;
+
+const Option = styled.div`
+    margin: 12px;
+    display: flex;
+    padding: 10px 20px;
+    font-weight: normal;
+    font-size: 1rem;
     &:hover {
-        color: white;
+        background: #9999ff;
+        color: #f2f2f2;
     }
 `;
 
@@ -45,53 +59,48 @@ interface ChannelsProps {
 
 const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const[openLeaveChannel, setLeaveChannel] = useState(false);
-    const[openDelete, setDelete] = useState(false);
-    const router = useRouter();
+    const [openCreateChannel, setOpenCreateChannel] = useState(false);
+    const [invitePeople, setInvitePeople] = useState(false);
+    const [createChannel] = useCreateChannelMutation();
 
-    const { data } = useChannelsQuery({ variables: { teamId } });
-    const [deleteTeam] = useDeleteTeamMutation();
-    const [leaveTeam] = useLeaveTeamMutation();
+    const { data } = useChannelsQuery({ 
+        variables: { teamId },
+        skip: !teamId
+    });
 
-    let settingOption = "";
-
- 
+    if(!isServer()) {
+        window.addEventListener('click', function(e: any){
+            if(!document.getElementById('channel-dropdown')?.contains(e.target)
+                && !document.getElementById('chevron')?.contains(e.target)
+            ) {
+                setIsOpen(false);
+            }
+        });
+    }
 
     return (
         <Container>
             <Flex>
                 <Title>Text Channels</Title>
-                <Box>
-                <select value={settingOption} name="choice" onChange = { (e) => {
-                    if(e.target.value === "invite"){
-                        //invite(teamId)
-                        //setInvite(true);
-                    } 
-                    if(e.target.value === "leave"){
-                        setLeaveChannel(true);
-                        
-                    }
-                    if(e.target.value === "new channel"){
-                        setIsOpen(true);
-                    }
-                    //next option should only appear for the Team Owner!
-                    if(e.target.value === "delete"){
-                        setDelete(true);
-                    }
-                } }>
-                    <option value="" label="Settings"/>
-                    <option value="invite" label="Invite Friends"/>
-                    <option value="leave" label="Leave Team"/>
-                    <option value="new channel" label="Create New Channel"/>
-                    <option value="delete" label="Delete Team"/>
-                </select>
-                </Box>
-                
 
+                <Box onClick={() => setIsOpen(true)}>
+                    <FontAwesomeIcon id='chevron' icon={faChevronDown} />
+
+                    {isOpen && (
+                        <Dropdown id='channel-dropdown'>
+                            <Option onClick={() => setOpenCreateChannel(true)}>
+                                Create Channel
+                            </Option>
+
+                            <Option onClick={() => setInvitePeople(true)}>
+                                Invite People
+                            </Option>
+                        </Dropdown>
+                    )}
+                </Box>
             </Flex>
 
             {data?.channels?.map((c, i) => {
-                let numChannels = data?.channels?.length;
                 let route = `/view-team/${teamId}/${c.id}`;
                 let active = false;
 
@@ -102,9 +111,6 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                 return (
                     <Channel 
                         key = {c.id}
-                        isRead = {c.read}
-                        channelId = {c.id}
-                        numChannels = {numChannels}
                         active = {active}
                         route = {route}
                         {...c}
@@ -112,48 +118,27 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                 ) 
             })} 
 
-            <CreateChannelModal
-                isOpen = {isOpen}
-                onClose = {() => setIsOpen(false)}
+            <EditModal
+                size = 'sm'
+                title = 'Create Channel'
+                isOpen = {openCreateChannel}
+                onClose = {() => setOpenCreateChannel(false)}
+                onSave = {async (channelName) => {
+                    await createChannel({ 
+                        variables: { channelName, teamId },
+                        update: (cache) => {
+                            cache.evict({ fieldName: "channels" });
+                        }
+                    });
+                }}
+            />
+
+            <InvitePeopleModal
+                isOpen = {invitePeople}
+                onClose = {() => setInvitePeople(false)}
                 teamId = {teamId}
             />
-
-            <ConfirmModal
-                isOpen = {openLeaveChannel}
-                onClose = {() => setLeaveChannel(false)}
-                title =  'Are you sure you want to leave this team?'
-                onSave ={async () => {
-                    const result = await leaveTeam({
-                        variables: { teamId },
-                        update: (cache) => {
-                            cache.evict({ fieldName: "teams"});
-                        }
-                    });
-
-                    if(result.data.leaveTeam){
-                        router.push('/profile')
-                    }
-                }}
-            />
-
-            <ConfirmModal
-                isOpen = {openDelete}
-                onClose = {() => setDelete(false)}
-                title = 'Are you sure you want to permanently delete this team?'
-                onSave = {async () => {
-                    const result =  await deleteTeam({
-                        variables: { teamId },
-                        update: (cache) => {
-                            cache.evict({ fieldName: "teams"})
-                        }
-                    });
-
-                    if (result.data.deleteTeam){
-                        router.push('/profile')
-                    }
-                }}
-            />
-            
+   
             <UserNav />
         </Container>
     )

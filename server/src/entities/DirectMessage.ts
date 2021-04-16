@@ -35,6 +35,9 @@ export class DirectMessage extends BaseEntity{
     @Field(() => User)
     user: User;
 
+    @Field()
+    isRead: boolean;
+
     @Field(() => String)
     @CreateDateColumn()
     createdAt: Date;

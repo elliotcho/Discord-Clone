@@ -1,0 +1,5 @@
+query Invitees($teamId: Int!) {
+    invitees(teamId: $teamId) {
+        ...RegularUser
+    }
+}

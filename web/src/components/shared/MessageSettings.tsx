@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { 
+    useEditDirectMessageMutation,
     useDeleteDirectMessageMutation,
     useDeleteMessageMutation,
     useEditMessageMutation,
@@ -50,17 +51,18 @@ const Text = styled.div`
 
 interface MessageSettingsProps {
     messageId: number;
+    channelId: number | undefined;
     text: string;
-    isDm: boolean;
 }
 
-const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm }) => {
+const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, channelId, text }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const [editMessage] = useEditMessageMutation();
     const [editDirectMessage] = useEditDirectMessageMutation();
     const [deleteMessage] = useDeleteMessageMutation();
     const [deleteDm] = useDeleteDirectMessageMutation();
+    const [editDm] = useEditDirectMessageMutation();
 
     return (
         <Box>
@@ -69,7 +71,7 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm
             <Dropdown>
                 <Option
                     onClick = {async () => {
-                        if(isDm) {
+                        if(!channelId) {
                             await deleteDm({
                                 variables: { messageId },
                                 update: (cache) => {
@@ -81,7 +83,7 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm
                         } 
 
                         await deleteMessage({
-                            variables: { messageId },
+                            variables: { messageId, channelId },
                             update: (cache) => {
                                 cache.evict({ fieldName: 'messages' });
                             }
@@ -114,22 +116,29 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, text, isDm
                 isOpen = {isOpen}
                 content = {text}
                 onClose = {() => setIsOpen(false)}
+                title = 'Edit your message'
                 onSave = {async (newText) => {
-                    if(!isDm) {
+                    if(channelId) {
                         await editMessage({
-                            variables: { messageId, text: newText },
+                            variables: { 
+                                text: newText,
+                                messageId,
+                                channelId
+                            },
                             update: (cache) => {
                                 cache.evict({ fieldName: 'messages' });
                             }
                         });
-                    } else {
-                        await editDirectMessage({
-                            variables: {messageId, text: newText},
-                            update: (cache) => {
-                                cache.evict({fieldName: 'directMessages'});
-                            }
-                        })
+
+                        return;
                     }
+
+                    await editDm({
+                        variables: { messageId, text: newText },
+                        update: (cache) => {
+                            cache.evict({ fieldName: 'directMessages' });
+                        }
+                    })
                 }}
             />
         </Box>

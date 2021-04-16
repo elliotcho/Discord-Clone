@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useDirectMessagesQuery } from '../../generated/graphql';
+import { useDirectMessagesQuery, useUserTypingDmQuery } from '../../generated/graphql';
+import TypingSnippet from '../../components/shared/TypingSnippet';
 import Message from '../../components/shared/Message';
 
 const Container = styled.div`
@@ -17,19 +18,25 @@ interface MessageContainerProps {
 }
 
 const MessageContainer: React.FC<MessageContainerProps> = ({ userId: receiverId }) => {
-    const { data } = useDirectMessagesQuery({
-        variables: { receiverId }
-    });
+    const { data } = useDirectMessagesQuery({ variables: { receiverId } });
+    const response = useUserTypingDmQuery();
+
+    const directMessages = data?.directMessages || [];
+    const username = response?.data?.userTypingDm?.username;
+    const userId = response?.data?.userTypingDm?.id;
 
     return (
         <Container>
-           {data?.directMessages.map(m => {
+            {userId && (
+                <TypingSnippet key={userId} username={username} />
+            )}
+
+           {directMessages.map(m => {
                return (
                     <Message
                         key = {m.id}
                         messageId = {m.id}
                         date = {m.createdAt}
-                        isDm = {true}
                         {...m.user}
                         {...m} 
                     />

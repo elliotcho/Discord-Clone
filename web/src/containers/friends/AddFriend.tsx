@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useSearchResultsQuery } from '../../generated/graphql';
-import UserCard from '../shared/UserCard';
+import FriendCard from '../shared/FriendCard';
 import FriendButtonWrapper from '../shared/FriendButtonWrapper';
 import Searchbar from '../../components/friends/Searchbar';
 
@@ -38,7 +38,7 @@ const AddFriend: React.FC<{}> =() => {
             />
 
             {data?.searchResults?.map(u =>
-                <UserCard 
+                <FriendCard 
                     key = {u.id}
                     profileURL = {u.profileURL}
                     username = {u.username}
@@ -55,7 +55,7 @@ const AddFriend: React.FC<{}> =() => {
                             </Button>
                         </FriendButtonWrapper>
                    )}
-                </UserCard>
+                </FriendCard>
             )}
         </> 
     )

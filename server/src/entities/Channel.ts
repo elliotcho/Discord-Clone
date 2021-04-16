@@ -9,7 +9,6 @@ import {
     UpdateDateColumn
 } from "typeorm";
 import { Team } from './Team';
-import { Message } from './Message';
 
 @ObjectType()
 @Entity()
@@ -24,10 +23,11 @@ export class Channel extends BaseEntity {
 
     @Field()
     @Column()
-    teamId: number;
+    isOriginal: boolean;
 
     @Field()
-    lastMessage: Message;
+    @Column()
+    teamId: number;
 
     @ManyToOne(() => Team, (team) => team.channels, {
         onDelete: 'CASCADE'

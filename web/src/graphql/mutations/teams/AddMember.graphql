@@ -1,0 +1,3 @@
+mutation AddMember($userId: Int!, $teamId: Int!) {
+    addMember(userId: $userId, teamId: $teamId)
+}

@@ -1,4 +1,4 @@
-import { 
+  import { 
     Arg,
     Ctx,
     Field,
@@ -6,9 +6,12 @@ import {
     Int,
     Mutation,  
     ObjectType,  
+    PubSub,  
+    PubSubEngine,  
     Query,  
     Resolver,
-    Root
+    Root,
+    Subscription
 } from "type-graphql";
 import argon2 from 'argon2';
 import { v4 } from 'uuid';
@@ -18,6 +21,8 @@ import { MyContext, GraphQLUpload, Upload } from "../types";
 import { sendEmail } from "../utils/sendEmail"
 import fs, { createWriteStream } from 'fs';
 import path from 'path';
+
+const CHANGE_ACTIVE_STATUS_EVENT = 'CHANGE_ACTIVE_STATUS_EVENT';
 
 @ObjectType()
 class FieldError {
@@ -83,6 +88,36 @@ export class UserResolver {
         return 2;
     }
 
+    @Subscription(() => User, {
+        nullable: true,
+        topics: CHANGE_ACTIVE_STATUS_EVENT,
+        filter: async ({ payload, context }) => {
+            const { req } = context.connection.context;
+            context.req = req;
+
+            if(req.session.uid === payload.userId) {
+                return false;
+            }
+        
+            const isFriend = await getConnection().query(
+                `
+                    select * from friend as f
+                    where (f."senderId" = $1 or f."receiverId" = $1) and
+                    (f."receiverId" = $2 or f."senderId" = $2)
+                    and f.status = true
+                `,
+                [req.session.uid, payload.userId]
+            );
+
+            return !!isFriend.length;
+        }
+    })
+    async newStatusUpdate(
+        @Root() { userId } : { userId: number }
+    ) : Promise<User | undefined> {
+        return User.findOne(userId);
+    }
+
     @Query(() => User)
     async user(
         @Arg('userId', () => Int, { nullable: true })  userId: number,
@@ -115,7 +150,7 @@ export class UserResolver {
         return users;
     }
 
-    @Query(() => User)
+    @Query(() => User, { nullable: true })
     async me(
         @Ctx() { req } : MyContext
     ) : Promise<User | undefined> {
@@ -128,8 +163,15 @@ export class UserResolver {
 
     @Mutation(() => Boolean)
     async logout (
+        @PubSub() pubsub: PubSubEngine,
         @Ctx() { req, res } : MyContext
     ) : Promise<boolean> {
+        await User.update({ id: req.session.uid }, { activeStatus: 0 });
+
+        await pubsub.publish(CHANGE_ACTIVE_STATUS_EVENT, {
+            userId: req.session.uid
+        });
+
         return new Promise(resolve => {
             req.session.destroy(err => {
                 res.clearCookie('cid');
@@ -171,9 +213,23 @@ export class UserResolver {
         @Arg('file', () => GraphQLUpload) { createReadStream, filename } : Upload,
         @Ctx() { req } : MyContext
     ): Promise<boolean> {
+        let user;
         const name = 'PROFILE-' + v4() + path.extname(filename);
+        const { uid } = req.session;
 
-        await User.update({ id: req.session.uid }, { profilePic: name });
+        user = await User.findOne(uid);
+
+        if(user && user.profilePic) {
+            const location = path.join(__dirname, `../../images/${user.profilePic}`);
+
+            fs.unlink(location, err => {
+                if(err) {
+                     console.log(err);
+                }
+            });
+        }
+        
+        await User.update({ id: uid }, { profilePic: name });
 
         return new Promise(async (resolve, reject) =>
             createReadStream()
@@ -185,6 +241,7 @@ export class UserResolver {
 
     @Mutation(() => UserResponse)
     async login(
+        @PubSub() pubsub: PubSubEngine,
         @Arg('username') username: string,
         @Arg('password') password: string,
         @Ctx() { req } : MyContext
@@ -210,6 +267,12 @@ export class UserResolver {
                 }]
             };
         }
+        
+        await User.update({ id: user.id }, { activeStatus: 2 });
+
+        await pubsub.publish(CHANGE_ACTIVE_STATUS_EVENT, {
+            userId: user.id
+        });
 
         req.session.uid = user.id;
         return { user };
@@ -217,6 +280,7 @@ export class UserResolver {
 
     @Mutation(() => UserResponse)
     async register(
+        @PubSub() pubsub: PubSubEngine,
         @Arg('username') username: string,
         @Arg('password') password: string,
         @Arg('email') email: string,
@@ -250,12 +314,19 @@ export class UserResolver {
             }
         }
 
+        await User.update({ id: user.id }, { activeStatus: 2 });
+
+        await pubsub.publish(CHANGE_ACTIVE_STATUS_EVENT, {
+            userId: user.id
+        });
+
         req.session.uid = user.id;
         return { user };
     }
 
     @Mutation(()=> UserResponse)
     async changePassword(
+        @PubSub() pubsub: PubSubEngine,
         @Arg('token') token: string,
         @Arg('newPassword') newPassword: string,
         @Ctx() { req, redis } : MyContext
@@ -284,12 +355,17 @@ export class UserResolver {
         }
 
         await User.update({ id: user.id }, { 
-            password: await argon2.hash(newPassword)
+            password: await argon2.hash(newPassword),
+            activeStatus: 2
         });
-        
-        await redis.del(token);
+    
+        await pubsub.publish(CHANGE_ACTIVE_STATUS_EVENT, {
+            userId: user.id
+        });
 
         req.session.uid = user.id;
+        await redis.del(token);
+
         return { user };
     }
 
@@ -339,17 +415,23 @@ export class UserResolver {
 
     @Mutation(() => Boolean)
     async setStatus(
-        @Arg('status') status: string,
-        @Ctx() {req}: MyContext
+        @PubSub() pubsub: PubSubEngine,
+        @Arg('status', () => Int) status: number,
+        @Ctx() { req }: MyContext
     ): Promise<boolean>{
         await getConnection().query(
             `
                 update "user"
-                set status = $1
+                set "activeStatus" = $1
                 where id = $2
             `,
             [status, req.session.uid]
         );
+
+        await pubsub.publish(CHANGE_ACTIVE_STATUS_EVENT, {
+            userId: req.session.uid
+        });
+
         return true;
     }
 }

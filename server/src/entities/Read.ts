@@ -1,6 +1,7 @@
 import{
     BaseEntity,
     PrimaryColumn,
+    Column,
     Entity
 } from "typeorm";
 
@@ -11,4 +12,7 @@ export class Read extends BaseEntity{
 
     @PrimaryColumn()
     userId: number;
+
+    @Column({ nullable: true })
+    isDM: boolean;
 }

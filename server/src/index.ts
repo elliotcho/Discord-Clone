@@ -46,17 +46,18 @@ const main = async () => {
 
     app.use(sessionMiddleware);
 
-    
     const apolloServer = new ApolloServer({
         schema: await createSchema(),
         uploads: { maxFileSize: 10000000, maxFiles: 10 },
-        context: ({ req, res }) => ({ req, res, redis }),
+        context: ({ req, res, connection }) => {
+            return ({ req, res, redis, connection });
+        },
         subscriptions: {
             path: '/subscriptions',
             onConnect: (_, ws: any) => {
                 return new Promise(res => 
-                    sessionMiddleware(ws.upgradReq, {} as any, () => {
-                        res({ req: ws.upgradReq });
+                    sessionMiddleware(ws.upgradeReq, {} as any, () => {
+                        res({ req: ws.upgradeReq });
                     })
                 );
             }

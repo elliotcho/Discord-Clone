@@ -48,8 +48,8 @@ const Navbar: React.FC<{}> = () => {
         } else {
             body = (
                 <>
-                    <NextLink href='/profile'>
-                        <Link>Profile</Link>
+                    <NextLink href='/friends'>
+                        <Link>Friends</Link>
                     </NextLink>
                 </>
             )
