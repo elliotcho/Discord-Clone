@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { gql } from '@apollo/client';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faCog } from '@fortawesome/free-solid-svg-icons';
@@ -116,6 +117,7 @@ const UserNav: React.FC<{}> = () => {
         });
     }
 
+    const userId = data?.me?.id;
     const profileURL = data?.me?.profileURL;
     const username = data?.me?.username;
 
@@ -143,8 +145,15 @@ const UserNav: React.FC<{}> = () => {
                                     await setStatus({
                                         variables: { status },
                                         update: (cache) => {
-                                            cache.evict({ fieldName: 'offlineMembers' });
-                                            cache.evict({ fieldName: 'onlineMembers' });
+                                            cache.writeFragment({
+                                                id: 'User:' + userId,
+                                                data: { activeStatus: status },
+                                                fragment: gql`
+                                                    fragment _ on User {
+                                                        activeStatus
+                                                    }
+                                                `
+                                            });
                                         }
                                     });
                                 }}

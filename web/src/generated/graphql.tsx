@@ -364,6 +364,7 @@ export type FieldError = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  newStatusUpdate?: Maybe<User>;
   newUserTypingMessage: Scalars['Boolean'];
   newMessage: Scalars['Boolean'];
   newUserTypingDm: Scalars['Boolean'];
@@ -997,6 +998,17 @@ export type NewUserTypingMessageSubscriptionVariables = Exact<{ [key: string]: n
 export type NewUserTypingMessageSubscription = (
   { __typename?: 'Subscription' }
   & Pick<Subscription, 'newUserTypingMessage'>
+);
+
+export type NewStatusUpdateSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NewStatusUpdateSubscription = (
+  { __typename?: 'Subscription' }
+  & { newStatusUpdate?: Maybe<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
 );
 
 export const RegularChannelFragmentDoc = gql`
@@ -2704,3 +2716,31 @@ export function useNewUserTypingMessageSubscription(baseOptions?: Apollo.Subscri
       }
 export type NewUserTypingMessageSubscriptionHookResult = ReturnType<typeof useNewUserTypingMessageSubscription>;
 export type NewUserTypingMessageSubscriptionResult = Apollo.SubscriptionResult<NewUserTypingMessageSubscription>;
+export const NewStatusUpdateDocument = gql`
+    subscription NewStatusUpdate {
+  newStatusUpdate {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useNewStatusUpdateSubscription__
+ *
+ * To run a query within a React component, call `useNewStatusUpdateSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewStatusUpdateSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewStatusUpdateSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewStatusUpdateSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewStatusUpdateSubscription, NewStatusUpdateSubscriptionVariables>) {
+        return Apollo.useSubscription<NewStatusUpdateSubscription, NewStatusUpdateSubscriptionVariables>(NewStatusUpdateDocument, baseOptions);
+      }
+export type NewStatusUpdateSubscriptionHookResult = ReturnType<typeof useNewStatusUpdateSubscription>;
+export type NewStatusUpdateSubscriptionResult = Apollo.SubscriptionResult<NewStatusUpdateSubscription>;

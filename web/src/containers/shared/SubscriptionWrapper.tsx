@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { useApolloClient } from '@apollo/client';
+import { gql, useApolloClient } from '@apollo/client';
 import {
     useNewMessageSubscription,
     useNewDirectMessageSubscription,
+    useNewStatusUpdateSubscription,
     useNewUserTypingMessageSubscription,
     useNewUserTypingDmSubscription
 } from '../../generated/graphql';   
@@ -11,18 +12,38 @@ const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
     const { cache } = useApolloClient();
     
     const { data: newDmData } = useNewDirectMessageSubscription();
-    const { data: newTypingDmData } = useNewUserTypingDmSubscription();
+    const { data: newStatusData } = useNewStatusUpdateSubscription();
     const { data: newTypingMessageData } = useNewUserTypingMessageSubscription();
+    const { data: newTypingDmData } = useNewUserTypingDmSubscription();
     const { data: newMessageData } = useNewMessageSubscription();
 
     const subscriptionData = [
         newDmData,
-        newTypingDmData,
+        newStatusData,
         newTypingMessageData,
+        newTypingDmData,
         newMessageData
     ];
 
     useEffect(() => {
+
+        if(newStatusData) {
+            alert("HI")
+
+            const user = newStatusData?.newStatusUpdate;
+            const activeStatus = user?.activeStatus;
+            const userId = user?.id;
+
+            cache.writeFragment({
+                id: 'User:' + userId,
+                data: { activeStatus },
+                fragment: gql`
+                    fragment _ on User {
+                        activeStatus
+                    }
+                `
+            });
+        }
 
         if(newDmData) {
             cache.evict({ fieldName: 'directMessages' });
