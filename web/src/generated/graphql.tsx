@@ -176,7 +176,6 @@ export type Mutation = {
   sendDmFile: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
-  updateRead: Scalars['Boolean'];
   removeFriend: Scalars['Boolean'];
   acceptFriendRequest: Scalars['Boolean'];
   cancelFriendRequest: Scalars['Boolean'];
@@ -314,11 +313,6 @@ export type MutationDeleteChannelArgs = {
 };
 
 
-export type MutationUpdateReadArgs = {
-  channelId: Scalars['Int'];
-};
-
-
 export type MutationRemoveFriendArgs = {
   friendId: Scalars['Int'];
 };
@@ -367,7 +361,7 @@ export type Subscription = {
 
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
-  & Pick<Channel, 'id' | 'name'>
+  & Pick<Channel, 'id' | 'isOriginal' | 'name'>
 );
 
 export type RegularMessageFragment = (
@@ -428,16 +422,6 @@ export type DeleteChannelMutationVariables = Exact<{
 export type DeleteChannelMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteChannel'>
-);
-
-export type UpdateReadMutationVariables = Exact<{
-  channelId: Scalars['Int'];
-}>;
-
-
-export type UpdateReadMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'updateRead'>
 );
 
 export type DeleteDirectMessageMutationVariables = Exact<{
@@ -995,6 +979,7 @@ export type NewStatusUpdateSubscription = (
 export const RegularChannelFragmentDoc = gql`
     fragment RegularChannel on Channel {
   id
+  isOriginal
   name
 }
     `;
@@ -1111,36 +1096,6 @@ export function useDeleteChannelMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannelMutation>;
 export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
 export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
-export const UpdateReadDocument = gql`
-    mutation UpdateRead($channelId: Int!) {
-  updateRead(channelId: $channelId)
-}
-    `;
-export type UpdateReadMutationFn = Apollo.MutationFunction<UpdateReadMutation, UpdateReadMutationVariables>;
-
-/**
- * __useUpdateReadMutation__
- *
- * To run a mutation, you first call `useUpdateReadMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateReadMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateReadMutation, { data, loading, error }] = useUpdateReadMutation({
- *   variables: {
- *      channelId: // value for 'channelId'
- *   },
- * });
- */
-export function useUpdateReadMutation(baseOptions?: Apollo.MutationHookOptions<UpdateReadMutation, UpdateReadMutationVariables>) {
-        return Apollo.useMutation<UpdateReadMutation, UpdateReadMutationVariables>(UpdateReadDocument, baseOptions);
-      }
-export type UpdateReadMutationHookResult = ReturnType<typeof useUpdateReadMutation>;
-export type UpdateReadMutationResult = Apollo.MutationResult<UpdateReadMutation>;
-export type UpdateReadMutationOptions = Apollo.BaseMutationOptions<UpdateReadMutation, UpdateReadMutationVariables>;
 export const DeleteDirectMessageDocument = gql`
     mutation DeleteDirectMessage($messageId: Int!) {
   deleteDirectMessage(messageId: $messageId)

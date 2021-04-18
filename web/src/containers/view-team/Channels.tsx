@@ -101,7 +101,6 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
             </Flex>
 
             {data?.channels?.map((c, i) => {
-                let route = `/view-team/${teamId}/${c.id}`;
                 let active = false;
 
                 if((i === 0 && channelId === -1) || (channelId === c.id)) {
@@ -112,7 +111,8 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
                     <Channel 
                         key = {c.id}
                         active = {active}
-                        route = {route}
+                        channelId = {c.id}
+                        teamId = {teamId}
                         {...c}
                     />
                 ) 

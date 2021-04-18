@@ -1,4 +1,5 @@
 fragment RegularChannel on Channel {
     id
+    isOriginal
     name 
 }
