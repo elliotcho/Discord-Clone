@@ -15,7 +15,6 @@ import { v4 } from 'uuid';
 import { getConnection } from "typeorm";
 import { DirectMessage } from "../entities/DirectMessage";
 import { User } from '../entities/User';
-import { Read } from "../entities/Read";
 import { filterSubscription } from '../utils/filterSubscription';
 import { 
     MyContext, 
@@ -32,22 +31,6 @@ const IS_TYPING_DM_PREFIX = 'IS_TYPING_DM_PREFIX';
 
 @Resolver(DirectMessage)
 export class DirectMessageResolver {
-    @FieldResolver()
-    async isRead(
-        @Root() dm : DirectMessage,
-        @Ctx() { req }: MyContext
-    ): Promise<boolean>{
-        const isRead = await Read.findOne({
-            where: {
-                messageId: dm.id,
-                userId: req.session.uid,
-                isDM: true
-            }
-        });
-
-        return !!isRead;
-    }
-
     @FieldResolver(() => User)
     async user(
         @Root() { senderId } : DirectMessage

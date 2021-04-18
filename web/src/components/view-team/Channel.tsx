@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog } from '@fortawesome/free-solid-svg-icons';
 import NextLink from 'next/link';
 
 const Container = styled.div`
@@ -10,6 +12,18 @@ const Container = styled.div`
     color: white;
     &:hover {
         background: #808080;
+    }
+`;
+
+const Box = styled.div`
+    margin-left: auto;
+`;  
+
+const Icon = styled.div`
+    color: #404040;
+
+    ${Box}:hover & {
+        color: #f2f2f2;
     }
 `;
 
@@ -34,6 +48,14 @@ const Channel: React.FC<ChannelProps> = ({
         <NextLink href={route}>
             <Container style={style}>
                 # {name}
+
+               <NextLink href='/channel-settings'>
+                <Box>
+                        <Icon>
+                            <FontAwesomeIcon icon = {faCog} />
+                        </Icon>
+                    </Box>
+                </NextLink>
             </Container> 
         </NextLink>
     )

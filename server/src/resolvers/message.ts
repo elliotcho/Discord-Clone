@@ -16,7 +16,6 @@ import { getConnection } from "typeorm";
 import { Message } from "../entities/Message";
 import { Channel } from "../entities/Channel";
 import { User } from '../entities/User';
-import { Read } from '../entities/Read';
 import { filterSubscription } from '../utils/filterSubscription';
 import { 
     GraphQLUpload, 
@@ -32,24 +31,6 @@ const NEW_MESSAGE_EVENT = 'NEW_MESSAGE_EVENT';
 
 @Resolver(Message)
 export class MessageResolver {
-    @FieldResolver()
-    async isRead(
-        @Root() message: Message,
-        @Ctx() { req } : MyContext
-    ) : Promise<boolean> {
-        const isDM = false;
-        
-        const isRead = await Read.findOne({
-            where: {
-                userId: req.session.uid,
-                messageId: message.id,
-                isDM
-            }
-        });
-
-        return !!isRead;
-    } 
-
     @FieldResolver()
     async pic(
         @Root() message: Message

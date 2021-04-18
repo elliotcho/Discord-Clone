@@ -4,6 +4,5 @@ Home Page
 Read receipts for messages
 Read receipts for dms 
 
-Unfriend button
 Channel Settings
 Team Settings

@@ -37,6 +37,7 @@ const Dropdown = styled.div`
     display: none;
     min-width: 160px;
     position: absolute;
+    border-radius: 11px;
     background: #000;
     color: red;
     bottom: -25px;

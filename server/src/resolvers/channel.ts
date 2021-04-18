@@ -1,11 +1,9 @@
-import { MyContext } from "src/types";
 import { 
     Resolver,
     Query, 
     Arg,
     Int,
-    Mutation,
-    Ctx
+    Mutation
 } from "type-graphql";
 import { getConnection } from "typeorm";
 import { Channel } from "../entities/Channel";
@@ -55,21 +53,5 @@ export class ChannelResolver {
         @Arg('channelId', () => Int) channelId: number
     ) : Promise<Channel | undefined> {
         return Channel.findOne(channelId)
-    }
-
-    @Mutation(() => Boolean)
-    async updateRead(
-        @Arg('channelId', () => Int) channelId: number,
-        @Ctx() { req }: MyContext
-    ): Promise<boolean>{
-        await getConnection().query(
-            `
-                insert into read ("channelId", "userId")
-                VALUES($1, $2)
-            `,
-            [channelId, req.session.uid]
-        );
-        
-        return true;
     }
 }
