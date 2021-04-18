@@ -88,6 +88,10 @@ const Input = styled.input`
     display: none;
 `;
 
+const Div = styled.div`
+    width: 100%;
+`;
+
 const ProfileCard: React.FC<{}> = () => {
     const { data } = useMeQuery({
         skip: isServer()

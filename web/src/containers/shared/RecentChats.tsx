@@ -22,14 +22,14 @@ const RecentChats : React.FC<{}> = () => {
                     router.push(path);
                 }
 
-                return (
+                return u.friendStatus == 2 && (
                     <UserCard
                         key = {u.id}
                         handleClick = {handleClick}
                         showStatus = {true}
                         {...u}
                     /> 
-                )
+                );
             })}
 
             <UserNav />

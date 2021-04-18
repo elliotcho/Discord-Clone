@@ -110,7 +110,7 @@ const UserNav: React.FC<{}> = () => {
     if(!isServer()) {
         window.addEventListener('click', function(e: any){
             if(!document.getElementById('status-dropdown')?.contains(e.target)
-                && !document.getElementById('icon')?.contains(e.target)
+                && !document.getElementById('chevron-icon')?.contains(e.target)
             ) {
                 setIsOpen(false);
             }
@@ -127,7 +127,7 @@ const UserNav: React.FC<{}> = () => {
                 <Image src={profileURL} alt='user'/>
 
                 <Icon 
-                    id='icon' 
+                    id='chevron-icon' 
                     onClick={() => setIsOpen(true)}
                     style = {{ color: iconColor }}
                 >

@@ -24,7 +24,6 @@ const Dropdown = styled.div`
     position: absolute;
     background: #000;
     color: white;
-    box-shadow: 0 0 5px black;
     right: 25px;
     top: 55px;
     ${Box}:hover & {

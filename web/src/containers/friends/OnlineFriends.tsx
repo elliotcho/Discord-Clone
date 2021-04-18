@@ -1,13 +1,17 @@
 import React from 'react';
+import { gql } from '@apollo/client';
 import styled from 'styled-components';
-import { useOnlineFriendsQuery } from '../../generated/graphql';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { useOnlineFriendsQuery, useRemoveFriendMutation } from '../../generated/graphql';
 import FriendCard from '../shared/FriendCard';
 import NextLink from 'next/link';
 
-const Button = styled.button`
+const ButtonStyles = `
     color: #f2f2f2;
     padding: 10px;
     margin-right: 15px;
+    border-radius: 11px;
     background: #737373;
     font-size: 1.1rem;
     cursor: pointer;
@@ -17,15 +21,50 @@ const Button = styled.button`
     &:hover {
         background: #999;
     }
+`
+
+const Button = styled.button`
+    ${ButtonStyles}
+`;
+
+const Icon = styled.button`
+    ${ButtonStyles}
+`;
+
+
+const Dropdown = styled.div`
+    z-index: 1;
+    display: none;
+    min-width: 160px;
+    position: absolute;
+    background: #000;
+    color: white;
+    bottom: -25px;
+    right: 30px;
+
+    ${Icon}:hover & {
+        display: block;
+    }
+`;
+
+const Option = styled.div`
+    margin: 12px;
+    padding: 10px;
+    display: flex;
+    &:hover {
+        background: red;
+        color: #f2f2f2;
+    }
 `;
 
 const Friends: React.FC<{}> =() => {
     const { data } = useOnlineFriendsQuery();
+    const [removeFriend] = useRemoveFriendMutation();
 
     return (
         <>
             {data?.onlineFriends?.map(u =>
-               !!u.activeStatus && (
+               !!u.activeStatus && u.friendStatus === 2 && (
                     <FriendCard 
                         key = {u.id}
                         activeStatus = {u.activeStatus}
@@ -37,6 +76,31 @@ const Friends: React.FC<{}> =() => {
                                 Message
                             </Button>
                         </NextLink>
+
+                        <Icon>
+                            <FontAwesomeIcon icon={faEllipsisV}/>
+    
+                            <Dropdown
+                                onClick = {async () => {
+                                    await removeFriend({
+                                        variables: { friendId: u.id },
+                                        update: (cache) => {
+                                            cache.writeFragment({
+                                                id: 'User:' + u.id,
+                                                data: { friendStatus: 0 },
+                                                fragment: gql`
+                                                    fragment _ on User {
+                                                        friendStatus
+                                                    }
+                                                `
+                                            });
+                                        }
+                                    })
+                                }}
+                            >
+                                <Option>Remove Friend</Option>
+                            </Dropdown>
+                        </Icon>
                     </FriendCard>
                )
             )}
