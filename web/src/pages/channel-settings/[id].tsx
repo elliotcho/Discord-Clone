@@ -17,7 +17,6 @@ const Container = styled.div`
 
 const ChannelSettings : React.FC<{}> =() => {
     const router = useRouter();
-    
     let channel = router.query.id as string;
     let channelId = parseInt(channel);
 
@@ -26,16 +25,25 @@ const ChannelSettings : React.FC<{}> =() => {
         skip: !channelId
     });
 
+    const isOwner = !!data?.channel?.isOwner;
+    const isOriginal = !!data?.channel?.isOriginal;
+    const name = data?.channel?.name || '';
+
     return (
         <AuthWrapper requiresAuth>
              <Container>
                 <Sidebar 
-                    isOriginal = {!!data?.channel?.isOriginal}
-                    channelId={channelId}
+                    isOwner = {isOwner}
+                    isOriginal={isOriginal}
+                    channelId={channelId} 
                 />
                 
                 <>
-                    <Overview />
+                    <Overview 
+                        isOwner = {isOwner}
+                        channelId={channelId} 
+                        name={name}
+                    />
                 </>
 
                 <EscapeColumn />

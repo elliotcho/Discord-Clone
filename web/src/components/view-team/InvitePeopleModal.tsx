@@ -12,6 +12,12 @@ const Header = styled.h2`
     color: #404040;
 `;
 
+const Text = styled.div`
+    padding: 15px;
+    font-size: 1.3rem;
+    color: #404040;
+`;
+
 const Button = styled.button`
     color: #fff;
     padding: 5px 10px;
@@ -78,6 +84,12 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
                                 +
                             </Button>
                         </FriendCard>
+                    )}
+
+                    {!data?.invitees.length && (
+                        <Text>
+                            No users available
+                        </Text>
                     )}
                 </Container>
         </Modal>

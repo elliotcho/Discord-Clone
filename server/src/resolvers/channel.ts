@@ -3,13 +3,45 @@ import {
     Query, 
     Arg,
     Int,
-    Mutation
+    Mutation,
+    Ctx,
+    FieldResolver,
+    Root
 } from "type-graphql";
 import { getConnection } from "typeorm";
 import { Channel } from "../entities/Channel";
+import { Team } from '../entities/Team';
+import { MyContext } from "../types";
 
 @Resolver(Channel)
 export class ChannelResolver {
+    @FieldResolver(() => Boolean)
+    async isOwner(
+        @Root() { teamId } : Channel,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const team = await Team.findOne(teamId);
+        const ownerId = team?.ownerId;
+
+        return req.session.uid === ownerId;
+    }
+
+    @Mutation(() => Boolean)
+    async editChannelName(
+        @Arg('channelId', () => Int) channelId: number,
+        @Arg('newName') newName: string
+    ) : Promise<boolean> {
+        const channel = await Channel.findOne(channelId);
+        const { name } = channel!;
+
+        if(name === newName) {
+            return false;
+        }
+
+        await Channel.update({ id: channelId }, { name: newName });
+        return true;
+    }
+
     @Query(() => [Channel])
     async channels(
         @Arg('teamId', () => Int) teamId: number

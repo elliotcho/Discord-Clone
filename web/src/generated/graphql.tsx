@@ -121,6 +121,7 @@ export type Channel = {
   teamId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  isOwner: Scalars['Boolean'];
 };
 
 export type Message = {
@@ -174,6 +175,7 @@ export type Mutation = {
   sendDirectMessage: Scalars['Boolean'];
   deleteDirectMessage: Scalars['Boolean'];
   sendDmFile: Scalars['Boolean'];
+  editChannelName: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
   removeFriend: Scalars['Boolean'];
@@ -302,6 +304,12 @@ export type MutationSendDmFileArgs = {
 };
 
 
+export type MutationEditChannelNameArgs = {
+  newName: Scalars['String'];
+  channelId: Scalars['Int'];
+};
+
+
 export type MutationCreateChannelArgs = {
   teamId: Scalars['Int'];
   channelName: Scalars['String'];
@@ -361,7 +369,7 @@ export type Subscription = {
 
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
-  & Pick<Channel, 'id' | 'isOriginal' | 'name'>
+  & Pick<Channel, 'id' | 'isOriginal' | 'isOwner' | 'name'>
 );
 
 export type RegularMessageFragment = (
@@ -422,6 +430,17 @@ export type DeleteChannelMutationVariables = Exact<{
 export type DeleteChannelMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteChannel'>
+);
+
+export type EditChannelNameMutationVariables = Exact<{
+  channelId: Scalars['Int'];
+  newName: Scalars['String'];
+}>;
+
+
+export type EditChannelNameMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'editChannelName'>
 );
 
 export type DeleteDirectMessageMutationVariables = Exact<{
@@ -980,6 +999,7 @@ export const RegularChannelFragmentDoc = gql`
     fragment RegularChannel on Channel {
   id
   isOriginal
+  isOwner
   name
 }
     `;
@@ -1096,6 +1116,37 @@ export function useDeleteChannelMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannelMutation>;
 export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
 export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
+export const EditChannelNameDocument = gql`
+    mutation EditChannelName($channelId: Int!, $newName: String!) {
+  editChannelName(channelId: $channelId, newName: $newName)
+}
+    `;
+export type EditChannelNameMutationFn = Apollo.MutationFunction<EditChannelNameMutation, EditChannelNameMutationVariables>;
+
+/**
+ * __useEditChannelNameMutation__
+ *
+ * To run a mutation, you first call `useEditChannelNameMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditChannelNameMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editChannelNameMutation, { data, loading, error }] = useEditChannelNameMutation({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *      newName: // value for 'newName'
+ *   },
+ * });
+ */
+export function useEditChannelNameMutation(baseOptions?: Apollo.MutationHookOptions<EditChannelNameMutation, EditChannelNameMutationVariables>) {
+        return Apollo.useMutation<EditChannelNameMutation, EditChannelNameMutationVariables>(EditChannelNameDocument, baseOptions);
+      }
+export type EditChannelNameMutationHookResult = ReturnType<typeof useEditChannelNameMutation>;
+export type EditChannelNameMutationResult = Apollo.MutationResult<EditChannelNameMutation>;
+export type EditChannelNameMutationOptions = Apollo.BaseMutationOptions<EditChannelNameMutation, EditChannelNameMutationVariables>;
 export const DeleteDirectMessageDocument = gql`
     mutation DeleteDirectMessage($messageId: Int!) {
   deleteDirectMessage(messageId: $messageId)

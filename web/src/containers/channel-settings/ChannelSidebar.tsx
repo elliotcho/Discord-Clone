@@ -32,11 +32,16 @@ const Li = styled.li`
 `;
 
 interface ChannelSidebarProps {
+    isOwner: boolean;
     isOriginal: boolean;
     channelId: number;
 }
 
-const ChannelSidebar: React.FC<ChannelSidebarProps> = ({ isOriginal, channelId }) => {
+const ChannelSidebar: React.FC<ChannelSidebarProps> = ({ 
+    isOwner,
+    isOriginal, 
+    channelId 
+}) => {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [deleteChannel] = useDeleteChannelMutation();
     const router = useRouter();
@@ -45,7 +50,7 @@ const ChannelSidebar: React.FC<ChannelSidebarProps> = ({ isOriginal, channelId }
         <Container>
             <Box>
                 <Ul>
-                    {!isOriginal && (
+                    {!isOriginal && isOwner && (
                         <Li 
                             style={{ color: '#e60000'}}
                             onClick = {() => {
