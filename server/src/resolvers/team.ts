@@ -33,6 +33,20 @@ export class TeamResolver {
     }
 
     @Mutation(() => Boolean)
+    async editTeamName(
+        @Arg('teamId', () => Int) teamId: number,
+        @Arg('newName') newName: string
+    ) : Promise<boolean> {
+        try {
+            await Team.update({ id: teamId }, { name: newName });
+        } catch {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
     async deleteTeam(
         @Arg('teamId', () => Int) teamId: number
     ) : Promise<boolean> {

@@ -132,7 +132,6 @@ export type Message = {
   pic: Scalars['String'];
   senderId: Scalars['Float'];
   channelId: Scalars['Float'];
-  isRead: Scalars['Boolean'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   user: User;
@@ -146,7 +145,6 @@ export type DirectMessage = {
   senderId: Scalars['Float'];
   receiverId: Scalars['Float'];
   user: User;
-  isRead: Scalars['Boolean'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
 };
@@ -162,6 +160,7 @@ export type Mutation = {
   forgotPassword: Scalars['Boolean'];
   changeUsername: Scalars['Boolean'];
   setStatus: Scalars['Boolean'];
+  editTeamName: Scalars['Boolean'];
   deleteTeam: Scalars['Boolean'];
   addMember: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
@@ -224,6 +223,12 @@ export type MutationChangeUsernameArgs = {
 
 export type MutationSetStatusArgs = {
   status: Scalars['Int'];
+};
+
+
+export type MutationEditTeamNameArgs = {
+  newName: Scalars['String'];
+  teamId: Scalars['Int'];
 };
 
 
@@ -382,7 +387,7 @@ export type RegularChannelFragment = (
 
 export type RegularMessageFragment = (
   { __typename?: 'Message' }
-  & Pick<Message, 'id' | 'text' | 'createdAt' | 'isRead' | 'pic'>
+  & Pick<Message, 'id' | 'text' | 'createdAt' | 'pic'>
   & { user: (
     { __typename?: 'User' }
     & RegularUserFragment
@@ -661,6 +666,17 @@ export type DeleteTeamMutation = (
   & Pick<Mutation, 'deleteTeam'>
 );
 
+export type EditTeamNameMutationVariables = Exact<{
+  teamId: Scalars['Int'];
+  newName: Scalars['String'];
+}>;
+
+
+export type EditTeamNameMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'editTeamName'>
+);
+
 export type ChangePasswordMutationVariables = Exact<{
   token: Scalars['String'];
   newPassword: Scalars['String'];
@@ -795,7 +811,7 @@ export type DirectMessagesQuery = (
   { __typename?: 'Query' }
   & { directMessages: Array<(
     { __typename?: 'DirectMessage' }
-    & Pick<DirectMessage, 'id' | 'text' | 'createdAt' | 'senderId' | 'isRead' | 'pic'>
+    & Pick<DirectMessage, 'id' | 'text' | 'createdAt' | 'senderId' | 'pic'>
     & { user: (
       { __typename?: 'User' }
       & RegularUserFragment
@@ -1042,7 +1058,6 @@ export const RegularMessageFragmentDoc = gql`
   id
   text
   createdAt
-  isRead
   pic
   user {
     ...RegularUser
@@ -1778,6 +1793,37 @@ export function useDeleteTeamMutation(baseOptions?: Apollo.MutationHookOptions<D
 export type DeleteTeamMutationHookResult = ReturnType<typeof useDeleteTeamMutation>;
 export type DeleteTeamMutationResult = Apollo.MutationResult<DeleteTeamMutation>;
 export type DeleteTeamMutationOptions = Apollo.BaseMutationOptions<DeleteTeamMutation, DeleteTeamMutationVariables>;
+export const EditTeamNameDocument = gql`
+    mutation EditTeamName($teamId: Int!, $newName: String!) {
+  editTeamName(teamId: $teamId, newName: $newName)
+}
+    `;
+export type EditTeamNameMutationFn = Apollo.MutationFunction<EditTeamNameMutation, EditTeamNameMutationVariables>;
+
+/**
+ * __useEditTeamNameMutation__
+ *
+ * To run a mutation, you first call `useEditTeamNameMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditTeamNameMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editTeamNameMutation, { data, loading, error }] = useEditTeamNameMutation({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *      newName: // value for 'newName'
+ *   },
+ * });
+ */
+export function useEditTeamNameMutation(baseOptions?: Apollo.MutationHookOptions<EditTeamNameMutation, EditTeamNameMutationVariables>) {
+        return Apollo.useMutation<EditTeamNameMutation, EditTeamNameMutationVariables>(EditTeamNameDocument, baseOptions);
+      }
+export type EditTeamNameMutationHookResult = ReturnType<typeof useEditTeamNameMutation>;
+export type EditTeamNameMutationResult = Apollo.MutationResult<EditTeamNameMutation>;
+export type EditTeamNameMutationOptions = Apollo.BaseMutationOptions<EditTeamNameMutation, EditTeamNameMutationVariables>;
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($token: String!, $newPassword: String!) {
   changePassword(token: $token, newPassword: $newPassword) {
@@ -2129,7 +2175,6 @@ export const DirectMessagesDocument = gql`
     text
     createdAt
     senderId
-    isRead
     pic
     user {
       ...RegularUser

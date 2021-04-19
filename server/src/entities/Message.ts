@@ -4,9 +4,11 @@ import{
     Column,
     CreateDateColumn,
     Entity,
+    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
+import { Channel } from './Channel';
 
 @ObjectType()
 @Entity()
@@ -31,8 +33,10 @@ export class Message extends BaseEntity{
     @Column()
     channelId: number;
 
-    @Field()
-    isRead: boolean;
+    @ManyToOne(() => Channel, (channel) => channel.messages, {
+        onDelete: 'CASCADE'
+    })
+    channel: Channel;
 
     @Field(() => String)
     @CreateDateColumn()

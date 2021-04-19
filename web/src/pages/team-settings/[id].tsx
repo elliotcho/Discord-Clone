@@ -4,6 +4,7 @@ import { useTeamQuery } from '../../generated/graphql';
 import { withApollo } from '../../utils/withApollo';
 import AuthWrapper from '../../containers/shared/AuthWrapper';
 import Sidebar from '../../containers/team-settings/TeamSidebar';
+import Overview from '../../containers/team-settings/TeamOverview';
 import EscapeColumn from '../../containers/shared/EscapeColumn';
 import { useRouter } from 'next/router';
 
@@ -25,14 +26,21 @@ const TeamSettings : React.FC<{}> =() => {
     });
 
     const isOwner = !!data?.team?.isOwner;
+    const name = data?.team?.name || '';
 
     return (
         <AuthWrapper requiresAuth>
              <Container>
                 <Sidebar teamId={teamId} isOwner={isOwner} />
 
-                <div style={{background: '#4d4d4d'}}></div>
-               
+                <>
+                    <Overview
+                        teamId = {teamId}
+                        isOwner = {isOwner}
+                        name = {name}
+                    />
+                </>
+
                 <EscapeColumn />
             </Container>
         </AuthWrapper>

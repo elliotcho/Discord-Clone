@@ -1,0 +1,3 @@
+mutation EditTeamName($teamId: Int!, $newName: String!) {
+    editTeamName(teamId: $teamId, newName: $newName)
+}

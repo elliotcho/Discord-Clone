@@ -5,9 +5,11 @@ import {
     CreateDateColumn, 
     Entity, 
     ManyToOne, 
+    OneToMany, 
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
+import { Message } from './Message';
 import { Team } from './Team';
 
 @ObjectType()
@@ -33,6 +35,9 @@ export class Channel extends BaseEntity {
         onDelete: 'CASCADE'
     })
     team: Team;
+
+    @OneToMany(() => Message, (message) => message.channel)
+    messages: Message[];
 
     @Field()
     @CreateDateColumn()
