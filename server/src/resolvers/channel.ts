@@ -28,13 +28,13 @@ export class ChannelResolver {
 
     @Mutation(() => Boolean)
     async editChannelName(
+        @Arg('teamId', () => Int) teamId: number,
         @Arg('channelId', () => Int) channelId: number,
         @Arg('newName') newName: string
     ) : Promise<boolean> {
-        const channel = await Channel.findOne(channelId);
-        const { name } = channel!;
+        const channels = await Channel.find({ teamId, name: newName });
 
-        if(name === newName) {
+        if(!!channels.length) {
             return false;
         }
 

@@ -43,12 +43,14 @@ const Button = styled.button`
 interface ChannelNameProps {
     isOwner: boolean;
     channelId: number;
+    teamId: number;
     name: string;
 }
 
 const ChannelName: React.FC<ChannelNameProps> = ({
     isOwner,
     channelId, 
+    teamId,
     name
 }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -82,17 +84,19 @@ const ChannelName: React.FC<ChannelNameProps> = ({
                 onClose = {() => setIsOpen(false)}
                 onSave = {async (newName: string) => {
                     await editChannelName({
-                        variables: { channelId, newName },
-                        update: (cache) => {
-                            cache.writeFragment({
-                                id: 'Channel:' + channelId,
-                                data: { name: newName },
-                                fragment: gql`
-                                    fragment _ on Channel {
-                                        name
-                                    }
-                                `
-                            });
+                        variables: { channelId, teamId, newName },
+                        update: (cache, { data }) => {
+                            if(data?.editChannelName) {
+                                cache.writeFragment({
+                                    id: 'Channel:' + channelId,
+                                    data: { name: newName },
+                                    fragment: gql`
+                                        fragment _ on Channel {
+                                            name
+                                        }
+                                    `
+                                });
+                            }
                         }
                     });
                 }}

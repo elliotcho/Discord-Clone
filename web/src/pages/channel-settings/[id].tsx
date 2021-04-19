@@ -27,6 +27,7 @@ const ChannelSettings : React.FC<{}> =() => {
 
     const isOwner = !!data?.channel?.isOwner;
     const isOriginal = !!data?.channel?.isOriginal;
+    const teamId = data?.channel?.teamId || -1;
     const name = data?.channel?.name || '';
 
     return (
@@ -36,12 +37,14 @@ const ChannelSettings : React.FC<{}> =() => {
                     isOwner = {isOwner}
                     isOriginal={isOriginal}
                     channelId={channelId} 
+                    teamId={teamId}
                 />
                 
                 <>
                     <Overview 
                         isOwner = {isOwner}
                         channelId={channelId} 
+                        teamId={teamId}
                         name={name}
                     />
                 </>

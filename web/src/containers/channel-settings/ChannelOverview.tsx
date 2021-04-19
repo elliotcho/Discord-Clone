@@ -19,12 +19,14 @@ const Header = styled.h3`
 interface ChannelOverviewProps {
     isOwner: boolean;
     channelId: number;
+    teamId: number;
     name: string;
 }
 
 const ChannelOverview: React.FC<ChannelOverviewProps> = ({
     isOwner,
     channelId, 
+    teamId,
     name
 }) => {
     return (
@@ -35,6 +37,7 @@ const ChannelOverview: React.FC<ChannelOverviewProps> = ({
                 <ChannelName 
                     isOwner = {isOwner}
                     channelId = {channelId}
+                    teamId = {teamId}
                     name = {name}
                 />
             </Wrapper>

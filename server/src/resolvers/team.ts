@@ -17,6 +17,14 @@ import { MyContext } from "../types";
 
 @Resolver(Team)
 export class TeamResolver {
+    @FieldResolver(() => Boolean) 
+    isOwner(
+        @Root() { ownerId } : Team,
+        @Ctx() { req } : MyContext
+    ) : boolean {
+        return ownerId === req.session.uid;
+    }
+
     @FieldResolver(() => [Channel])
     async channels(
         @Root() team: Team

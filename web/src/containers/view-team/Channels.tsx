@@ -8,6 +8,7 @@ import InvitePeopleModal from '../../components/view-team/InvitePeopleModal';
 import EditModal from '../../components/shared/EditModal';
 import Channel from '../../components/view-team/Channel';
 import UserNav from '../../components/shared/UserNav';
+import { useRouter } from 'next/router';
 
 const Container = styled.div`
     position: relative;
@@ -55,13 +56,19 @@ const Option = styled.div`
 interface ChannelsProps {
     teamId: number;
     channelId: number;
+    isOwner: boolean;
 }
 
-const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
+const Channels: React.FC<ChannelsProps> = ({ 
+    teamId, 
+    channelId,
+    isOwner
+}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [openCreateChannel, setOpenCreateChannel] = useState(false);
     const [invitePeople, setInvitePeople] = useState(false);
     const [createChannel] = useCreateChannelMutation();
+    const router = useRouter();
 
     const { data } = useChannelsQuery({ 
         variables: { teamId },
@@ -88,12 +95,20 @@ const Channels: React.FC<ChannelsProps> = ({ teamId, channelId }) => {
 
                     {isOpen && (
                         <Dropdown id='channel-dropdown'>
-                            <Option onClick={() => setOpenCreateChannel(true)}>
-                                Create Channel
-                            </Option>
+                            {isOwner && (
+                                <>
+                                    <Option onClick={() => setInvitePeople(true)}>
+                                        Invite People
+                                    </Option>
 
-                            <Option onClick={() => setInvitePeople(true)}>
-                                Invite People
+                                    <Option onClick={() => setOpenCreateChannel(true)}>
+                                        Create Channel
+                                    </Option>
+                                </>
+                            )}
+
+                            <Option onClick={() => router.push(`/team-settings/${teamId}`)}>
+                                Team Settings
                             </Option>
                         </Dropdown>
                     )}

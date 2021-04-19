@@ -110,6 +110,7 @@ export type Team = {
   ownerId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  isOwner: Scalars['Boolean'];
   channels: Array<Channel>;
 };
 
@@ -307,6 +308,7 @@ export type MutationSendDmFileArgs = {
 export type MutationEditChannelNameArgs = {
   newName: Scalars['String'];
   channelId: Scalars['Int'];
+  teamId: Scalars['Int'];
 };
 
 
@@ -369,7 +371,7 @@ export type Subscription = {
 
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
-  & Pick<Channel, 'id' | 'isOriginal' | 'isOwner' | 'name'>
+  & Pick<Channel, 'id' | 'isOriginal' | 'teamId' | 'isOwner' | 'name'>
 );
 
 export type RegularMessageFragment = (
@@ -383,7 +385,7 @@ export type RegularMessageFragment = (
 
 export type RegularTeamFragment = (
   { __typename?: 'Team' }
-  & Pick<Team, 'id' | 'name'>
+  & Pick<Team, 'id' | 'name' | 'isOwner'>
   & { channels: Array<(
     { __typename?: 'Channel' }
     & Pick<Channel, 'id'>
@@ -434,6 +436,7 @@ export type DeleteChannelMutation = (
 
 export type EditChannelNameMutationVariables = Exact<{
   channelId: Scalars['Int'];
+  teamId: Scalars['Int'];
   newName: Scalars['String'];
 }>;
 
@@ -999,6 +1002,7 @@ export const RegularChannelFragmentDoc = gql`
     fragment RegularChannel on Channel {
   id
   isOriginal
+  teamId
   isOwner
   name
 }
@@ -1033,6 +1037,7 @@ export const RegularTeamFragmentDoc = gql`
     fragment RegularTeam on Team {
   id
   name
+  isOwner
   channels {
     id
   }
@@ -1117,8 +1122,8 @@ export type DeleteChannelMutationHookResult = ReturnType<typeof useDeleteChannel
 export type DeleteChannelMutationResult = Apollo.MutationResult<DeleteChannelMutation>;
 export type DeleteChannelMutationOptions = Apollo.BaseMutationOptions<DeleteChannelMutation, DeleteChannelMutationVariables>;
 export const EditChannelNameDocument = gql`
-    mutation EditChannelName($channelId: Int!, $newName: String!) {
-  editChannelName(channelId: $channelId, newName: $newName)
+    mutation EditChannelName($channelId: Int!, $teamId: Int!, $newName: String!) {
+  editChannelName(channelId: $channelId, teamId: $teamId, newName: $newName)
 }
     `;
 export type EditChannelNameMutationFn = Apollo.MutationFunction<EditChannelNameMutation, EditChannelNameMutationVariables>;
@@ -1137,6 +1142,7 @@ export type EditChannelNameMutationFn = Apollo.MutationFunction<EditChannelNameM
  * const [editChannelNameMutation, { data, loading, error }] = useEditChannelNameMutation({
  *   variables: {
  *      channelId: // value for 'channelId'
+ *      teamId: // value for 'teamId'
  *      newName: // value for 'newName'
  *   },
  * });

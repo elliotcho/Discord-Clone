@@ -35,12 +35,14 @@ interface ChannelSidebarProps {
     isOwner: boolean;
     isOriginal: boolean;
     channelId: number;
+    teamId: number;
 }
 
 const ChannelSidebar: React.FC<ChannelSidebarProps> = ({ 
     isOwner,
     isOriginal, 
-    channelId 
+    channelId,
+    teamId
 }) => {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [deleteChannel] = useDeleteChannelMutation();
@@ -75,7 +77,7 @@ const ChannelSidebar: React.FC<ChannelSidebarProps> = ({
                         }
                     });
 
-                    router.back();
+                    router.push(`/view-team/${teamId}`);
                 }}
             />
         </Container>

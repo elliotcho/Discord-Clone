@@ -1,6 +1,7 @@
 fragment RegularTeam on Team {
     id
     name
+    isOwner
     channels {
         id
     }
