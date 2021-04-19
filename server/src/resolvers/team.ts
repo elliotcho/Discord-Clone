@@ -32,6 +32,19 @@ export class TeamResolver {
         return Channel.find({ teamId: team.id });
     }
 
+    @Mutation(() => Boolean)
+    async deleteTeam(
+        @Arg('teamId', () => Int) teamId: number
+    ) : Promise<boolean> {
+        try {
+            await Team.delete({ id: teamId });
+        } catch {
+            return false;
+        }
+
+        return true;
+    }
+
     @Query(() => [User])
     async invitees(
         @Arg('teamId', () => Int) teamId: number,
