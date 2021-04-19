@@ -1,0 +1,3 @@
+mutation RemoveTeamPhoto($teamId: Int!) {
+    removeTeamPhoto(teamId: $teamId)
+}

@@ -12,18 +12,33 @@ const Container = styled.div`
     padding: 20px 20px;
 `;
 
-const TeamIcon = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    background: #333;
-    color: #fff;
-    font-size: 24px;
+const IconStyles = `
     border-radius: 11px;
     margin-bottom: 20px;
     cursor: pointer;
+    height: 50px;
+    width: 50px;
+`;
+
+const Image = styled.img`
+    ${IconStyles}
+
+    &:hover {
+        border: 2px solid black;
+        box-sizing: border-box;
+    }
+`;
+
+const TeamIcon = styled.div`
+    ${IconStyles}
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #333;
+    color: #fff;
+    font-size: 24px;
+
     &:hover {
        background: #a6a6a6;
     }
@@ -45,6 +60,14 @@ const Teams: React.FC<{}> = () => {
 
                 {data?.teams?.map(t => {
                     const route = `/view-team/${t.id}`;
+
+                    if(t.photo) {
+                        return (
+                            <NextLink key={t.id} href={route}>
+                                <Image src={t.photo} alt='team photo' />
+                            </NextLink>
+                        )
+                    }
                     
                     return (
                         <NextLink key={t.id} href={route}>
@@ -75,7 +98,7 @@ const Teams: React.FC<{}> = () => {
                 />
             </Container>
         </SubscriptionWrapper>
-    )
+    );
 }
 
 export default Teams;

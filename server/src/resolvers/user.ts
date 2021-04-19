@@ -244,7 +244,7 @@ export class UserResolver {
            .pipe(createWriteStream(path.join(__dirname, `../../images/${name}`)))
            .on('finish', () => resolve(true))
            .on('error', () => reject(false))
-        )
+        );
     }
 
     @Mutation(() => UserResponse)

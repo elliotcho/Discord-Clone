@@ -25,6 +25,10 @@ export class Team extends BaseEntity {
     @Column()
     ownerId: number;
 
+    @Field()
+    @Column({ default: '' })
+    photo: string;
+
     @OneToMany(() => Channel, (channel) => channel.team)
     channels: Channel[];
 

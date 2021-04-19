@@ -1,17 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { 
-    useMeQuery,
-    useUpdateProfilePicMutation,
-    useRemoveProfilePicMutation
-} from '../../generated/graphql';
-import { isServer } from '../../utils/isServer';
+import { useUpdateTeamPhotoMutation, useRemoveTeamPhotoMutation } from '../../generated/graphql';
 
 const Container = styled.div`
     display: flex;
     position: relative;
+    align-items: center;
     background: #262626;
-    min-height: 160px;
+    min-height: 100px;
     padding: 12px;
 `;
 
@@ -20,14 +16,21 @@ const ImageWrapper = styled.div`
 `;
 
 const Image = styled.img`
-    border-radius: 50%;
+    border-radius: 11px;
     height: 5rem;
     width: 5rem;
 `;
 
-const Header = styled.h2`
-    margin-left: 25px;
-    color: #f2f2f2;
+const Icon = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #bfbfbf;
+    border-radius: 11px;
+    font-size: 24px;
+    color: #4d4d4d;
+    height: 5rem;
+    width: 5rem;
 `;
 
 const Box = styled.div`
@@ -42,7 +45,6 @@ const Button = styled.button`
     cursor: pointer;
     outline: none;
     color: #f2f2f2;
-    margin: 15px;
     padding: 5px;
     &:hover {
         background: #999;
@@ -72,12 +74,12 @@ const Update = styled.div`
     cursor: pointer;
     text-align: center;
     position: absolute;
-    border-bottom-left-radius: 75px;
-    border-bottom-right-radius: 75px;
+    border-bottom-left-radius: 11px;
+    border-bottom-right-radius: 11px;
     background: #d9d9d9;
     height: 2.5rem;
     width: 5rem;
-    top: 53px;
+    top: 60px;
 
     ${ImageWrapper}:hover & {
         display: block;
@@ -88,43 +90,70 @@ const Input = styled.input`
     display: none;
 `;
 
-const ProfileCard: React.FC<{}> = () => {
-    const { data } = useMeQuery({
-        skip: isServer()
-    });
+interface TeamPhotoProps {
+    teamId: number;
+    isOwner: boolean;
+    photo: string;
+    name: string;
+}
 
-    const [updatePic] = useUpdateProfilePicMutation();
-    const [removePic] = useRemoveProfilePicMutation();
+const TeamPhoto: React.FC<TeamPhotoProps> = ({
+    teamId,
+    isOwner,
+    photo,
+    name
+}) => {
+    let cursor = isOwner? 'pointer' : 'auto';
 
-    const hasProfilePic = !!data?.me?.profilePic;
-    const profileURL = data?.me?.profileURL;
-    const username = data?.me?.username;
+    const [updatePic] = useUpdateTeamPhotoMutation();
+    const [removePic] = useRemoveTeamPhotoMutation();
 
     const openFile = (e: any) => {
         e.preventDefault();
 
         document
-            .getElementById('profilePic')
+            .getElementById('teamPhoto')
                 .click();
     };
 
     return (
         <Container>
-            <ImageWrapper onClick = {openFile}>  
-                <Image src={profileURL} alt='pic'/>
+           {photo && (
+                <ImageWrapper 
+                    style = {{ cursor }}
+                    onClick={openFile}
+                >  
+                    <Image src={photo} alt='pic'/>
 
-                <Update>
-                    Update
-                </Update>
-            </ImageWrapper>
+                    <Update>
+                        Update
+                    </Update>
+                </ImageWrapper>
+           )}
+
+           {!photo && (
+               <ImageWrapper 
+                    style={{ cursor }}
+                    onClick={openFile}
+                >
+                   <Icon>
+                        {name[0].toUpperCase()}
+                    </Icon>
+
+                    <Update>
+                        Update
+                    </Update>
+               </ImageWrapper>
+           )}
 
 
-            {hasProfilePic && (
+            {photo && (
                 <Remove
                     onClick = {async () => {
                         await removePic({
+                            variables: { teamId },
                             update: (cache) => {
-                                cache.evict({ fieldName: 'me' });
+                                cache.evict({ id: 'Team:' + teamId });
                             }
                         })
                     }}
@@ -133,10 +162,6 @@ const ProfileCard: React.FC<{}> = () => {
                 </Remove>
             )}
 
-            <Header>
-                {username}
-            </Header>
-
             <Box>
                 <Button onClick={openFile}>
                     Upload
@@ -144,15 +169,15 @@ const ProfileCard: React.FC<{}> = () => {
             </Box>
 
             <Input 
-                id='profilePic'
+                id='teamPhoto'
                 type = 'file'
                 onChange = {async (e) => {
                     const file = e.target.files[0];
 
                     await updatePic({
-                        variables: { file },
+                        variables: { file, teamId },
                         update: cache => {
-                            cache.evict({ fieldName: 'me' });
+                            cache.evict({ id: 'Team:' + teamId });
                         }
                     })
                 }}
@@ -161,4 +186,4 @@ const ProfileCard: React.FC<{}> = () => {
     )
 }
 
-export default ProfileCard;
+export default TeamPhoto;

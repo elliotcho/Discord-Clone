@@ -108,6 +108,7 @@ export type Team = {
   id: Scalars['Float'];
   name: Scalars['String'];
   ownerId: Scalars['Float'];
+  photo: Scalars['String'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   isOwner: Scalars['Boolean'];
@@ -160,6 +161,8 @@ export type Mutation = {
   forgotPassword: Scalars['Boolean'];
   changeUsername: Scalars['Boolean'];
   setStatus: Scalars['Boolean'];
+  removeTeamPhoto: Scalars['Boolean'];
+  updateTeamPhoto: Scalars['Boolean'];
   editTeamName: Scalars['Boolean'];
   deleteTeam: Scalars['Boolean'];
   addMember: Scalars['Boolean'];
@@ -223,6 +226,17 @@ export type MutationChangeUsernameArgs = {
 
 export type MutationSetStatusArgs = {
   status: Scalars['Int'];
+};
+
+
+export type MutationRemoveTeamPhotoArgs = {
+  teamId: Scalars['Int'];
+};
+
+
+export type MutationUpdateTeamPhotoArgs = {
+  teamId: Scalars['Int'];
+  file: Scalars['Upload'];
 };
 
 
@@ -396,7 +410,7 @@ export type RegularMessageFragment = (
 
 export type RegularTeamFragment = (
   { __typename?: 'Team' }
-  & Pick<Team, 'id' | 'name' | 'isOwner'>
+  & Pick<Team, 'id' | 'name' | 'isOwner' | 'photo'>
   & { channels: Array<(
     { __typename?: 'Channel' }
     & Pick<Channel, 'id'>
@@ -675,6 +689,27 @@ export type EditTeamNameMutationVariables = Exact<{
 export type EditTeamNameMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'editTeamName'>
+);
+
+export type RemoveTeamPhotoMutationVariables = Exact<{
+  teamId: Scalars['Int'];
+}>;
+
+
+export type RemoveTeamPhotoMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'removeTeamPhoto'>
+);
+
+export type UpdateTeamPhotoMutationVariables = Exact<{
+  file: Scalars['Upload'];
+  teamId: Scalars['Int'];
+}>;
+
+
+export type UpdateTeamPhotoMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'updateTeamPhoto'>
 );
 
 export type ChangePasswordMutationVariables = Exact<{
@@ -1069,6 +1104,7 @@ export const RegularTeamFragmentDoc = gql`
   id
   name
   isOwner
+  photo
   channels {
     id
   }
@@ -1824,6 +1860,67 @@ export function useEditTeamNameMutation(baseOptions?: Apollo.MutationHookOptions
 export type EditTeamNameMutationHookResult = ReturnType<typeof useEditTeamNameMutation>;
 export type EditTeamNameMutationResult = Apollo.MutationResult<EditTeamNameMutation>;
 export type EditTeamNameMutationOptions = Apollo.BaseMutationOptions<EditTeamNameMutation, EditTeamNameMutationVariables>;
+export const RemoveTeamPhotoDocument = gql`
+    mutation RemoveTeamPhoto($teamId: Int!) {
+  removeTeamPhoto(teamId: $teamId)
+}
+    `;
+export type RemoveTeamPhotoMutationFn = Apollo.MutationFunction<RemoveTeamPhotoMutation, RemoveTeamPhotoMutationVariables>;
+
+/**
+ * __useRemoveTeamPhotoMutation__
+ *
+ * To run a mutation, you first call `useRemoveTeamPhotoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveTeamPhotoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeTeamPhotoMutation, { data, loading, error }] = useRemoveTeamPhotoMutation({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useRemoveTeamPhotoMutation(baseOptions?: Apollo.MutationHookOptions<RemoveTeamPhotoMutation, RemoveTeamPhotoMutationVariables>) {
+        return Apollo.useMutation<RemoveTeamPhotoMutation, RemoveTeamPhotoMutationVariables>(RemoveTeamPhotoDocument, baseOptions);
+      }
+export type RemoveTeamPhotoMutationHookResult = ReturnType<typeof useRemoveTeamPhotoMutation>;
+export type RemoveTeamPhotoMutationResult = Apollo.MutationResult<RemoveTeamPhotoMutation>;
+export type RemoveTeamPhotoMutationOptions = Apollo.BaseMutationOptions<RemoveTeamPhotoMutation, RemoveTeamPhotoMutationVariables>;
+export const UpdateTeamPhotoDocument = gql`
+    mutation UpdateTeamPhoto($file: Upload!, $teamId: Int!) {
+  updateTeamPhoto(file: $file, teamId: $teamId)
+}
+    `;
+export type UpdateTeamPhotoMutationFn = Apollo.MutationFunction<UpdateTeamPhotoMutation, UpdateTeamPhotoMutationVariables>;
+
+/**
+ * __useUpdateTeamPhotoMutation__
+ *
+ * To run a mutation, you first call `useUpdateTeamPhotoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateTeamPhotoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateTeamPhotoMutation, { data, loading, error }] = useUpdateTeamPhotoMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useUpdateTeamPhotoMutation(baseOptions?: Apollo.MutationHookOptions<UpdateTeamPhotoMutation, UpdateTeamPhotoMutationVariables>) {
+        return Apollo.useMutation<UpdateTeamPhotoMutation, UpdateTeamPhotoMutationVariables>(UpdateTeamPhotoDocument, baseOptions);
+      }
+export type UpdateTeamPhotoMutationHookResult = ReturnType<typeof useUpdateTeamPhotoMutation>;
+export type UpdateTeamPhotoMutationResult = Apollo.MutationResult<UpdateTeamPhotoMutation>;
+export type UpdateTeamPhotoMutationOptions = Apollo.BaseMutationOptions<UpdateTeamPhotoMutation, UpdateTeamPhotoMutationVariables>;
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($token: String!, $newPassword: String!) {
   changePassword(token: $token, newPassword: $newPassword) {

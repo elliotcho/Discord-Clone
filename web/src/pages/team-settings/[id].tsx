@@ -25,8 +25,9 @@ const TeamSettings : React.FC<{}> =() => {
         skip: !teamId
     });
 
+    const photo = data?.team?.photo;
+    const name = data?.team?.name || 'Loading...';
     const isOwner = !!data?.team?.isOwner;
-    const name = data?.team?.name || '';
 
     return (
         <AuthWrapper requiresAuth>
@@ -37,6 +38,7 @@ const TeamSettings : React.FC<{}> =() => {
                     <Overview
                         teamId = {teamId}
                         isOwner = {isOwner}
+                        photo = {photo}
                         name = {name}
                     />
                 </>

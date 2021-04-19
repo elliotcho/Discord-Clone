@@ -219,7 +219,7 @@ export class MessageResolver {
     @Mutation(() => Boolean)
     async sendFile(
         @PubSub() pubsub: PubSubEngine,
-        @Arg('file', () => GraphQLUpload) {createReadStream, filename}: Upload,
+        @Arg('file', () => GraphQLUpload) { createReadStream, filename }: Upload,
         @Arg('channelId', () => Int) channelId: number,
         @Ctx() { req }: MyContext
     ): Promise<boolean>{
@@ -249,7 +249,7 @@ export class MessageResolver {
            .pipe(createWriteStream(path.join(__dirname, `../../images/${name}`)))
            .on('finish', () => resolve(true))
            .on('error', () => reject(false))
-        )
+        );
     }
 
     @Mutation(() => Boolean)

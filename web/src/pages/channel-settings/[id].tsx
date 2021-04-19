@@ -28,7 +28,7 @@ const ChannelSettings : React.FC<{}> =() => {
     const isOwner = !!data?.channel?.isOwner;
     const isOriginal = !!data?.channel?.isOriginal;
     const teamId = data?.channel?.teamId || -1;
-    const name = data?.channel?.name || '';
+    const name = data?.channel?.name || 'Loading...';
 
     return (
         <AuthWrapper requiresAuth>

@@ -8,15 +8,33 @@ import {
     Resolver, 
     Root
 } from "type-graphql";
+import { v4 } from 'uuid';
 import { getConnection } from "typeorm";
 import { Member } from "../entities/Member";
 import { Channel } from '../entities/Channel';
 import { Team } from "../entities/Team";
 import { User } from '../entities/User';
-import { MyContext } from "../types";
+import { 
+    MyContext,
+    GraphQLUpload,
+    Upload
+} from "../types";
+import fs, { createWriteStream } from 'fs';
+import path from 'path';
 
 @Resolver(Team)
 export class TeamResolver {
+    @FieldResolver(() => String)
+    async photo (
+        @Root() team: Team
+    ) : Promise<string> {
+        if(team && team.photo) {
+            return `${process.env.SERVER_URL}/images/${team.photo}`;
+        }
+
+        return '';
+    }
+
     @FieldResolver(() => Boolean) 
     isOwner(
         @Root() { ownerId } : Team,
@@ -30,6 +48,55 @@ export class TeamResolver {
         @Root() team: Team
     ) : Promise<Channel[]> {
         return Channel.find({ teamId: team.id });
+    }
+
+    @Mutation(() => Boolean)
+    async removeTeamPhoto(
+        @Arg('teamId', () => Int) teamId: number
+    ) : Promise<boolean> {
+        const team = await Team.findOne(teamId);
+
+        if(team?.photo) {
+            const location = path.join(__dirname, `../../images/${team.photo}`);
+
+            fs.unlink(location, err => {
+                if(err) {
+                    console.log(err);
+                }
+            });
+
+            await Team.update({ id: teamId }, { photo: '' });
+        }
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async updateTeamPhoto(
+        @Arg('file', () => GraphQLUpload) { createReadStream, filename }: Upload,
+        @Arg('teamId', () => Int) teamId: number,
+    ) : Promise<boolean> {
+        const team = await Team.findOne(teamId);
+        const name = 'TEAM-' + v4() + path.extname(filename);
+
+        if(team?.photo) {
+            const location = path.join(__dirname, `../../images/${team.photo}`);
+
+            fs.unlink(location, err => {
+                if(err) {
+                     console.log(err);
+                }
+            });
+        }
+        
+        await Team.update({ id: teamId }, { photo: name });
+
+        return new Promise(async (resolve, reject) =>
+            createReadStream()
+            .pipe(createWriteStream(path.join(__dirname, `../../images/${name}`)))
+            .on('finish', () => resolve(true))
+            .on('error', () => reject(false))
+        );
     }
 
     @Mutation(() => Boolean)

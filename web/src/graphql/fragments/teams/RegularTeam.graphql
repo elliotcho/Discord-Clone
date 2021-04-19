@@ -2,6 +2,7 @@ fragment RegularTeam on Team {
     id
     name
     isOwner
+    photo
     channels {
         id
     }

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import TeamName from '../../components/team-settings/TeamName';
+import TeamPhoto from '../../components/team-settings/TeamPhoto';
 
 const Container = styled.div`
     background: #4d4d4d;
@@ -19,12 +20,14 @@ const Header = styled.h3`
 interface TeamOverviewProps {
     isOwner: boolean;
     teamId: number;
+    photo: string;
     name: string;
 }
 
 const ChannelOverview: React.FC<TeamOverviewProps> = ({
     isOwner,
     teamId,
+    photo,
     name
 }) => {
     return (
@@ -35,6 +38,13 @@ const ChannelOverview: React.FC<TeamOverviewProps> = ({
                 <TeamName
                     teamId = {teamId}
                     isOwner = {isOwner}
+                    name = {name}
+                />
+
+                <TeamPhoto 
+                    teamId = {teamId}
+                    isOwner = {isOwner}
+                    photo = {photo}
                     name = {name}
                 />
             </Wrapper>
