@@ -34,10 +34,10 @@ const Header = styled.h1`
 const Text = styled.div`
     ${TextStyles}
 
-    font-size: 2.2rem;
+    font-size: 2.0rem;
     max-width: 600px;
 
-    @media screen and (max-width: 1000px) {
+    @media screen and (max-width: 1050px) {
        display: none;
    }
 `;
