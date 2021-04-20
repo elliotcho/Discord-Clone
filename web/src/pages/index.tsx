@@ -1,12 +1,13 @@
 import React from 'react';
+import styled from 'styled-components';
 import { withApollo } from '../utils/withApollo';
-import Navbar from '../components/shared/Navbar';
+import Layout from '../containers/shared/AuthLayout';
 
 const Index : React.FC<{}> = () => {
   return (
-    <>
-      <Navbar />
-    </>
+     <Layout>
+
+     </Layout>
   )
 }
 

@@ -3,13 +3,14 @@ import styled from 'styled-components';
 
 const Container = styled.div`
     width: 40%;
-    margin: 60px auto;
     padding: 1.2rem;
-    border-radius: 16px;
+    margin: 60px auto;
+    height: fit-content;
     text-align: center;
+    border-radius: 16px;
     font-family: 'Caveat', cursive;
-    font-size: 21px;
     word-spacing: 2px;
+    font-size: 21px;
     color: #000000;
 `;
 

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Form, Formik } from 'formik';
 import { useForgotPasswordMutation } from '../generated/graphql'
 import { withApollo } from '../utils/withApollo';
-import AuthWrapper from '../containers/shared/AuthWrapper';
 import Layout from '../containers/shared/AuthLayout';
 import FormContainer from '../containers/auth/FormContainer';
 import InputField from '../components/auth/InputField';
