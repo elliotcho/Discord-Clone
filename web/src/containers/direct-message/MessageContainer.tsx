@@ -33,12 +33,14 @@ const MessageContainer: React.FC<MessageContainerProps> = ({ userId: receiverId 
 
     useEffect(() => {
         const onMount = async () => {
-            await readDms({
-                variables: { userId: receiverId },
-                update: (cache) => {
-                    cache.evict({ fieldName: 'unreadChats' });
-                }
-            })
+            if(!!receiverId) {
+                await readDms({
+                    variables: { userId: receiverId },
+                    update: (cache) => {
+                        cache.evict({ fieldName: 'unreadChats' });
+                    }
+                });
+            }
         }
 
         onMount();

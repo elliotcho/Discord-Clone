@@ -203,8 +203,6 @@ export class DirectMessageResolver {
                     and (d."receiverId" = $1 or d."senderId" = $1) 
 
                 ) as latest from "user" as u 
-                inner join friend as f on (f."receiverId" = u.id or f."senderId" = u.id)
-                where (f."receiverId" = $1 or f."senderId" = $1)
                 order by latest DESC 
                 limit 5
             `, 

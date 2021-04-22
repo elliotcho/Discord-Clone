@@ -93,7 +93,7 @@ const UserCard: React.FC<UserCardProps> = ({
 
     if(!!handleClick) {
         return (
-            <DefaultCard>
+            <DefaultCard onClick={handleClick}> 
                 {body}
             </DefaultCard>
         )

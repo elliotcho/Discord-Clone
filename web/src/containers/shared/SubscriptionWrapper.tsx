@@ -45,22 +45,24 @@ const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
             });
         }
 
-        if(newDmData) {
-            cache.evict({ fieldName: 'directMessages' });
+        if(newTypingMessageData) {
+            cache.evict({ fieldName: 'usersTypingMessage' });
         }
 
         if(newTypingDmData) {
             cache.evict({ fieldName: 'userTypingDm' });
         }
 
-        if(newTypingMessageData) {
-            cache.evict({ fieldName: 'usersTypingMessage' });
-        }
-
         if(newMessageData) {
             cache.evict({ fieldName: 'channels' });
             cache.evict({ fieldName: 'messages' });
             cache.evict({ fieldName: 'teams' });
+        }
+
+        if(newDmData) {
+            cache.evict({ fieldName: 'recentChats' });
+            cache.evict({ fieldName: 'directMessages' });
+            cache.evict({ fieldName: 'unreadChats' });
         }
 
         if(newReadReceiptData) {
