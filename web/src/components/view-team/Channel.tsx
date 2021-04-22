@@ -18,6 +18,7 @@ const Icon = styled.div`
 
 const Container = styled.div`
     padding: 5px;
+    position: relative;
     padding-left: 10px;
     display: flex;
     cursor: pointer;
@@ -28,18 +29,30 @@ const Container = styled.div`
     }
 `;
 
+const Marker = styled.div`
+    background: #ccc;
+    position: absolute;
+    border-top-right-radius: 11px;
+    border-bottom-right-radius: 11px;
+    height: 20px;
+    width: 5px;
+    left: 0px;
+`;
+
 interface ChannelProps {
-    channelId: number;
-    teamId: number;
-    active: boolean;
     name: string;
+    teamId: number;
+    channelId: number;
+    isRead: boolean;
+    active: boolean;
 }
 
 const Channel: React.FC<ChannelProps> = ({
-    channelId,
+    name,
     teamId,
-    active,
-    name
+    channelId,
+    isRead,
+    active
 }) => {
     let style = {};
    
@@ -56,12 +69,16 @@ const Channel: React.FC<ChannelProps> = ({
                 # {name}
 
                <NextLink href={settingsRoute}>
-                <Box>
+                    <Box>
                         <Icon>
                             <FontAwesomeIcon icon = {faCog} />
                         </Icon>
                     </Box>
                 </NextLink>
+
+                {!active && !isRead && (
+                    <Marker />
+                )}
             </Container> 
         </NextLink>
     )

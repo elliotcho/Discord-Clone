@@ -9,12 +9,33 @@ import {
     Root
 } from "type-graphql";
 import { getConnection } from "typeorm";
+import { Message } from '../entities/Message';
 import { Channel } from "../entities/Channel";
 import { Team } from '../entities/Team';
+import { Read } from '../entities/Read';
 import { MyContext } from "../types";
 
 @Resolver(Channel)
 export class ChannelResolver {
+    @FieldResolver(() => Boolean) 
+    async isRead(
+        @Root() { id: channelId } : Channel,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const messages = await Message.find({ where: { channelId } });
+
+        for(let i=0;i<messages.length;i++) {
+            const isRead = await Read.findOne({ where: {
+                messageId: messages[i].id,
+                userId: req.session.uid
+            }});
+
+            if(!isRead) return false;
+        }
+
+        return true;
+    }
+
     @FieldResolver(() => Boolean)
     async isOwner(
         @Root() { teamId } : Channel,

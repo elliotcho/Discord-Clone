@@ -130,6 +130,7 @@ export type Channel = {
   teamId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  isRead: Scalars['Boolean'];
   isOwner: Scalars['Boolean'];
 };
 
@@ -416,7 +417,7 @@ export type Subscription = {
 
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
-  & Pick<Channel, 'id' | 'isOriginal' | 'teamId' | 'isOwner' | 'name'>
+  & Pick<Channel, 'id' | 'isOriginal' | 'isRead' | 'teamId' | 'isOwner' | 'name'>
 );
 
 export type RegularMessageFragment = (
@@ -1155,6 +1156,7 @@ export const RegularChannelFragmentDoc = gql`
     fragment RegularChannel on Channel {
   id
   isOriginal
+  isRead
   teamId
   isOwner
   name
