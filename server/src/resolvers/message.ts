@@ -201,13 +201,23 @@ export class MessageResolver {
         const channel = await Channel.findOne(channelId);
         const teamId = channel?.teamId;
 
-        await getConnection().query(
-            `
-             insert into message ("channelId", "senderId", text)
-             values ($1, $2, $3)
-            `, 
-            [channelId, req.session.uid, text]
-        );
+        await getConnection().transaction(async tm => {
+            await tm.query(
+                `
+                 insert into message ("channelId", "senderId", text)
+                 values ($1, $2, $3)
+                `, 
+                [channelId, req.session.uid, text]
+            );
+    
+            await tm.query(
+                `
+                    delete from seen as s
+                    where s."userId" != $1 and
+                    s."teamId" = $2
+                `, [req.session.uid, teamId]
+            );
+        });
 
         await pubsub.publish(NEW_MESSAGE_EVENT, {
             senderId: req.session.uid,
@@ -280,14 +290,24 @@ export class MessageResolver {
 
         const name = 'MESSAGE-' +v4() + path.extname(filename);
 
-        await getConnection().query(
-            `
-             insert into message ("channelId", "senderId", pic)
-             values ($1, $2, $3)
-            `, 
-            [channelId, req.session.uid, name]
-        );
-
+        await getConnection().transaction(async (tm) => {
+            await tm.query(
+                `
+                 insert into message ("channelId", "senderId", pic)
+                 values ($1, $2, $3)
+                `, 
+                [channelId, req.session.uid, name]
+            );
+    
+            await tm.query(
+                `
+                    delete from seen as s
+                    where s."userId" != $1 and
+                    s."teamId" = $2
+                `, [req.session.uid, teamId]
+            );    
+        })
+   
         await pubsub.publish(NEW_MESSAGE_EVENT, {
             senderId: req.session.uid,
             receiverId: channelId,

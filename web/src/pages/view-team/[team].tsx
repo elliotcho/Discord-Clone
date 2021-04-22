@@ -14,6 +14,7 @@ import { useRouter } from 'next/router';
 const Container = styled.div`
     height: 100vh;
     grid-template-columns: 100px 250px 1fr 250px;
+    overflow-x: hidden;
     display: grid;
 `;
 

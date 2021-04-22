@@ -83,7 +83,7 @@ export class TeamResolver {
                 userId: req.session.uid,
             }});
 
-            if(!!isRead) total++;
+            if(!isRead) total++;
         }
 
         return total;

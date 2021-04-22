@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { useTeamsQuery, useCreateTeamMutation } from '../../generated/graphql';
+import { formatCount } from '../../utils/formatCount';
 import SubscriptionWrapper from '../../containers/shared/SubscriptionWrapper';
 import EditModal from './EditModal';
 import NextLink from 'next/link';
@@ -13,6 +14,7 @@ const Container = styled.div`
 `;
 
 const IconStyles = `
+    position: relative;
     border-radius: 11px;
     margin-bottom: 20px;
     cursor: pointer;
@@ -22,9 +24,10 @@ const IconStyles = `
 
 const Image = styled.img`
     ${IconStyles}
+    position: fixed;
 
     &:hover {
-        border: 2px solid black;
+        border: 1px solid #fff;
         box-sizing: border-box;
     }
 `;
@@ -42,6 +45,18 @@ const TeamIcon = styled.div`
     &:hover {
        background: #a6a6a6;
     }
+`;
+
+const Box = styled.div`
+   color: white;
+   background: orangered;
+   border-radius: 11px;
+   position: absolute;
+   font-size: 0.8rem;
+   font-weight: bold;
+   padding: 2px 5px;
+   right: -5px;
+   top: -5px;
 `;
 
 const Teams: React.FC<{}> = () => {
@@ -64,7 +79,15 @@ const Teams: React.FC<{}> = () => {
                     if(t.photo) {
                         return (
                             <NextLink key={t.id} href={route}>
-                                <Image src={t.photo} alt='team photo' />
+                                <TeamIcon>
+                                    <Image src={t.photo} alt='team photo' />
+
+                                    {!!t.unreadMessages && (
+                                        <Box>
+                                            {formatCount(t.unreadMessages)}
+                                        </Box>
+                                    )}
+                                </TeamIcon>
                             </NextLink>
                         )
                     }
@@ -73,6 +96,12 @@ const Teams: React.FC<{}> = () => {
                         <NextLink key={t.id} href={route}>
                             <TeamIcon>
                                 {t.name[0].toUpperCase()}
+
+                                {!!t.unreadMessages && (
+                                    <Box>
+                                        {formatCount(t.unreadMessages)}
+                                    </Box>
+                                )}
                             </TeamIcon>
                         </NextLink>   
                     )
