@@ -28,6 +28,7 @@ import fs, { createWriteStream } from 'fs';
 import path from 'path';
 
 const IS_TYPING_MESSAGE_PREFIX = 'IS_TYPING_MESSAGE_PREFIX';
+const NEW_READ_RECEIPT_EVENT = 'NEW_READ_RECEIPT_EVENT';
 const NEW_TYPING_MESSAGE_EVENT = 'NEW_TYPING_MESSAGE_EVENT';
 const NEW_MESSAGE_EVENT = 'NEW_MESSAGE_EVENT';
 
@@ -67,12 +68,46 @@ export class MessageResolver {
         return true;
     }
 
+    @Subscription(() => Boolean, {
+        topics: NEW_READ_RECEIPT_EVENT,
+        filter: filterSubscription
+    })
+    newReadReceipt() : boolean {
+        return true;
+    }
+
+    @Query(() => [User])
+    async readReceipts(
+        @Arg('messageId', () => Int) messageId: Number,
+        @Ctx() { req } : MyContext
+    ): Promise<User[]> {
+        const readReceipts = await getConnection().query(
+            `
+                select u.* from "user" as u
+                inner join read as r on r."userId" = u.id
+                where r."messageId" = $1 and u.id != $2
+            `, [messageId, req.session.uid]
+        );
+
+        return readReceipts;
+    }
+
     @Mutation(() => Boolean)
     async readChannelMessages(
+        @PubSub() pubsub: PubSubEngine,
         @Arg('channelId', () => Int) channelId: number,
         @Ctx() { req } : MyContext
     ) : Promise<boolean> {
-        const messages = await Message.find({ where: { channelId } });
+        const { uid } = req.session;
+        const channel = await Channel.findOne(channelId);
+        const teamId = channel?.teamId;
+     
+        const messages = await getConnection().query(
+            `
+                select m.* from message as m
+                where m."channelId" = $1
+            `, [channelId]
+        )
 
         for(let i=0;i<messages.length;i++) {
             const { id: messageId } = messages[i];
@@ -85,12 +120,19 @@ export class MessageResolver {
             if(!isRead) {
                 await getConnection().query(
                     `
-                        insert into read ("userId", "messageId")
+                        insert into read ("messageId", "userId")
                         values ($1, $2)
-                    `, [req.session.uid, messageId]
+                    `, [messageId, uid]
                 );
             }
         }
+
+        await pubsub.publish(NEW_READ_RECEIPT_EVENT, {
+            senderId: uid,
+            receiverId: channelId,
+            isDm: false,
+            teamId
+        });
 
         return true;
     }

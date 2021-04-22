@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import { useChannelsQuery, useCreateChannelMutation } from '../../generated/graphql';
+import { 
+    useChannelsQuery, 
+    useCreateChannelMutation,
+    useSeeTeamMessagesMutation
+} from '../../generated/graphql';
 import { isServer } from '../../utils/isServer';
 import InvitePeopleModal from '../../components/view-team/InvitePeopleModal';
 import EditModal from '../../components/shared/EditModal';
@@ -67,6 +71,8 @@ const Channels: React.FC<ChannelsProps> = ({
     const [isOpen, setIsOpen] = useState(false);
     const [openCreateChannel, setOpenCreateChannel] = useState(false);
     const [invitePeople, setInvitePeople] = useState(false);
+
+    const [seeTeamMessages] = useSeeTeamMessagesMutation();
     const [createChannel] = useCreateChannelMutation();
     const router = useRouter();
 
@@ -84,6 +90,21 @@ const Channels: React.FC<ChannelsProps> = ({
             }
         });
     }
+
+    useEffect(() => {
+        const onMount = async () => {
+            if(teamId) {
+                await seeTeamMessages({
+                    variables: { teamId },
+                    update: (cache) => {
+                        cache.evict({ fieldName: 'teams' });
+                    }
+                });
+            }
+        }
+
+        onMount();
+    }, [data])
 
     return (
         <Container>

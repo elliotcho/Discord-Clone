@@ -37,13 +37,16 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ channelId }) => {
         const onMount = async () => {
             if(channelId) {
                  await readChannelMessages({
-                     variables: { channelId }
+                     variables: { channelId },
+                     update: (cache) => {
+                         cache.evict({ fieldName: 'channels' });
+                     }
                  });
             }
         }
 
         onMount();
-    }, [data])
+    }, [data, channelId])
 
     return (
         <Container>
