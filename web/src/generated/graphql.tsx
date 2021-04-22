@@ -620,6 +620,26 @@ export type EditMessageMutation = (
   & Pick<Mutation, 'editMessage'>
 );
 
+export type ReadChannelMessagesMutationVariables = Exact<{
+  channelId: Scalars['Int'];
+}>;
+
+
+export type ReadChannelMessagesMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'readChannelMessages'>
+);
+
+export type SeeTeamMessagesMutationVariables = Exact<{
+  teamId: Scalars['Int'];
+}>;
+
+
+export type SeeTeamMessagesMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'seeTeamMessages'>
+);
+
 export type SendFileMutationVariables = Exact<{
   file: Scalars['Upload'];
   channelId: Scalars['Int'];
@@ -1630,6 +1650,66 @@ export function useEditMessageMutation(baseOptions?: Apollo.MutationHookOptions<
 export type EditMessageMutationHookResult = ReturnType<typeof useEditMessageMutation>;
 export type EditMessageMutationResult = Apollo.MutationResult<EditMessageMutation>;
 export type EditMessageMutationOptions = Apollo.BaseMutationOptions<EditMessageMutation, EditMessageMutationVariables>;
+export const ReadChannelMessagesDocument = gql`
+    mutation ReadChannelMessages($channelId: Int!) {
+  readChannelMessages(channelId: $channelId)
+}
+    `;
+export type ReadChannelMessagesMutationFn = Apollo.MutationFunction<ReadChannelMessagesMutation, ReadChannelMessagesMutationVariables>;
+
+/**
+ * __useReadChannelMessagesMutation__
+ *
+ * To run a mutation, you first call `useReadChannelMessagesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReadChannelMessagesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [readChannelMessagesMutation, { data, loading, error }] = useReadChannelMessagesMutation({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useReadChannelMessagesMutation(baseOptions?: Apollo.MutationHookOptions<ReadChannelMessagesMutation, ReadChannelMessagesMutationVariables>) {
+        return Apollo.useMutation<ReadChannelMessagesMutation, ReadChannelMessagesMutationVariables>(ReadChannelMessagesDocument, baseOptions);
+      }
+export type ReadChannelMessagesMutationHookResult = ReturnType<typeof useReadChannelMessagesMutation>;
+export type ReadChannelMessagesMutationResult = Apollo.MutationResult<ReadChannelMessagesMutation>;
+export type ReadChannelMessagesMutationOptions = Apollo.BaseMutationOptions<ReadChannelMessagesMutation, ReadChannelMessagesMutationVariables>;
+export const SeeTeamMessagesDocument = gql`
+    mutation SeeTeamMessages($teamId: Int!) {
+  seeTeamMessages(teamId: $teamId)
+}
+    `;
+export type SeeTeamMessagesMutationFn = Apollo.MutationFunction<SeeTeamMessagesMutation, SeeTeamMessagesMutationVariables>;
+
+/**
+ * __useSeeTeamMessagesMutation__
+ *
+ * To run a mutation, you first call `useSeeTeamMessagesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSeeTeamMessagesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [seeTeamMessagesMutation, { data, loading, error }] = useSeeTeamMessagesMutation({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useSeeTeamMessagesMutation(baseOptions?: Apollo.MutationHookOptions<SeeTeamMessagesMutation, SeeTeamMessagesMutationVariables>) {
+        return Apollo.useMutation<SeeTeamMessagesMutation, SeeTeamMessagesMutationVariables>(SeeTeamMessagesDocument, baseOptions);
+      }
+export type SeeTeamMessagesMutationHookResult = ReturnType<typeof useSeeTeamMessagesMutation>;
+export type SeeTeamMessagesMutationResult = Apollo.MutationResult<SeeTeamMessagesMutation>;
+export type SeeTeamMessagesMutationOptions = Apollo.BaseMutationOptions<SeeTeamMessagesMutation, SeeTeamMessagesMutationVariables>;
 export const SendFileDocument = gql`
     mutation SendFile($file: Upload!, $channelId: Int!) {
   sendFile(file: $file, channelId: $channelId)

@@ -52,6 +52,7 @@ const FriendCard: React.FC<FriendCardProps> = ({
 }) => {
     let color = '';
     let dimensions = '';
+    let minWidth = '400px';
     let fontSize = '';
     let margin = '';
 
@@ -71,13 +72,14 @@ const FriendCard: React.FC<FriendCardProps> = ({
 
     switch(size) {
         case 'sm':
+            minWidth = '';
             dimensions = '2rem';
             fontSize = '0.8rem';
             margin = '0';
     }
 
     return (
-        <Card style = {{ margin }}>
+        <Card style = {{ margin, minWidth }}>
             <Image 
                 src={profileURL} 
                 alt='profile pic'

@@ -57,6 +57,7 @@ const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
 
         if(newMessageData) {
             cache.evict({ fieldName: 'messages' });
+            cache.evict({ fieldName: 'teams' });
         }
 
     }, subscriptionData);
