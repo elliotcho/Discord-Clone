@@ -14,6 +14,8 @@ import { Member } from "../entities/Member";
 import { Channel } from '../entities/Channel';
 import { Team } from "../entities/Team";
 import { User } from '../entities/User';
+import { Read } from '../entities/Read';
+import { Seen } from '../entities/Seen';
 import { 
     MyContext,
     GraphQLUpload,
@@ -48,6 +50,43 @@ export class TeamResolver {
         @Root() team: Team
     ) : Promise<Channel[]> {
         return Channel.find({ teamId: team.id });
+    }
+
+    @FieldResolver(() => Int)
+    async unreadMessages(
+        @Root() { id: teamId } : Team,
+        @Ctx() { req } : MyContext,
+    ) : Promise<number> {
+        let total = 0;
+        
+        let seen = await Seen.findOne({ where: { 
+            userId: req.session.uid,
+            teamId
+        }});
+
+        if(!!seen) {
+            return total;
+        }
+
+        const messages = await getConnection().query(
+            `
+                select m.* from message as m
+                inner join channel as c on c.id = m."channelId"
+                inner join team as t on t.id = c."teamId"
+                where t.id = $1  
+            `, [teamId]
+        );
+
+        for(let i=0;i<messages.length;i++) {
+            let isRead = await Read.findOne({ where: { 
+                messageId: messages[i].id,
+                userId: req.session.uid,
+            }});
+
+            if(!!isRead) total++;
+        }
+
+        return total;
     }
 
     @Mutation(() => Boolean)

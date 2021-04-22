@@ -1,5 +1,4 @@
 Profile / Settings Page
-Home Page
 
 Read receipts for messages
 Read receipts for dms 

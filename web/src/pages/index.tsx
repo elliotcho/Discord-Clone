@@ -6,7 +6,6 @@ import Layout from '../containers/shared/AuthLayout';
 const Container = styled.div`
    background: #008ae6;
    overflow-x: hidden;
-   height: 92vh;
 `;
 
 const Grid = styled.div`

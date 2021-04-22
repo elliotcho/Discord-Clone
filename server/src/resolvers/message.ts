@@ -16,6 +16,8 @@ import { getConnection } from "typeorm";
 import { Message } from "../entities/Message";
 import { Channel } from "../entities/Channel";
 import { User } from '../entities/User';
+import { Seen } from '../entities/Seen';
+import { Read } from '../entities/Read';
 import { filterSubscription } from '../utils/filterSubscription';
 import { 
     GraphQLUpload, 
@@ -62,6 +64,56 @@ export class MessageResolver {
         filter: filterSubscription
     })
     newMessage(): boolean {
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async readChannelMessages(
+        @Arg('channelId', () => Int) channelId: number,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const messages = await Message.find({ where: { channelId } });
+
+        for(let i=0;i<messages.length;i++) {
+            const { id: messageId } = messages[i];
+
+            const isRead = await Read.findOne({ where: { 
+                 userId: req.session.uid,
+                 messageId
+            }});
+
+            if(!isRead) {
+                await getConnection().query(
+                    `
+                        insert into read ("userId", "messageId")
+                        values ($1, $2)
+                    `, [req.session.uid, messageId]
+                );
+            }
+        }
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async seeTeamMessages(
+        @Arg('teamId', () => Int) teamId: number,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const seen = await Seen.findOne({ where: { 
+            userId: req.session.uid,
+            teamId
+        }});
+        
+        if(!seen) {
+            await getConnection().query(
+                `
+                    insert into seen ("userId", "teamId")
+                    values ($1, $2)
+                `, [req.session.uid, teamId]
+            );
+        }
+
         return true;
     }
 

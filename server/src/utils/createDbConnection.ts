@@ -6,13 +6,15 @@ import { Friend } from '../entities/Friend';
 import { Team } from '../entities/Team';
 import { User } from '../entities/User';
 import { DirectMessage } from '../entities/DirectMessage';
+import { Seen } from '../entities/Seen';
+import { Read } from '../entities/Read';
 
 export const createDbConnection = async () => {
     await createConnection({
         type: 'postgres',
         url: process.env.DB_URL,
         synchronize: true,
-        logging: true,
+        logging: false,
         entities: [
             User,
             Member,
@@ -20,7 +22,9 @@ export const createDbConnection = async () => {
             Friend,
             Channel,
             Team,
-            DirectMessage
+            DirectMessage,
+            Seen,
+            Read
         ] 
     });
 }

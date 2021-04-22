@@ -109,6 +109,7 @@ export type Team = {
   name: Scalars['String'];
   ownerId: Scalars['Float'];
   photo: Scalars['String'];
+  unreadMessages: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   isOwner: Scalars['Boolean'];
@@ -167,6 +168,8 @@ export type Mutation = {
   deleteTeam: Scalars['Boolean'];
   addMember: Scalars['Boolean'];
   createTeam: Scalars['Boolean'];
+  readChannelMessages: Scalars['Boolean'];
+  seeTeamMessages: Scalars['Boolean'];
   stopTypingMessage: Scalars['Boolean'];
   startTypingMessage: Scalars['Boolean'];
   sendMessage: Scalars['Boolean'];
@@ -259,6 +262,16 @@ export type MutationAddMemberArgs = {
 
 export type MutationCreateTeamArgs = {
   teamName: Scalars['String'];
+};
+
+
+export type MutationReadChannelMessagesArgs = {
+  channelId: Scalars['Int'];
+};
+
+
+export type MutationSeeTeamMessagesArgs = {
+  teamId: Scalars['Int'];
 };
 
 
@@ -410,10 +423,10 @@ export type RegularMessageFragment = (
 
 export type RegularTeamFragment = (
   { __typename?: 'Team' }
-  & Pick<Team, 'id' | 'name' | 'isOwner' | 'photo'>
+  & Pick<Team, 'id' | 'name' | 'unreadMessages' | 'isOwner' | 'photo'>
   & { channels: Array<(
     { __typename?: 'Channel' }
-    & Pick<Channel, 'id'>
+    & RegularChannelFragment
   )> }
 );
 
@@ -1065,15 +1078,6 @@ export type NewStatusUpdateSubscription = (
   )> }
 );
 
-export const RegularChannelFragmentDoc = gql`
-    fragment RegularChannel on Channel {
-  id
-  isOriginal
-  teamId
-  isOwner
-  name
-}
-    `;
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
@@ -1099,17 +1103,27 @@ export const RegularMessageFragmentDoc = gql`
   }
 }
     ${RegularUserFragmentDoc}`;
+export const RegularChannelFragmentDoc = gql`
+    fragment RegularChannel on Channel {
+  id
+  isOriginal
+  teamId
+  isOwner
+  name
+}
+    `;
 export const RegularTeamFragmentDoc = gql`
     fragment RegularTeam on Team {
   id
   name
+  unreadMessages
   isOwner
   photo
   channels {
-    id
+    ...RegularChannel
   }
 }
-    `;
+    ${RegularChannelFragmentDoc}`;
 export const RegularErrorFragmentDoc = gql`
     fragment RegularError on FieldError {
   field
