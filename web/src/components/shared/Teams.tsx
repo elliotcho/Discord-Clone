@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
-import { useTeamsQuery, useCreateTeamMutation } from '../../generated/graphql';
+import { 
+    useTeamsQuery, 
+    useCreateTeamMutation,
+    useUnreadChatsQuery
+} from '../../generated/graphql';
 import { formatCount } from '../../utils/formatCount';
 import SubscriptionWrapper from '../../containers/shared/SubscriptionWrapper';
 import EditModal from './EditModal';
@@ -60,6 +64,8 @@ const Box = styled.div`
 `;
 
 const Teams: React.FC<{}> = () => {
+    const chats = useUnreadChatsQuery()?.data?.unreadChats || [];
+
     const [isOpen, setIsOpen] = useState(false);
     const [createTeam] = useCreateTeamMutation();
     const { data } = useTeamsQuery();
@@ -72,6 +78,24 @@ const Teams: React.FC<{}> = () => {
                         <FontAwesomeIcon icon={faDiscord}/>
                     </TeamIcon>
                 </NextLink>
+
+                {chats.map(u => {
+                    const route = `/direct-message/${u.id}`;
+
+                    return (
+                        <NextLink key={u.id} href={route}>
+                           <TeamIcon>
+                                <Image src={u.profileURL} alt='profile pic'/>
+
+                                {!!u.unreadDms && (
+                                    <Box>
+                                        {formatCount(u.unreadDms)}
+                                    </Box>
+                                )}
+                           </TeamIcon>
+                        </NextLink>
+                    )
+                })}
 
                 {data?.teams?.map(t => {
                     const route = `/view-team/${t.id}`;

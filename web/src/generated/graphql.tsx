@@ -29,6 +29,7 @@ export type Query = {
   readReceipts: Array<User>;
   usersTypingMessage: Array<User>;
   messages: Array<Message>;
+  unreadChats: Array<User>;
   userTypingDm?: Maybe<User>;
   recentChats: Array<User>;
   directMessages: Array<DirectMessage>;
@@ -106,6 +107,7 @@ export type User = {
   isMe: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  unreadDms: Scalars['Int'];
 };
 
 
@@ -153,6 +155,7 @@ export type DirectMessage = {
   pic: Scalars['String'];
   senderId: Scalars['Float'];
   receiverId: Scalars['Float'];
+  isRead: Scalars['Boolean'];
   user: User;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
@@ -183,6 +186,7 @@ export type Mutation = {
   deleteMessage: Scalars['Boolean'];
   sendFile: Scalars['Boolean'];
   editMessage: Scalars['Boolean'];
+  readDms: Scalars['Boolean'];
   stopTypingDm: Scalars['Boolean'];
   startTypingDm: Scalars['Boolean'];
   editDirectMessage: Scalars['Boolean'];
@@ -317,6 +321,11 @@ export type MutationEditMessageArgs = {
 };
 
 
+export type MutationReadDmsArgs = {
+  userId: Scalars['Int'];
+};
+
+
 export type MutationStopTypingDmArgs = {
   receiverId: Scalars['Int'];
 };
@@ -445,7 +454,7 @@ export type RegularErrorFragment = (
 
 export type RegularUserFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'isMe' | 'email' | 'username' | 'friendStatus' | 'activeStatus' | 'profilePic' | 'profileURL' | 'createdAt' | 'updatedAt'>
+  & Pick<User, 'id' | 'isMe' | 'email' | 'username' | 'friendStatus' | 'activeStatus' | 'unreadDms' | 'profilePic' | 'profileURL' | 'createdAt' | 'updatedAt'>
 );
 
 export type RegularUserResponseFragment = (
@@ -511,6 +520,16 @@ export type EditDirectMessageMutationVariables = Exact<{
 export type EditDirectMessageMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'editDirectMessage'>
+);
+
+export type ReadDmsMutationVariables = Exact<{
+  userId: Scalars['Int'];
+}>;
+
+
+export type ReadDmsMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'readDms'>
 );
 
 export type SendDirectMessageMutationVariables = Exact<{
@@ -906,6 +925,17 @@ export type RecentChatsQuery = (
   )> }
 );
 
+export type UnreadChatsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UnreadChatsQuery = (
+  { __typename?: 'Query' }
+  & { unreadChats: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
+);
+
 export type UserTypingDmQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1135,6 +1165,7 @@ export const RegularUserFragmentDoc = gql`
   username
   friendStatus
   activeStatus
+  unreadDms
   profilePic
   profileURL
   createdAt
@@ -1345,6 +1376,36 @@ export function useEditDirectMessageMutation(baseOptions?: Apollo.MutationHookOp
 export type EditDirectMessageMutationHookResult = ReturnType<typeof useEditDirectMessageMutation>;
 export type EditDirectMessageMutationResult = Apollo.MutationResult<EditDirectMessageMutation>;
 export type EditDirectMessageMutationOptions = Apollo.BaseMutationOptions<EditDirectMessageMutation, EditDirectMessageMutationVariables>;
+export const ReadDmsDocument = gql`
+    mutation ReadDms($userId: Int!) {
+  readDms(userId: $userId)
+}
+    `;
+export type ReadDmsMutationFn = Apollo.MutationFunction<ReadDmsMutation, ReadDmsMutationVariables>;
+
+/**
+ * __useReadDmsMutation__
+ *
+ * To run a mutation, you first call `useReadDmsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReadDmsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [readDmsMutation, { data, loading, error }] = useReadDmsMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useReadDmsMutation(baseOptions?: Apollo.MutationHookOptions<ReadDmsMutation, ReadDmsMutationVariables>) {
+        return Apollo.useMutation<ReadDmsMutation, ReadDmsMutationVariables>(ReadDmsDocument, baseOptions);
+      }
+export type ReadDmsMutationHookResult = ReturnType<typeof useReadDmsMutation>;
+export type ReadDmsMutationResult = Apollo.MutationResult<ReadDmsMutation>;
+export type ReadDmsMutationOptions = Apollo.BaseMutationOptions<ReadDmsMutation, ReadDmsMutationVariables>;
 export const SendDirectMessageDocument = gql`
     mutation SendDirectMessage($text: String!, $receiverId: Int!) {
   sendDirectMessage(text: $text, receiverId: $receiverId)
@@ -2461,6 +2522,38 @@ export function useRecentChatsLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type RecentChatsQueryHookResult = ReturnType<typeof useRecentChatsQuery>;
 export type RecentChatsLazyQueryHookResult = ReturnType<typeof useRecentChatsLazyQuery>;
 export type RecentChatsQueryResult = Apollo.QueryResult<RecentChatsQuery, RecentChatsQueryVariables>;
+export const UnreadChatsDocument = gql`
+    query UnreadChats {
+  unreadChats {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useUnreadChatsQuery__
+ *
+ * To run a query within a React component, call `useUnreadChatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUnreadChatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUnreadChatsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUnreadChatsQuery(baseOptions?: Apollo.QueryHookOptions<UnreadChatsQuery, UnreadChatsQueryVariables>) {
+        return Apollo.useQuery<UnreadChatsQuery, UnreadChatsQueryVariables>(UnreadChatsDocument, baseOptions);
+      }
+export function useUnreadChatsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UnreadChatsQuery, UnreadChatsQueryVariables>) {
+          return Apollo.useLazyQuery<UnreadChatsQuery, UnreadChatsQueryVariables>(UnreadChatsDocument, baseOptions);
+        }
+export type UnreadChatsQueryHookResult = ReturnType<typeof useUnreadChatsQuery>;
+export type UnreadChatsLazyQueryHookResult = ReturnType<typeof useUnreadChatsLazyQuery>;
+export type UnreadChatsQueryResult = Apollo.QueryResult<UnreadChatsQuery, UnreadChatsQueryVariables>;
 export const UserTypingDmDocument = gql`
     query UserTypingDm {
   userTypingDm {

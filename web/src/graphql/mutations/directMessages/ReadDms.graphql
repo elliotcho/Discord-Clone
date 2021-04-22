@@ -1,0 +1,3 @@
+mutation ReadDms($userId: Int!) {
+    readDms(userId: $userId)
+}

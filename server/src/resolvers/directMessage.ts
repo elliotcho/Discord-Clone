@@ -31,6 +31,17 @@ const IS_TYPING_DM_PREFIX = 'IS_TYPING_DM_PREFIX';
 
 @Resolver(DirectMessage)
 export class DirectMessageResolver {
+    @FieldResolver(() => Boolean)
+    isRead(
+        @Root() { senderId, isRead } : DirectMessage,
+        @Ctx() { req } : MyContext
+    ) : boolean {
+        const { uid } = req.session;
+        const isSender = senderId === uid;
+
+        return isRead || isSender;
+    }
+
     @FieldResolver(() => User)
     async user(
         @Root() { senderId } : DirectMessage
@@ -63,6 +74,54 @@ export class DirectMessageResolver {
     })
     newDirectMessage(): boolean {
         return true;
+    }
+
+    @Mutation(() => Boolean)
+    async readDms(
+        @Arg('userId', () => Int) userId: number,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        await getConnection().query(
+            `
+                update direct_message
+                set "isRead" = true 
+                where "receiverId" = $1
+                and "senderId" = $2
+            `, [req.session.uid, userId]
+        );
+
+        return true;
+    }
+
+    @Query(() => [User])
+    async unreadChats(
+        @Ctx() { req } : MyContext
+    ) : Promise<User[]> {
+        const result = [];
+
+        const users = await getConnection().query(
+            `
+                select u.*, (
+
+                    select max(d."createdAt") from direct_message as d
+                    where (d."senderId" = u.id and d."receiverId" = $1) 
+                    and d."isRead" = false
+                    and u.id != $1
+
+                ) as latest from "user" as u 
+                order by latest DESC 
+                limit 5
+            `, 
+            [req.session.uid]
+        );
+
+        for(let i=0;i<users.length;i++) {
+            if(users[i].latest) {
+                result.push(users[i]);
+            }
+        }
+
+        return result;
     }
 
     @Query(() => User, { nullable: true })

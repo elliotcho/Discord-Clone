@@ -43,6 +43,26 @@ class UserResponse {
 
 @Resolver(User)
 export class UserResolver {
+    @FieldResolver(() => Int)
+    async unreadDms (
+        @Root() { id: userId } : User,
+        @Ctx() { req } : MyContext
+    ) : Promise<number> {
+        if(userId === req.session.uid) {
+            return 0;
+        }
+
+        const dms = await getConnection().query(
+            `
+                select d.* from direct_message as d
+                where d."receiverId" = $1
+                and d."isRead" = false
+            `, [req.session.uid]
+        );
+
+        return dms.length;
+    }
+
     @FieldResolver(() => String)
     async profileURL (
         @Root() user : User
