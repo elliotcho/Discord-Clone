@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Modal } from 'react-responsive-modal';
-import { useMessageReadReceiptsQuery } from '../../generated/graphql';
+import { useDmReadReceiptsQuery ,useMessageReadReceiptsQuery } from '../../generated/graphql';
 import FriendCard from '../../containers/shared/FriendCard';
 
 const Container = styled.div`
@@ -34,6 +34,13 @@ const ReadReceiptModal : React.FC<ReadReceiptModalProps> = ({ isOpen, onClose, m
         )
     });
 
+    const response = useDmReadReceiptsQuery({
+        variables: { messageId },
+        skip: (
+            !messageId || !isDm
+        )
+    })
+
     return(
         <Modal
             open = {isOpen}
@@ -60,6 +67,21 @@ const ReadReceiptModal : React.FC<ReadReceiptModalProps> = ({ isOpen, onClose, m
                     )}
 
                     {!isDm && !data?.messageReadReceipts.length && (
+                        <Text>
+                            No users available
+                        </Text>
+                    )}
+
+                    {isDm && response?.data?.dmReadReceipts.map(u => 
+                        <FriendCard
+                            key = {u.id}
+                            profileURL = {u.profileURL}
+                            username = {u.username}
+                            size = 'sm'
+                        />
+                    )}
+
+                    {isDm && !response?.data?.dmReadReceipts.length && (
                         <Text>
                             No users available
                         </Text>

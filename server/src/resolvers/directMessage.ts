@@ -26,6 +26,7 @@ import path from 'path';
 
 
 const NEW_DM_EVENT = 'NEW_DM_EVENT';
+const NEW_DM_READ_RECEIPT = 'NEW_DM_READ_RECEIPT';
 const NEW_TYPING_DM_EVENT = 'NEW_TYPING_DM_EVENT';
 const IS_TYPING_DM_PREFIX = 'IS_TYPING_DM_PREFIX';
 
@@ -76,8 +77,35 @@ export class DirectMessageResolver {
         return true;
     }
 
+    @Subscription(() => Boolean, {
+        topics: NEW_DM_READ_RECEIPT,
+        filter: filterSubscription
+    })
+    newDmReadReceipt() : boolean {
+        return true;
+    }
+
+    @Query(() => [User])
+    async dmReadReceipts(
+        @Arg('messageId', () => Int) messageId: number,
+        @Ctx() { req } : MyContext
+    ) : Promise<User[]> {
+        const users = await getConnection().query(
+            `
+                select u.* from "user" as u
+                inner join direct_message as d on d."receiverId" = u.id
+                where d.id = $1 and d."senderId" = $2
+                and d."isRead" = true
+            `,
+            [messageId, req.session.uid]
+        );
+
+        return users;
+    }
+
     @Mutation(() => Boolean)
     async readDms(
+        @PubSub() pubsub: PubSubEngine,
         @Arg('userId', () => Int) userId: number,
         @Ctx() { req } : MyContext
     ) : Promise<boolean> {
@@ -89,6 +117,12 @@ export class DirectMessageResolver {
                 and "senderId" = $2
             `, [req.session.uid, userId]
         );
+
+        await pubsub.publish(NEW_DM_READ_RECEIPT, {
+            senderId: req.session.uid,
+            receiverId: userId,
+            isDm: true
+        });
 
         return true;
     }

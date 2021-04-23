@@ -29,6 +29,7 @@ export type Query = {
   messageReadReceipts: Array<User>;
   usersTypingMessage: Array<User>;
   messages: Array<Message>;
+  dmReadReceipts: Array<User>;
   unreadChats: Array<User>;
   userTypingDm?: Maybe<User>;
   recentChats: Array<User>;
@@ -78,6 +79,11 @@ export type QueryUsersTypingMessageArgs = {
 
 export type QueryMessagesArgs = {
   channelId: Scalars['Int'];
+};
+
+
+export type QueryDmReadReceiptsArgs = {
+  messageId: Scalars['Int'];
 };
 
 
@@ -422,6 +428,7 @@ export type Subscription = {
   newMessageReadReceipt: Scalars['Boolean'];
   newUserTypingDm: Scalars['Boolean'];
   newDirectMessage: Scalars['Boolean'];
+  newDmReadReceipt: Scalars['Boolean'];
 };
 
 export type RegularChannelFragment = (
@@ -914,6 +921,19 @@ export type DirectMessagesQuery = (
   )> }
 );
 
+export type DmReadReceiptsQueryVariables = Exact<{
+  messageId: Scalars['Int'];
+}>;
+
+
+export type DmReadReceiptsQuery = (
+  { __typename?: 'Query' }
+  & { dmReadReceipts: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
+);
+
 export type RecentChatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1112,6 +1132,14 @@ export type NewDirectMessageSubscriptionVariables = Exact<{ [key: string]: never
 export type NewDirectMessageSubscription = (
   { __typename?: 'Subscription' }
   & Pick<Subscription, 'newDirectMessage'>
+);
+
+export type NewDmReadReceiptSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NewDmReadReceiptSubscription = (
+  { __typename?: 'Subscription' }
+  & Pick<Subscription, 'newDmReadReceipt'>
 );
 
 export type NewUserTypingDmSubscriptionVariables = Exact<{ [key: string]: never; }>;
@@ -2490,6 +2518,39 @@ export function useDirectMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type DirectMessagesQueryHookResult = ReturnType<typeof useDirectMessagesQuery>;
 export type DirectMessagesLazyQueryHookResult = ReturnType<typeof useDirectMessagesLazyQuery>;
 export type DirectMessagesQueryResult = Apollo.QueryResult<DirectMessagesQuery, DirectMessagesQueryVariables>;
+export const DmReadReceiptsDocument = gql`
+    query DmReadReceipts($messageId: Int!) {
+  dmReadReceipts(messageId: $messageId) {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useDmReadReceiptsQuery__
+ *
+ * To run a query within a React component, call `useDmReadReceiptsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDmReadReceiptsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDmReadReceiptsQuery({
+ *   variables: {
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useDmReadReceiptsQuery(baseOptions: Apollo.QueryHookOptions<DmReadReceiptsQuery, DmReadReceiptsQueryVariables>) {
+        return Apollo.useQuery<DmReadReceiptsQuery, DmReadReceiptsQueryVariables>(DmReadReceiptsDocument, baseOptions);
+      }
+export function useDmReadReceiptsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DmReadReceiptsQuery, DmReadReceiptsQueryVariables>) {
+          return Apollo.useLazyQuery<DmReadReceiptsQuery, DmReadReceiptsQueryVariables>(DmReadReceiptsDocument, baseOptions);
+        }
+export type DmReadReceiptsQueryHookResult = ReturnType<typeof useDmReadReceiptsQuery>;
+export type DmReadReceiptsLazyQueryHookResult = ReturnType<typeof useDmReadReceiptsLazyQuery>;
+export type DmReadReceiptsQueryResult = Apollo.QueryResult<DmReadReceiptsQuery, DmReadReceiptsQueryVariables>;
 export const RecentChatsDocument = gql`
     query RecentChats {
   recentChats {
@@ -3036,6 +3097,32 @@ export function useNewDirectMessageSubscription(baseOptions?: Apollo.Subscriptio
       }
 export type NewDirectMessageSubscriptionHookResult = ReturnType<typeof useNewDirectMessageSubscription>;
 export type NewDirectMessageSubscriptionResult = Apollo.SubscriptionResult<NewDirectMessageSubscription>;
+export const NewDmReadReceiptDocument = gql`
+    subscription NewDmReadReceipt {
+  newDmReadReceipt
+}
+    `;
+
+/**
+ * __useNewDmReadReceiptSubscription__
+ *
+ * To run a query within a React component, call `useNewDmReadReceiptSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewDmReadReceiptSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewDmReadReceiptSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewDmReadReceiptSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewDmReadReceiptSubscription, NewDmReadReceiptSubscriptionVariables>) {
+        return Apollo.useSubscription<NewDmReadReceiptSubscription, NewDmReadReceiptSubscriptionVariables>(NewDmReadReceiptDocument, baseOptions);
+      }
+export type NewDmReadReceiptSubscriptionHookResult = ReturnType<typeof useNewDmReadReceiptSubscription>;
+export type NewDmReadReceiptSubscriptionResult = Apollo.SubscriptionResult<NewDmReadReceiptSubscription>;
 export const NewUserTypingDmDocument = gql`
     subscription NewUserTypingDm {
   newUserTypingDm

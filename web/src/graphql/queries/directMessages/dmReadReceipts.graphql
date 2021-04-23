@@ -1,0 +1,5 @@
+query DmReadReceipts($messageId: Int!) {
+    dmReadReceipts(messageId: $messageId) {
+        ...RegularUser
+    }
+}

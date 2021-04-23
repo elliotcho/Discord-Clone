@@ -1,6 +1,5 @@
 Profile / Settings Page
 
-Read receipts for messages
 Read receipts for dms 
 
 Channel Settings
