@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import {useMeQuery} from '../../generated/graphql';
 import EscapeColumn from '../shared/EscapeColumn';
 import Sidebar from './ProfileSidebar';
 import MyAccount from './MyAccount';
@@ -12,12 +13,17 @@ const Container = styled.div`
 `;
 
 const ProfileLayout : React.FC<{}> =() => {
+    const {data} = useMeQuery()
+
+    const username = data?.me?.username 
+    const email = data?.me?.email
+
     return (
         <Container>
             <Sidebar />
             
             <>
-                <MyAccount />
+                <MyAccount  username={username} email={email}/>
             </>
 
             <EscapeColumn />

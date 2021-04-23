@@ -10,7 +10,7 @@ import {
     useEditDirectMessageMutation,
     useDeleteDirectMessageMutation,
     useDeleteMessageMutation,
-    useEditMessageMutation 
+    useEditMessageMutation,
 } from '../../generated/graphql';
 import ReadReceiptModal from './ReadReceiptModal';
 import EditModal from './EditModal';
