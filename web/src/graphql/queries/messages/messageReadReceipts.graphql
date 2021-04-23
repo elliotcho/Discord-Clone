@@ -1,0 +1,5 @@
+query MessageReadReceipts($messageId: Int!) {
+    messageReadReceipts(messageId: $messageId) {
+        ...RegularUser
+    }
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Modal } from 'react-responsive-modal';
-import { useReadReceiptsQuery } from '../../generated/graphql';
+import { useMessageReadReceiptsQuery } from '../../generated/graphql';
 import FriendCard from '../../containers/shared/FriendCard';
 
 const Container = styled.div`
@@ -23,12 +23,15 @@ interface ReadReceiptModalProps {
     isOpen: boolean;
     messageId: number;
     onClose(): void;
+    isDm: boolean;
 }
 
-const ReadReceiptModal : React.FC<ReadReceiptModalProps> = ({ isOpen, onClose, messageId }) => {
-    const { data } = useReadReceiptsQuery({
+const ReadReceiptModal : React.FC<ReadReceiptModalProps> = ({ isOpen, onClose, messageId, isDm }) => {
+    const { data } = useMessageReadReceiptsQuery({
         variables: { messageId },
-        skip: !messageId
+        skip: (
+            !messageId || isDm
+        )
     });
 
     return(
@@ -44,10 +47,10 @@ const ReadReceiptModal : React.FC<ReadReceiptModalProps> = ({ isOpen, onClose, m
         >
                 <Container>
                     <Header>
-                        Invite People
+                        Read By
                     </Header>
 
-                    {data?.readReceipts.map(u => 
+                    {!isDm && data?.messageReadReceipts.map(u => 
                         <FriendCard
                             key = {u.id}
                             profileURL = {u.profileURL}
@@ -56,7 +59,7 @@ const ReadReceiptModal : React.FC<ReadReceiptModalProps> = ({ isOpen, onClose, m
                         />
                     )}
 
-                    {!data?.readReceipts.length && (
+                    {!isDm && !data?.messageReadReceipts.length && (
                         <Text>
                             No users available
                         </Text>

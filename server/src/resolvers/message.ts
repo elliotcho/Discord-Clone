@@ -28,7 +28,7 @@ import fs, { createWriteStream } from 'fs';
 import path from 'path';
 
 const IS_TYPING_MESSAGE_PREFIX = 'IS_TYPING_MESSAGE_PREFIX';
-const NEW_READ_RECEIPT_EVENT = 'NEW_READ_RECEIPT_EVENT';
+const NEW_MESSAGE_READ_RECEIPT_EVENT = 'NEW_MESSAGE_READ_RECEIPT_EVENT';
 const NEW_TYPING_MESSAGE_EVENT = 'NEW_TYPING_MESSAGE_EVENT';
 const NEW_MESSAGE_EVENT = 'NEW_MESSAGE_EVENT';
 
@@ -69,15 +69,15 @@ export class MessageResolver {
     }
 
     @Subscription(() => Boolean, {
-        topics: NEW_READ_RECEIPT_EVENT,
+        topics: NEW_MESSAGE_READ_RECEIPT_EVENT,
         filter: filterSubscription
     })
-    newReadReceipt() : boolean {
+    newMessageReadReceipt() : boolean {
         return true;
     }
 
     @Query(() => [User])
-    async readReceipts(
+    async messageReadReceipts(
         @Arg('messageId', () => Int) messageId: Number,
         @Ctx() { req } : MyContext
     ): Promise<User[]> {
@@ -127,7 +127,7 @@ export class MessageResolver {
             }
         }
 
-        await pubsub.publish(NEW_READ_RECEIPT_EVENT, {
+        await pubsub.publish(NEW_MESSAGE_READ_RECEIPT_EVENT, {
             senderId: uid,
             receiverId: channelId,
             isDm: false,

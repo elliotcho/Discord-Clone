@@ -26,7 +26,7 @@ export type Query = {
   members: Array<User>;
   team: Team;
   teams: Array<Team>;
-  readReceipts: Array<User>;
+  messageReadReceipts: Array<User>;
   usersTypingMessage: Array<User>;
   messages: Array<Message>;
   unreadChats: Array<User>;
@@ -66,7 +66,7 @@ export type QueryTeamArgs = {
 };
 
 
-export type QueryReadReceiptsArgs = {
+export type QueryMessageReadReceiptsArgs = {
   messageId: Scalars['Int'];
 };
 
@@ -419,7 +419,7 @@ export type Subscription = {
   newStatusUpdate?: Maybe<User>;
   newUserTypingMessage: Scalars['Boolean'];
   newMessage: Scalars['Boolean'];
-  newReadReceipt: Scalars['Boolean'];
+  newMessageReadReceipt: Scalars['Boolean'];
   newUserTypingDm: Scalars['Boolean'];
   newDirectMessage: Scalars['Boolean'];
 };
@@ -980,6 +980,19 @@ export type OnlineFriendsQuery = (
   )> }
 );
 
+export type MessageReadReceiptsQueryVariables = Exact<{
+  messageId: Scalars['Int'];
+}>;
+
+
+export type MessageReadReceiptsQuery = (
+  { __typename?: 'Query' }
+  & { messageReadReceipts: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
+);
+
 export type MessagesQueryVariables = Exact<{
   channelId: Scalars['Int'];
 }>;
@@ -990,19 +1003,6 @@ export type MessagesQuery = (
   & { messages: Array<(
     { __typename?: 'Message' }
     & RegularMessageFragment
-  )> }
-);
-
-export type ReadReceiptsQueryVariables = Exact<{
-  messageId: Scalars['Int'];
-}>;
-
-
-export type ReadReceiptsQuery = (
-  { __typename?: 'Query' }
-  & { readReceipts: Array<(
-    { __typename?: 'User' }
-    & RegularUserFragment
   )> }
 );
 
@@ -1130,12 +1130,12 @@ export type NewMessageSubscription = (
   & Pick<Subscription, 'newMessage'>
 );
 
-export type NewReadReceiptSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type NewMessageReadReceiptSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NewReadReceiptSubscription = (
+export type NewMessageReadReceiptSubscription = (
   { __typename?: 'Subscription' }
-  & Pick<Subscription, 'newReadReceipt'>
+  & Pick<Subscription, 'newMessageReadReceipt'>
 );
 
 export type NewUserTypingMessageSubscriptionVariables = Exact<{ [key: string]: never; }>;
@@ -2682,6 +2682,39 @@ export function useOnlineFriendsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type OnlineFriendsQueryHookResult = ReturnType<typeof useOnlineFriendsQuery>;
 export type OnlineFriendsLazyQueryHookResult = ReturnType<typeof useOnlineFriendsLazyQuery>;
 export type OnlineFriendsQueryResult = Apollo.QueryResult<OnlineFriendsQuery, OnlineFriendsQueryVariables>;
+export const MessageReadReceiptsDocument = gql`
+    query MessageReadReceipts($messageId: Int!) {
+  messageReadReceipts(messageId: $messageId) {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useMessageReadReceiptsQuery__
+ *
+ * To run a query within a React component, call `useMessageReadReceiptsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMessageReadReceiptsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMessageReadReceiptsQuery({
+ *   variables: {
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function useMessageReadReceiptsQuery(baseOptions: Apollo.QueryHookOptions<MessageReadReceiptsQuery, MessageReadReceiptsQueryVariables>) {
+        return Apollo.useQuery<MessageReadReceiptsQuery, MessageReadReceiptsQueryVariables>(MessageReadReceiptsDocument, baseOptions);
+      }
+export function useMessageReadReceiptsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MessageReadReceiptsQuery, MessageReadReceiptsQueryVariables>) {
+          return Apollo.useLazyQuery<MessageReadReceiptsQuery, MessageReadReceiptsQueryVariables>(MessageReadReceiptsDocument, baseOptions);
+        }
+export type MessageReadReceiptsQueryHookResult = ReturnType<typeof useMessageReadReceiptsQuery>;
+export type MessageReadReceiptsLazyQueryHookResult = ReturnType<typeof useMessageReadReceiptsLazyQuery>;
+export type MessageReadReceiptsQueryResult = Apollo.QueryResult<MessageReadReceiptsQuery, MessageReadReceiptsQueryVariables>;
 export const MessagesDocument = gql`
     query Messages($channelId: Int!) {
   messages(channelId: $channelId) {
@@ -2715,39 +2748,6 @@ export function useMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<M
 export type MessagesQueryHookResult = ReturnType<typeof useMessagesQuery>;
 export type MessagesLazyQueryHookResult = ReturnType<typeof useMessagesLazyQuery>;
 export type MessagesQueryResult = Apollo.QueryResult<MessagesQuery, MessagesQueryVariables>;
-export const ReadReceiptsDocument = gql`
-    query ReadReceipts($messageId: Int!) {
-  readReceipts(messageId: $messageId) {
-    ...RegularUser
-  }
-}
-    ${RegularUserFragmentDoc}`;
-
-/**
- * __useReadReceiptsQuery__
- *
- * To run a query within a React component, call `useReadReceiptsQuery` and pass it any options that fit your needs.
- * When your component renders, `useReadReceiptsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReadReceiptsQuery({
- *   variables: {
- *      messageId: // value for 'messageId'
- *   },
- * });
- */
-export function useReadReceiptsQuery(baseOptions: Apollo.QueryHookOptions<ReadReceiptsQuery, ReadReceiptsQueryVariables>) {
-        return Apollo.useQuery<ReadReceiptsQuery, ReadReceiptsQueryVariables>(ReadReceiptsDocument, baseOptions);
-      }
-export function useReadReceiptsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ReadReceiptsQuery, ReadReceiptsQueryVariables>) {
-          return Apollo.useLazyQuery<ReadReceiptsQuery, ReadReceiptsQueryVariables>(ReadReceiptsDocument, baseOptions);
-        }
-export type ReadReceiptsQueryHookResult = ReturnType<typeof useReadReceiptsQuery>;
-export type ReadReceiptsLazyQueryHookResult = ReturnType<typeof useReadReceiptsLazyQuery>;
-export type ReadReceiptsQueryResult = Apollo.QueryResult<ReadReceiptsQuery, ReadReceiptsQueryVariables>;
 export const UsersTypingMessageDocument = gql`
     query UsersTypingMessage($channelId: Int!) {
   usersTypingMessage(channelId: $channelId) {
@@ -3088,32 +3088,32 @@ export function useNewMessageSubscription(baseOptions?: Apollo.SubscriptionHookO
       }
 export type NewMessageSubscriptionHookResult = ReturnType<typeof useNewMessageSubscription>;
 export type NewMessageSubscriptionResult = Apollo.SubscriptionResult<NewMessageSubscription>;
-export const NewReadReceiptDocument = gql`
-    subscription NewReadReceipt {
-  newReadReceipt
+export const NewMessageReadReceiptDocument = gql`
+    subscription NewMessageReadReceipt {
+  newMessageReadReceipt
 }
     `;
 
 /**
- * __useNewReadReceiptSubscription__
+ * __useNewMessageReadReceiptSubscription__
  *
- * To run a query within a React component, call `useNewReadReceiptSubscription` and pass it any options that fit your needs.
- * When your component renders, `useNewReadReceiptSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useNewMessageReadReceiptSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewMessageReadReceiptSubscription` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useNewReadReceiptSubscription({
+ * const { data, loading, error } = useNewMessageReadReceiptSubscription({
  *   variables: {
  *   },
  * });
  */
-export function useNewReadReceiptSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewReadReceiptSubscription, NewReadReceiptSubscriptionVariables>) {
-        return Apollo.useSubscription<NewReadReceiptSubscription, NewReadReceiptSubscriptionVariables>(NewReadReceiptDocument, baseOptions);
+export function useNewMessageReadReceiptSubscription(baseOptions?: Apollo.SubscriptionHookOptions<NewMessageReadReceiptSubscription, NewMessageReadReceiptSubscriptionVariables>) {
+        return Apollo.useSubscription<NewMessageReadReceiptSubscription, NewMessageReadReceiptSubscriptionVariables>(NewMessageReadReceiptDocument, baseOptions);
       }
-export type NewReadReceiptSubscriptionHookResult = ReturnType<typeof useNewReadReceiptSubscription>;
-export type NewReadReceiptSubscriptionResult = Apollo.SubscriptionResult<NewReadReceiptSubscription>;
+export type NewMessageReadReceiptSubscriptionHookResult = ReturnType<typeof useNewMessageReadReceiptSubscription>;
+export type NewMessageReadReceiptSubscriptionResult = Apollo.SubscriptionResult<NewMessageReadReceiptSubscription>;
 export const NewUserTypingMessageDocument = gql`
     subscription NewUserTypingMessage {
   newUserTypingMessage

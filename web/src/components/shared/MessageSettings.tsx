@@ -91,6 +91,7 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, channelId,
                                 variables: { messageId },
                                 update: (cache) => {
                                     cache.evict({ fieldName: 'directMessages' });
+                                    cache.evict({ fieldName: 'recentChats' });
                                 }
                             });
 
@@ -131,6 +132,7 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, channelId,
                 isOpen = {openReadReceipts}
                 onClose = {() => setOpenReadReceipts(false)}
                 messageId = {messageId}
+                isDm = {!channelId}
             />
 
             <EditModal

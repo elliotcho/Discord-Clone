@@ -4,7 +4,7 @@ import {
     useNewMessageSubscription,
     useNewDirectMessageSubscription,
     useNewStatusUpdateSubscription,
-    useNewReadReceiptSubscription,
+    useNewMessageReadReceiptSubscription,
     useNewUserTypingMessageSubscription,
     useNewUserTypingDmSubscription
 } from '../../generated/graphql';   
@@ -14,7 +14,7 @@ const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
     
     const { data: newDmData } = useNewDirectMessageSubscription();
     const { data: newStatusData } = useNewStatusUpdateSubscription();
-    const { data: newReadReceiptData } = useNewReadReceiptSubscription();
+    const { data: newMessageReadReceiptData } = useNewMessageReadReceiptSubscription();
     const { data: newTypingMessageData } = useNewUserTypingMessageSubscription();
     const { data: newTypingDmData } = useNewUserTypingDmSubscription();
     const { data: newMessageData } = useNewMessageSubscription();
@@ -22,6 +22,7 @@ const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
     const subscriptionData = [
         newDmData,
         newStatusData,
+        newMessageReadReceiptData,
         newTypingMessageData,
         newTypingDmData,
         newMessageData
@@ -65,8 +66,8 @@ const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
             cache.evict({ fieldName: 'unreadChats' });
         }
 
-        if(newReadReceiptData) {
-            cache.evict({ fieldName: 'readReceipts' });
+        if(newMessageReadReceiptData) {
+            cache.evict({ fieldName: 'messageReadReceipts' });
         }
 
     }, subscriptionData);
