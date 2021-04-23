@@ -1,6 +1,4 @@
 Profile / Settings Page
 
-Read receipts for dms 
-
 Channel Settings
 Team Settings

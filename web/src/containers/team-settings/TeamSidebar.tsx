@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useDeleteTeamMutation} from '../../generated/graphql';
+import { useLeaveTeamMutation, useDeleteTeamMutation} from '../../generated/graphql';
 import ConfirmModal from '../../components/shared/ConfirmModal';
 import { useRouter } from 'next/router';
 
@@ -40,8 +40,10 @@ const TeamSidebar: React.FC<TeamSidebarProps> = ({
     isOwner,
     teamId
 }) => {
-    const [openConfirm, setOpenConfirm] = useState(false);
+    const [openDeleteTeam, setOpenDeleteTeam] = useState(false);
+    const [openLeaveTeam, setOpenLeaveTeam] = useState(false);
     const [deleteTeam] = useDeleteTeamMutation();
+    const [leaveTeam] = useLeaveTeamMutation();
     const router = useRouter();
 
     return (
@@ -52,19 +54,46 @@ const TeamSidebar: React.FC<TeamSidebarProps> = ({
                         <Li 
                             style={{ color: '#e60000'}}
                             onClick = {() => {
-                                setOpenConfirm(true);
+                                setOpenDeleteTeam(true);
                             }}
                         >
                             Delete Team
+                        </Li>
+                    )}
+
+                    {!isOwner && (
+                         <Li 
+                            style={{ color: '#e60000'}}
+                            onClick = {() => {
+                                setOpenLeaveTeam(true);
+                            }}
+                        >
+                            Leave Team
                         </Li>
                     )}
                 </Ul>
             </Box>
 
             <ConfirmModal
-                isOpen = {openConfirm}
+                isOpen = {openLeaveTeam}
+                title = 'Are you sure you want to leave this team?'
+                onClose = {() => setOpenLeaveTeam(false)}
+                onSave = {async () => {
+                   await leaveTeam({
+                       variables: { teamId },
+                       update: (cache) => {
+                           cache.evict({ fieldName: 'teams' });
+                       }
+                   });
+
+                   router.push('/friends');
+                }}
+            />
+
+            <ConfirmModal
+                isOpen = {openDeleteTeam}
                 title = 'Are you sure you want to delete this team?'
-                onClose = {() => setOpenConfirm(false)}
+                onClose = {() => setOpenDeleteTeam(false)}
                 onSave = {async () => {
                    await deleteTeam({
                        variables: { teamId },

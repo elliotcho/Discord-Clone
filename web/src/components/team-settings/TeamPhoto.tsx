@@ -125,9 +125,11 @@ const TeamPhoto: React.FC<TeamPhotoProps> = ({
                 >  
                     <Image src={photo} alt='pic'/>
 
-                    <Update>
-                        Update
-                    </Update>
+                    {isOwner && (
+                        <Update>
+                            Update
+                        </Update>
+                    )}
                 </ImageWrapper>
            )}
 
@@ -140,9 +142,11 @@ const TeamPhoto: React.FC<TeamPhotoProps> = ({
                         {name[0].toUpperCase()}
                     </Icon>
 
-                    <Update>
-                        Update
-                    </Update>
+                    {isOwner && (
+                        <Update>
+                            Update
+                        </Update>
+                    )}
                </ImageWrapper>
            )}
 
@@ -163,9 +167,11 @@ const TeamPhoto: React.FC<TeamPhotoProps> = ({
             )}
 
             <Box>
-                <Button onClick={openFile}>
-                    Upload
-                </Button>
+                {isOwner && (
+                    <Button onClick={openFile}>
+                        Upload
+                    </Button>
+                )}
             </Box>
 
             <Input 

@@ -90,6 +90,23 @@ export class TeamResolver {
     }
 
     @Mutation(() => Boolean)
+    async leaveTeam(
+        @Arg('teamId', () => Int) teamId: number,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        await getConnection().query(
+            `
+                delete from member as m
+                where m."userId" = $1
+                and m."teamId" = $2
+            `,
+            [req.session.uid, teamId]
+        );
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
     async removeTeamPhoto(
         @Arg('teamId', () => Int) teamId: number
     ) : Promise<boolean> {
