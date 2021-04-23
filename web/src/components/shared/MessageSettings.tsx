@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { 
+    faTrashAlt, 
+    faEdit, 
+    faUsers
+} from '@fortawesome/free-solid-svg-icons';
 import { 
     useEditDirectMessageMutation,
     useDeleteDirectMessageMutation,
     useDeleteMessageMutation,
     useEditMessageMutation,
 } from '../../generated/graphql';
+import ReadReceiptModal from './ReadReceiptModal';
 import EditModal from './EditModal';
 
 const Box = styled.div`
@@ -24,9 +29,8 @@ const Dropdown = styled.div`
     position: absolute;
     background: #000;
     color: white;
-    box-shadow: 0 0 5px black;
     right: 25px;
-    top: 55px;
+    top: 0px;
     ${Box}:hover & {
         display: block;
     }
@@ -55,7 +59,8 @@ interface MessageSettingsProps {
 }
 
 const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, channelId, text }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [openEditModal, setOpenEditModal] = useState(false);
+    const [openReadReceipts, setOpenReadReceipts] = useState(false);
 
     const [editMessage] = useEditMessageMutation();
     const [deleteMessage] = useDeleteMessageMutation();
@@ -67,6 +72,18 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, channelId,
             ...
 
             <Dropdown>
+                <Option
+                    onClick = {() => {
+                        setOpenReadReceipts(true);
+                    }}
+                >
+                    <FontAwesomeIcon icon={faUsers} />
+
+                    <Text>
+                        Read By
+                    </Text>
+               </Option>
+
                 <Option
                     onClick = {async () => {
                         if(!channelId) {
@@ -98,7 +115,7 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, channelId,
                {text && (
                     <Option
                         onClick = {() => {
-                            setIsOpen(true);
+                            setOpenEditModal(true);
                         }}
                     >
                         <FontAwesomeIcon icon={faEdit} />
@@ -110,10 +127,16 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, channelId,
                )}
             </Dropdown>
 
+            <ReadReceiptModal
+                isOpen = {openReadReceipts}
+                onClose = {() => setOpenReadReceipts(false)}
+                messageId = {messageId}
+            />
+
             <EditModal
-                isOpen = {isOpen}
                 content = {text}
-                onClose = {() => setIsOpen(false)}
+                isOpen = {openEditModal}
+                onClose = {() => setOpenEditModal(false)}
                 title = 'Edit your message'
                 onSave = {async (newText) => {
                     if(channelId) {

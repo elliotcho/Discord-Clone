@@ -32,11 +32,12 @@ export class DirectMessage extends BaseEntity{
     @Column()
     receiverId: number;
 
+    @Field()
+    @Column({ default: false })
+    isRead: boolean;
+
     @Field(() => User)
     user: User;
-
-    @Field()
-    isRead: boolean;
 
     @Field(() => String)
     @CreateDateColumn()

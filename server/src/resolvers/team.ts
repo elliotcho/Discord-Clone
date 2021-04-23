@@ -8,20 +8,161 @@ import {
     Resolver, 
     Root
 } from "type-graphql";
+import { v4 } from 'uuid';
 import { getConnection } from "typeorm";
 import { Member } from "../entities/Member";
 import { Channel } from '../entities/Channel';
 import { Team } from "../entities/Team";
 import { User } from '../entities/User';
-import { MyContext } from "../types";
+import { Read } from '../entities/Read';
+import { Seen } from '../entities/Seen';
+import { 
+    MyContext,
+    GraphQLUpload,
+    Upload
+} from "../types";
+import fs, { createWriteStream } from 'fs';
+import path from 'path';
 
 @Resolver(Team)
 export class TeamResolver {
+    @FieldResolver(() => String)
+    async photo (
+        @Root() team: Team
+    ) : Promise<string> {
+        if(team && team.photo) {
+            return `${process.env.SERVER_URL}/images/${team.photo}`;
+        }
+
+        return '';
+    }
+
+    @FieldResolver(() => Boolean) 
+    isOwner(
+        @Root() { ownerId } : Team,
+        @Ctx() { req } : MyContext
+    ) : boolean {
+        return ownerId === req.session.uid;
+    }
+
     @FieldResolver(() => [Channel])
     async channels(
         @Root() team: Team
     ) : Promise<Channel[]> {
         return Channel.find({ teamId: team.id });
+    }
+
+    @FieldResolver(() => Int)
+    async unreadMessages(
+        @Root() { id: teamId } : Team,
+        @Ctx() { req } : MyContext,
+    ) : Promise<number> {
+        let total = 0;
+        
+        let seen = await Seen.findOne({ where: { 
+            userId: req.session.uid,
+            teamId
+        }});
+
+        if(!!seen) {
+            return total;
+        }
+
+        const messages = await getConnection().query(
+            `
+                select m.* from message as m
+                inner join channel as c on c.id = m."channelId"
+                inner join team as t on t.id = c."teamId"
+                where t.id = $1  
+            `, [teamId]
+        );
+
+        for(let i=0;i<messages.length;i++) {
+            let isRead = await Read.findOne({ where: { 
+                messageId: messages[i].id,
+                userId: req.session.uid,
+            }});
+
+            if(!isRead) total++;
+        }
+
+        return total;
+    }
+
+    @Mutation(() => Boolean)
+    async removeTeamPhoto(
+        @Arg('teamId', () => Int) teamId: number
+    ) : Promise<boolean> {
+        const team = await Team.findOne(teamId);
+
+        if(team?.photo) {
+            const location = path.join(__dirname, `../../images/${team.photo}`);
+
+            fs.unlink(location, err => {
+                if(err) {
+                    console.log(err);
+                }
+            });
+
+            await Team.update({ id: teamId }, { photo: '' });
+        }
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async updateTeamPhoto(
+        @Arg('file', () => GraphQLUpload) { createReadStream, filename }: Upload,
+        @Arg('teamId', () => Int) teamId: number,
+    ) : Promise<boolean> {
+        const team = await Team.findOne(teamId);
+        const name = 'TEAM-' + v4() + path.extname(filename);
+
+        if(team?.photo) {
+            const location = path.join(__dirname, `../../images/${team.photo}`);
+
+            fs.unlink(location, err => {
+                if(err) {
+                     console.log(err);
+                }
+            });
+        }
+        
+        await Team.update({ id: teamId }, { photo: name });
+
+        return new Promise(async (resolve, reject) =>
+            createReadStream()
+            .pipe(createWriteStream(path.join(__dirname, `../../images/${name}`)))
+            .on('finish', () => resolve(true))
+            .on('error', () => reject(false))
+        );
+    }
+
+    @Mutation(() => Boolean)
+    async editTeamName(
+        @Arg('teamId', () => Int) teamId: number,
+        @Arg('newName') newName: string
+    ) : Promise<boolean> {
+        try {
+            await Team.update({ id: teamId }, { name: newName });
+        } catch {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async deleteTeam(
+        @Arg('teamId', () => Int) teamId: number
+    ) : Promise<boolean> {
+        try {
+            await Team.delete({ id: teamId });
+        } catch {
+            return false;
+        }
+
+        return true;
     }
 
     @Query(() => [User])
@@ -55,31 +196,14 @@ export class TeamResolver {
     }
 
     @Query(() => [User])
-    async onlineMembers(
+    async members(
         @Arg('teamId', () => Int) teamId: number
     ) : Promise<User[]> {
         const users = await getConnection().query(
             `
                 select u.* from "user" as u
                 inner join member as m on u.id = m."userId"
-                where u."activeStatus" != 0 and
-                m."teamId" = $1
-            `, [teamId]
-        );
-
-        return users;
-    }
-
-    @Query(() => [User])
-    async offlineMembers(
-        @Arg('teamId', () => Int) teamId: number
-    ) : Promise<User[]> {
-        const users = await getConnection().query(
-            `
-                select u.* from "user" as u
-                inner join member as m on u.id = m."userId"
-                where u."activeStatus" = 0 and
-                m."teamId" = $1
+                where m."teamId" = $1
             `, [teamId]
         );
 

@@ -1,7 +1,10 @@
 fragment RegularTeam on Team {
     id
     name
+    unreadMessages
+    isOwner
+    photo
     channels {
-        id
+        ...RegularChannel
     }
 }

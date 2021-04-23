@@ -106,7 +106,7 @@ const ProfileCard: React.FC<{}> = () => {
         document
             .getElementById('profilePic')
                 .click();
-    }
+    };
 
     return (
         <Container>

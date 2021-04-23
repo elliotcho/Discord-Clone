@@ -122,7 +122,7 @@ const SendMessage: React.FC<SendMessageProps> = ({ channelId }) => {
                     const submit = handleEnterPress(e);
 
                     if(submit) {
-                        e.preventDefault();
+                        await handleStopTyping();
 
                         await sendMessage({
                             variables: { text, channelId },

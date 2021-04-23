@@ -14,6 +14,7 @@ import { useRouter } from 'next/router';
 const Container = styled.div`
     height: 100vh;
     grid-template-columns: 100px 250px 1fr 250px;
+    overflow: hidden;
     display: grid;
 `;
 
@@ -21,6 +22,7 @@ const Chat = styled.div`
     display: grid;
     grid-template-rows: 1fr 8.5fr auto;
     grid-row-gap: 0;
+    overflow: auto;
 `;
 
 const ViewTeams: React.FC<{}> = () => {
@@ -47,7 +49,11 @@ const ViewTeams: React.FC<{}> = () => {
             <Container>
                 <Teams />
 
-                <Channels channelId={channelId} teamId={teamId}/>
+                <Channels 
+                    isOwner = {!!data?.team?.isOwner}
+                    channelId = {channelId} 
+                    teamId = {teamId}
+                />
 
                 <Chat>
                     <ChatHeader channelId={channelId}/>

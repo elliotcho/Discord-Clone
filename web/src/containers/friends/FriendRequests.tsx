@@ -1,5 +1,5 @@
 import React from 'react';
-import { ApolloCache } from '@apollo/client';
+import { gql, ApolloCache } from '@apollo/client';
 import styled from 'styled-components';
 import { 
     AcceptFriendRequestMutation as AcceptMutation,
@@ -31,11 +31,23 @@ const FriendRequests: React.FC<{}> =() => {
     const [acceptRequest] = useAcceptFriendRequestMutation();
     const [declineRequest] = useDeclineFriendRequestMutation();
 
-    const getMutationPayload = (userId: number) => ({
+    const getMutationPayload = (userId: number, isAccept?: boolean) => ({
         variables: { senderId: userId },
         update: (
             cache: ApolloCache<AcceptMutation | DeclineMutation>
         ) => {
+            if(isAccept) {
+                cache.writeFragment({
+                    id: 'User:' + userId,
+                    data: { friendStatus: 2 },
+                    fragment: gql`
+                        fragment _ on User {
+                            friendStatus
+                        }
+                    `
+                });
+            }
+
             cache.evict({ fieldName: 'friendRequests' });
         }
     });
@@ -62,7 +74,7 @@ const FriendRequests: React.FC<{}> =() => {
                     <Button
                         onClick = {async () => {
                             const userId = u.id;
-                            const payload = getMutationPayload(userId);
+                            const payload = getMutationPayload(userId, true);
 
                             await acceptRequest(payload);
                         }}

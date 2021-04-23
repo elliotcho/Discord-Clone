@@ -18,6 +18,7 @@ import { v4 } from 'uuid';
 import { getConnection } from "typeorm";
 import { User } from "../entities/User";
 import { MyContext, GraphQLUpload, Upload } from "../types";
+import { isTeammate } from '../utils/isTeammate';
 import { sendEmail } from "../utils/sendEmail"
 import fs, { createWriteStream } from 'fs';
 import path from 'path';
@@ -42,6 +43,26 @@ class UserResponse {
 
 @Resolver(User)
 export class UserResolver {
+    @FieldResolver(() => Int)
+    async unreadDms (
+        @Root() { id: userId } : User,
+        @Ctx() { req } : MyContext
+    ) : Promise<number> {
+        if(userId === req.session.uid) {
+            return 0;
+        }
+
+        const dms = await getConnection().query(
+            `
+                select d.* from direct_message as d
+                where d."receiverId" = $1
+                and d."isRead" = false
+            `, [req.session.uid]
+        );
+
+        return dms.length;
+    }
+
     @FieldResolver(() => String)
     async profileURL (
         @Root() user : User
@@ -93,10 +114,17 @@ export class UserResolver {
         topics: CHANGE_ACTIVE_STATUS_EVENT,
         filter: async ({ payload, context }) => {
             const { req } = context.connection.context;
+            const { uid } = req.session;
             context.req = req;
 
-            if(req.session.uid === payload.userId) {
+            if(payload.userId === uid) {
                 return false;
+            }
+
+            const teammate = await isTeammate(payload.userId, uid);
+            
+            if(teammate) {
+                return true;
             }
         
             const isFriend = await getConnection().query(
@@ -105,8 +133,8 @@ export class UserResolver {
                     where (f."senderId" = $1 or f."receiverId" = $1) and
                     (f."receiverId" = $2 or f."senderId" = $2)
                     and f.status = true
-                `,
-                [req.session.uid, payload.userId]
+                `, 
+                [payload.userId, uid]
             );
 
             return !!isFriend.length;
@@ -236,7 +264,7 @@ export class UserResolver {
            .pipe(createWriteStream(path.join(__dirname, `../../images/${name}`)))
            .on('finish', () => resolve(true))
            .on('error', () => reject(false))
-        )
+        );
     }
 
     @Mutation(() => UserResponse)

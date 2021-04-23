@@ -16,6 +16,7 @@ import { getConnection } from "typeorm";
 import { Message } from "../entities/Message";
 import { Channel } from "../entities/Channel";
 import { User } from '../entities/User';
+import { Seen } from '../entities/Seen';
 import { Read } from '../entities/Read';
 import { filterSubscription } from '../utils/filterSubscription';
 import { 
@@ -27,29 +28,12 @@ import fs, { createWriteStream } from 'fs';
 import path from 'path';
 
 const IS_TYPING_MESSAGE_PREFIX = 'IS_TYPING_MESSAGE_PREFIX';
+const NEW_READ_RECEIPT_EVENT = 'NEW_READ_RECEIPT_EVENT';
 const NEW_TYPING_MESSAGE_EVENT = 'NEW_TYPING_MESSAGE_EVENT';
 const NEW_MESSAGE_EVENT = 'NEW_MESSAGE_EVENT';
 
 @Resolver(Message)
 export class MessageResolver {
-    @FieldResolver()
-    async isRead(
-        @Root() message: Message,
-        @Ctx() { req } : MyContext
-    ) : Promise<boolean> {
-        const isDM = false;
-        
-        const isRead = await Read.findOne({
-            where: {
-                userId: req.session.uid,
-                messageId: message.id,
-                isDM
-            }
-        });
-
-        return !!isRead;
-    } 
-
     @FieldResolver()
     async pic(
         @Root() message: Message
@@ -81,6 +65,97 @@ export class MessageResolver {
         filter: filterSubscription
     })
     newMessage(): boolean {
+        return true;
+    }
+
+    @Subscription(() => Boolean, {
+        topics: NEW_READ_RECEIPT_EVENT,
+        filter: filterSubscription
+    })
+    newReadReceipt() : boolean {
+        return true;
+    }
+
+    @Query(() => [User])
+    async readReceipts(
+        @Arg('messageId', () => Int) messageId: Number,
+        @Ctx() { req } : MyContext
+    ): Promise<User[]> {
+        const readReceipts = await getConnection().query(
+            `
+                select u.* from "user" as u
+                inner join read as r on r."userId" = u.id
+                where r."messageId" = $1 and u.id != $2
+            `, [messageId, req.session.uid]
+        );
+
+        return readReceipts;
+    }
+
+    @Mutation(() => Boolean)
+    async readChannelMessages(
+        @PubSub() pubsub: PubSubEngine,
+        @Arg('channelId', () => Int) channelId: number,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const { uid } = req.session;
+        const channel = await Channel.findOne(channelId);
+        const teamId = channel?.teamId;
+     
+        const messages = await getConnection().query(
+            `
+                select m.* from message as m
+                where m."channelId" = $1
+            `, [channelId]
+        )
+
+        for(let i=0;i<messages.length;i++) {
+            const { id: messageId } = messages[i];
+
+            const isRead = await Read.findOne({ where: { 
+                 userId: req.session.uid,
+                 messageId
+            }});
+
+            if(!isRead) {
+                await getConnection().query(
+                    `
+                        insert into read ("messageId", "userId")
+                        values ($1, $2)
+                    `, [messageId, uid]
+                );
+            }
+        }
+
+        await pubsub.publish(NEW_READ_RECEIPT_EVENT, {
+            senderId: uid,
+            receiverId: channelId,
+            isDm: false,
+            teamId
+        });
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async seeTeamMessages(
+        @Arg('teamId', () => Int) teamId: number,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const seen = await Seen.findOne({ where: { 
+            userId: req.session.uid,
+            teamId
+        }});
+        
+        if(!seen) {
+            await getConnection().query(
+                `
+                    insert into seen ("userId", "teamId")
+                    values ($1, $2)
+                `, [req.session.uid, teamId]
+            );
+        }
+
         return true;
     }
 
@@ -168,13 +243,23 @@ export class MessageResolver {
         const channel = await Channel.findOne(channelId);
         const teamId = channel?.teamId;
 
-        await getConnection().query(
-            `
-             insert into message ("channelId", "senderId", text)
-             values ($1, $2, $3)
-            `, 
-            [channelId, req.session.uid, text]
-        );
+        await getConnection().transaction(async tm => {
+            await tm.query(
+                `
+                 insert into message ("channelId", "senderId", text)
+                 values ($1, $2, $3)
+                `, 
+                [channelId, req.session.uid, text]
+            );
+    
+            await tm.query(
+                `
+                    delete from seen as s
+                    where s."userId" != $1 and
+                    s."teamId" = $2
+                `, [req.session.uid, teamId]
+            );
+        });
 
         await pubsub.publish(NEW_MESSAGE_EVENT, {
             senderId: req.session.uid,
@@ -238,7 +323,7 @@ export class MessageResolver {
     @Mutation(() => Boolean)
     async sendFile(
         @PubSub() pubsub: PubSubEngine,
-        @Arg('file', () => GraphQLUpload) {createReadStream, filename}: Upload,
+        @Arg('file', () => GraphQLUpload) { createReadStream, filename }: Upload,
         @Arg('channelId', () => Int) channelId: number,
         @Ctx() { req }: MyContext
     ): Promise<boolean>{
@@ -247,14 +332,24 @@ export class MessageResolver {
 
         const name = 'MESSAGE-' +v4() + path.extname(filename);
 
-        await getConnection().query(
-            `
-             insert into message ("channelId", "senderId", pic)
-             values ($1, $2, $3)
-            `, 
-            [channelId, req.session.uid, name]
-        );
-
+        await getConnection().transaction(async (tm) => {
+            await tm.query(
+                `
+                 insert into message ("channelId", "senderId", pic)
+                 values ($1, $2, $3)
+                `, 
+                [channelId, req.session.uid, name]
+            );
+    
+            await tm.query(
+                `
+                    delete from seen as s
+                    where s."userId" != $1 and
+                    s."teamId" = $2
+                `, [req.session.uid, teamId]
+            );    
+        })
+   
         await pubsub.publish(NEW_MESSAGE_EVENT, {
             senderId: req.session.uid,
             receiverId: channelId,
@@ -268,7 +363,7 @@ export class MessageResolver {
            .pipe(createWriteStream(path.join(__dirname, `../../images/${name}`)))
            .on('finish', () => resolve(true))
            .on('error', () => reject(false))
-        )
+        );
     }
 
     @Mutation(() => Boolean)

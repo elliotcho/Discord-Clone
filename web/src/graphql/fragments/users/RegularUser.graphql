@@ -5,6 +5,7 @@ fragment RegularUser on User {
     username
     friendStatus
     activeStatus
+    unreadDms
     profilePic
     profileURL
     createdAt

@@ -1,19 +1,31 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useMeQuery } from '../../generated/graphql';
-import { isServer } from '../../utils/isServer';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import NextLink from 'next/link';
 
 const Container = styled.div`
-    height: 8vh;
     display: flex;
+    font-family: 'Caveat', cursive;
     align-items: center;
     background: #333;
+    height: 8vh;
+`;
+
+const Icon = styled.div`
+    margin: 15px;
+    font-size: 2.0rem;
+    cursor: pointer;
+    color: #ccc;
+
+    &:hover {
+        color: #f2f2f2;
+    }
 `;
 
 const Box = styled.div`
     margin-left: auto;
-    color: white;
+    color: #ccc;
 `;
 
 const Link = styled.span`
@@ -21,45 +33,27 @@ const Link = styled.span`
     font-size: 1.2rem;
     margin-right: 15px;
     &:hover {
-        text-decoration: underline;
+        color: #f2f2f2;
     }
 `;
 
 const Navbar: React.FC<{}> = () => {
-    const { data, loading } = useMeQuery({
-        skip: isServer()
-    });
-
-    let body: any;
-
-    if(!loading) {
-        if(!data?.me) {
-            body = (
-                <>
-                    <NextLink href='/login'>
-                        <Link>Login</Link>
-                    </NextLink>
-
-                    <NextLink href='/register'>
-                        <Link>Register</Link>
-                    </NextLink>
-                </>
-            );
-        } else {
-            body = (
-                <>
-                    <NextLink href='/friends'>
-                        <Link>Friends</Link>
-                    </NextLink>
-                </>
-            )
-        }
-    }
-
     return (
         <Container>
+            <NextLink href='/'>
+                <Icon>
+                    <FontAwesomeIcon icon={faDiscord} />
+                </Icon>
+            </NextLink>
+
             <Box>
-                {body}
+                <NextLink href='/login'>
+                    <Link>Login</Link>
+                </NextLink>
+
+                <NextLink href='/register'>
+                    <Link>Register</Link>
+                </NextLink>
             </Box>
         </Container>
     )

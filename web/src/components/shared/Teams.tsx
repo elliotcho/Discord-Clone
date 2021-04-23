@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
-import { useTeamsQuery, useCreateTeamMutation } from '../../generated/graphql';
+import { 
+    useTeamsQuery, 
+    useCreateTeamMutation,
+    useUnreadChatsQuery
+} from '../../generated/graphql';
+import { formatCount } from '../../utils/formatCount';
 import SubscriptionWrapper from '../../containers/shared/SubscriptionWrapper';
 import EditModal from './EditModal';
 import NextLink from 'next/link';
@@ -12,24 +17,55 @@ const Container = styled.div`
     padding: 20px 20px;
 `;
 
-const TeamIcon = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    background: #333;
-    color: #fff;
-    font-size: 24px;
+const IconStyles = `
+    position: relative;
     border-radius: 11px;
     margin-bottom: 20px;
     cursor: pointer;
+    height: 50px;
+    width: 50px;
+`;
+
+const Image = styled.img`
+    ${IconStyles}
+    position: fixed;
+
+    &:hover {
+        border: 1px solid #fff;
+        box-sizing: border-box;
+    }
+`;
+
+const TeamIcon = styled.div`
+    ${IconStyles}
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #333;
+    color: #fff;
+    font-size: 24px;
+
     &:hover {
        background: #a6a6a6;
     }
 `;
 
+const Box = styled.div`
+   color: white;
+   background: orangered;
+   border-radius: 11px;
+   position: absolute;
+   font-size: 0.8rem;
+   font-weight: bold;
+   padding: 2px 5px;
+   right: -5px;
+   top: -5px;
+`;
+
 const Teams: React.FC<{}> = () => {
+    const chats = useUnreadChatsQuery()?.data?.unreadChats || [];
+
     const [isOpen, setIsOpen] = useState(false);
     const [createTeam] = useCreateTeamMutation();
     const { data } = useTeamsQuery();
@@ -43,13 +79,53 @@ const Teams: React.FC<{}> = () => {
                     </TeamIcon>
                 </NextLink>
 
+                {chats.map(u => {
+                    const route = `/direct-message/${u.id}`;
+
+                    return (
+                        <NextLink key={u.id} href={route}>
+                           <TeamIcon>
+                                <Image src={u.profileURL} alt='profile pic'/>
+
+                                {!!u.unreadDms && (
+                                    <Box>
+                                        {formatCount(u.unreadDms)}
+                                    </Box>
+                                )}
+                           </TeamIcon>
+                        </NextLink>
+                    )
+                })}
+
                 {data?.teams?.map(t => {
                     const route = `/view-team/${t.id}`;
+
+                    if(t.photo) {
+                        return (
+                            <NextLink key={t.id} href={route}>
+                                <TeamIcon>
+                                    <Image src={t.photo} alt='team photo' />
+
+                                    {!!t.unreadMessages && (
+                                        <Box>
+                                            {formatCount(t.unreadMessages)}
+                                        </Box>
+                                    )}
+                                </TeamIcon>
+                            </NextLink>
+                        )
+                    }
                     
                     return (
                         <NextLink key={t.id} href={route}>
                             <TeamIcon>
                                 {t.name[0].toUpperCase()}
+
+                                {!!t.unreadMessages && (
+                                    <Box>
+                                        {formatCount(t.unreadMessages)}
+                                    </Box>
+                                )}
                             </TeamIcon>
                         </NextLink>   
                     )
@@ -75,7 +151,7 @@ const Teams: React.FC<{}> = () => {
                 />
             </Container>
         </SubscriptionWrapper>
-    )
+    );
 }
 
 export default Teams;

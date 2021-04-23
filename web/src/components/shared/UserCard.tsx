@@ -3,19 +3,27 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle } from '@fortawesome/free-solid-svg-icons';
 
-const Card = styled.div`
+const CardStyles = `
     display: flex;
-    cursor: pointer;
     position: relative;
     align-items: center;
     background: #404040;
     max-width: 600px;
     padding: 15px;
     margin: 15px;
+`;
 
+const DefaultCard = styled.div`
+    ${CardStyles}
+    cursor: pointer;
+  
     &:hover {
         box-shadow: 0 0 0 1px #fff;
     }
+`;
+
+const ChannelCard = styled.div`
+    ${CardStyles}
 `;
 
 const Image = styled.img`
@@ -67,8 +75,8 @@ const UserCard: React.FC<UserCardProps> = ({
             color = 'green';
     }
 
-    return (
-        <Card onClick = {handleClick}>
+    const body = (
+        <>
             <Image src={profileURL} alt='profile pic'/>
 
             {!!showStatus && (
@@ -80,7 +88,21 @@ const UserCard: React.FC<UserCardProps> = ({
             <Primary>
                 {username}
             </Primary>
-        </Card>
+        </>
+    );
+
+    if(!!handleClick) {
+        return (
+            <DefaultCard onClick={handleClick}> 
+                {body}
+            </DefaultCard>
+        )
+    }
+
+    return (
+        <ChannelCard>
+            {body}
+        </ChannelCard>
     )
 }
 

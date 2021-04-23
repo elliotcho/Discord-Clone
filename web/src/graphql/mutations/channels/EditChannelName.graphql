@@ -1,0 +1,3 @@
+mutation EditChannelName($channelId: Int!, $teamId: Int!, $newName: String!) {
+    editChannelName(channelId: $channelId, teamId: $teamId, newName: $newName)
+}

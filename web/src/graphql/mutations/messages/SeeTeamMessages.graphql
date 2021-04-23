@@ -1,0 +1,3 @@
+mutation SeeTeamMessages($teamId: Int!) {
+    seeTeamMessages(teamId: $teamId)
+}

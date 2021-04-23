@@ -1,5 +1,5 @@
-query OfflineMembers($teamId: Int!) {
-    offlineMembers(teamId: $teamId) {
+query Members($teamId: Int!) {
+    members(teamId: $teamId) {
         ...RegularUser
     }
 }

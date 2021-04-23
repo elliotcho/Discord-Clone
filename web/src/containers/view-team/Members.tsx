@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useOnlineMembersQuery, useOfflineMembersQuery } from '../../generated/graphql';
+import { useMembersQuery } from '../../generated/graphql';
 import UserCard from '../../components/shared/UserCard';
 
 const Container = styled.div`
@@ -17,15 +17,14 @@ interface MembersProps {
 }
 
 const Members: React.FC<MembersProps> = ({ teamId }) => {
-    const payload = { 
+    const { data } = useMembersQuery({
         variables: { teamId },
         skip: !teamId
-    };
+    });
 
-    const { data: onlineData } = useOnlineMembersQuery(payload);
-    const { data: offlineData } = useOfflineMembersQuery(payload);
-    const offlineMembers = offlineData?.offlineMembers || [];
-    const onlineMembers = onlineData?.onlineMembers || [];
+    const members = data?.members || [];
+    const offlineMembers = members.filter(u => u.activeStatus === 0) || [];
+    const onlineMembers = members.filter(u => u.activeStatus !== 0) || [];
 
     return (
         <Container>

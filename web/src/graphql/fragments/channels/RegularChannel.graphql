@@ -1,4 +1,8 @@
 fragment RegularChannel on Channel {
     id
+    isOriginal
+    isRead
+    teamId
+    isOwner
     name 
 }

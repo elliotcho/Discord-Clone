@@ -10,16 +10,21 @@ const Header = styled.h2`
     color: black;
 `;
 
-const Footer = styled.div`
+const Flex = styled.div`
+    display: flex;
     border-top: 1px solid gray;
     padding: 25px;
 `;
 
+const Footer = styled.div`
+    margin-left: auto;
+`;
+
 const ButtonStyles = `
-    width: 50%;
-    font-size: 20px:
-    cursor: pointer;
     color: white;
+    margin-left: 15px;
+    font-size: 20px;
+    cursor: pointer;
     padding: 15px;
     outline: none;
     border: none;
@@ -28,16 +33,16 @@ const ButtonStyles = `
 const Close = styled.button`
     ${ButtonStyles}
     background: gray;
-    $:hover {
-        background: silver;
+    &:hover {
+        background: #999;
     }
 `;
 
 const Submit = styled.button`
     ${ButtonStyles}
-    background: green;
-    &:hover{
-        background: lightgreen;
+    background: red;
+    &:hover {
+        background: orangered;
     }
 `;
 
@@ -57,25 +62,30 @@ const ConfirmModal : React.FC<ConfirmModalProps> = ({ title, onSave , isOpen, on
     return(
         <Modal
             open = {isOpen}
+            onClose = {onClose}
             closeOnEsc = {false}
             closeOnOverlayClick = {false}
-            styles = {{closeButton: {outline: 'none'}}}
-            onClose = {onClose}
+            styles = {{ 
+                closeButton: { outline: 'none' },
+                modal: { background: '#b3b3b3' }
+            }}
         >
                 <Container>
                     <Header>
                         {title}
                     </Header>
 
-                    <Footer>
-                        <Close onClick={onClose}>
-                            Close
-                        </Close>
+                    <Flex>
+                        <Footer>
+                            <Close onClick={onClose}>
+                                Close
+                            </Close>
 
-                        <Submit onClick={onSubmit}>
-                            Confirm
-                        </Submit>
-                    </Footer>
+                            <Submit onClick={onSubmit}>
+                                Confirm
+                            </Submit>
+                        </Footer>
+                    </Flex>
                 </Container>
         </Modal>
     )

@@ -1,18 +1,25 @@
-import{
-    BaseEntity,
+import {
     PrimaryColumn,
-    Column,
-    Entity
-} from "typeorm";
+    CreateDateColumn,
+    Entity,
+    BaseEntity,
+    ManyToOne
+} from 'typeorm';
+import { Message } from './Message';
 
 @Entity()
-export class Read extends BaseEntity{
-    @PrimaryColumn()
-    messageId: number;
-
+export class Read extends BaseEntity {
     @PrimaryColumn()
     userId: number;
 
-    @Column({ nullable: true })
-    isDM: boolean;
+    @PrimaryColumn()
+    messageId: number;
+
+    @ManyToOne(() => Message, (message) => message.readReceipts, {
+        onDelete: 'CASCADE'
+    })
+    message: Message;
+
+    @CreateDateColumn()
+    createdAt: Date;
 }

@@ -8,7 +8,8 @@ import {
     UpdateDateColumn
 } from "typeorm";
 import { Field, ObjectType } from 'type-graphql';
-import { Channel } from '../entities/Channel';
+import { Channel } from './Channel';
+import { Seen } from './Seen';
 
 @ObjectType()
 @Entity()
@@ -25,8 +26,18 @@ export class Team extends BaseEntity {
     @Column()
     ownerId: number;
 
+    @Field()
+    @Column({ default: '' })
+    photo: string;
+
+    @Field()
+    unreadMessages: number;
+
     @OneToMany(() => Channel, (channel) => channel.team)
     channels: Channel[];
+
+    @OneToMany(() => Seen, (seen) => seen.team)
+    seenBy: Seen;
 
     @Field()
     @CreateDateColumn()

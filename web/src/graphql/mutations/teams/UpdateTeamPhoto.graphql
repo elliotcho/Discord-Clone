@@ -1,0 +1,3 @@
+mutation UpdateTeamPhoto($file: Upload!, $teamId: Int!) {
+    updateTeamPhoto(file: $file, teamId: $teamId)
+}

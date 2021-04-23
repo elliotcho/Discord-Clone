@@ -122,10 +122,13 @@ const SendDm: React.FC<SendDmProps> = ({ userId: receiverId }) => {
                     const submit = handleEnterPress(e, 130);
 
                     if(submit) {
+                        await handleStopTyping();
+
                         await sendText({
                             variables: { text, receiverId },
                             update: (cache) => {
                                 cache.evict({ fieldName: 'directMessages' });
+                                cache.evict({ fieldName: 'recentChats' });
                             }
                         });
 

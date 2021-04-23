@@ -4,6 +4,7 @@ import {
     useNewMessageSubscription,
     useNewDirectMessageSubscription,
     useNewStatusUpdateSubscription,
+    useNewReadReceiptSubscription,
     useNewUserTypingMessageSubscription,
     useNewUserTypingDmSubscription
 } from '../../generated/graphql';   
@@ -13,6 +14,7 @@ const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
     
     const { data: newDmData } = useNewDirectMessageSubscription();
     const { data: newStatusData } = useNewStatusUpdateSubscription();
+    const { data: newReadReceiptData } = useNewReadReceiptSubscription();
     const { data: newTypingMessageData } = useNewUserTypingMessageSubscription();
     const { data: newTypingDmData } = useNewUserTypingDmSubscription();
     const { data: newMessageData } = useNewMessageSubscription();
@@ -43,20 +45,28 @@ const SubscriptionWrapper: React.FC<{}> = ({ children }) => {
             });
         }
 
-        if(newDmData) {
-            cache.evict({ fieldName: 'directMessages' });
+        if(newTypingMessageData) {
+            cache.evict({ fieldName: 'usersTypingMessage' });
         }
 
         if(newTypingDmData) {
             cache.evict({ fieldName: 'userTypingDm' });
         }
 
-        if(newTypingMessageData) {
-            cache.evict({ fieldName: 'usersTypingMessage' });
+        if(newMessageData) {
+            cache.evict({ fieldName: 'channels' });
+            cache.evict({ fieldName: 'messages' });
+            cache.evict({ fieldName: 'teams' });
         }
 
-        if(newMessageData) {
-            cache.evict({ fieldName: 'messages' });
+        if(newDmData) {
+            cache.evict({ fieldName: 'recentChats' });
+            cache.evict({ fieldName: 'directMessages' });
+            cache.evict({ fieldName: 'unreadChats' });
+        }
+
+        if(newReadReceiptData) {
+            cache.evict({ fieldName: 'readReceipts' });
         }
 
     }, subscriptionData);

@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { useMessagesQuery, useUsersTypingMessageQuery } from '../../generated/graphql';
+import { 
+    useMessagesQuery, 
+    useUsersTypingMessageQuery,
+    useReadChannelMessagesMutation
+} from '../../generated/graphql';
 import TypingSnippet from '../../components/shared/TypingSnippet';
 import Message from '../../components/shared/Message';
 
@@ -25,8 +29,24 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ channelId }) => {
         skip: !channelId
     };
 
+    const [readChannelMessages] = useReadChannelMessagesMutation();
     const response = useUsersTypingMessageQuery(payload);
     const { data } = useMessagesQuery(payload);
+
+    useEffect(() => {
+        const onMount = async () => {
+            if(channelId) {
+                 await readChannelMessages({
+                     variables: { channelId },
+                     update: (cache) => {
+                         cache.evict({ fieldName: 'channels' });
+                     }
+                 });
+            }
+        }
+
+        onMount();
+    }, [data, channelId])
 
     return (
         <Container>

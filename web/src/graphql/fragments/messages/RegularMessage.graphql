@@ -2,7 +2,6 @@ fragment RegularMessage on Message {
     id
     text
     createdAt
-    isRead
     pic
     user {
         ...RegularUser

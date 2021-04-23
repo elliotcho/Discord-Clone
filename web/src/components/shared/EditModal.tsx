@@ -59,7 +59,7 @@ const Submit = styled.button`
     &:hover {
         background: #009933;
     }
-`
+`;
 
 interface EditModalProps {
     isOpen: boolean;

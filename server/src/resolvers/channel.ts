@@ -1,17 +1,68 @@
-import { MyContext } from "src/types";
 import { 
     Resolver,
     Query, 
     Arg,
     Int,
     Mutation,
-    Ctx
+    Ctx,
+    FieldResolver,
+    Root
 } from "type-graphql";
 import { getConnection } from "typeorm";
+import { Message } from '../entities/Message';
 import { Channel } from "../entities/Channel";
+import { Team } from '../entities/Team';
+import { Read } from '../entities/Read';
+import { MyContext } from "../types";
 
 @Resolver(Channel)
 export class ChannelResolver {
+    @FieldResolver(() => Boolean) 
+    async isRead(
+        @Root() { id: channelId } : Channel,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const messages = await Message.find({ where: { channelId } });
+
+        for(let i=0;i<messages.length;i++) {
+            const isRead = await Read.findOne({ where: {
+                messageId: messages[i].id,
+                userId: req.session.uid
+            }});
+
+            if(!isRead) return false;
+        }
+
+        return true;
+    }
+
+    @FieldResolver(() => Boolean)
+    async isOwner(
+        @Root() { teamId } : Channel,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const team = await Team.findOne(teamId);
+        const ownerId = team?.ownerId;
+
+        return req.session.uid === ownerId;
+    }
+
+    @Mutation(() => Boolean)
+    async editChannelName(
+        @Arg('teamId', () => Int) teamId: number,
+        @Arg('channelId', () => Int) channelId: number,
+        @Arg('newName') newName: string
+    ) : Promise<boolean> {
+        const channels = await Channel.find({ teamId, name: newName });
+
+        if(!!channels.length) {
+            return false;
+        }
+
+        await Channel.update({ id: channelId }, { name: newName });
+        return true;
+    }
+
     @Query(() => [Channel])
     async channels(
         @Arg('teamId', () => Int) teamId: number
@@ -55,21 +106,5 @@ export class ChannelResolver {
         @Arg('channelId', () => Int) channelId: number
     ) : Promise<Channel | undefined> {
         return Channel.findOne(channelId)
-    }
-
-    @Mutation(() => Boolean)
-    async updateRead(
-        @Arg('channelId', () => Int) channelId: number,
-        @Ctx() { req }: MyContext
-    ): Promise<boolean>{
-        await getConnection().query(
-            `
-                insert into read ("channelId", "userId")
-                VALUES($1, $2)
-            `,
-            [channelId, req.session.uid]
-        );
-        
-        return true;
     }
 }
