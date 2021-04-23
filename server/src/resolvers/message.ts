@@ -279,12 +279,9 @@ export class MessageResolver {
         @Arg('text') text: string,
         @Ctx() { req } : MyContext
     ) : Promise<Boolean> {
-<<<<<<< HEAD
-=======
         const channel = await Channel.findOne(channelId);
         const teamId = channel?.teamId;
 
->>>>>>> upstream/master
         await getConnection().query(
             `
                 update message
@@ -292,9 +289,6 @@ export class MessageResolver {
                 where id = $2
             `, 
             [text, messageId]
-<<<<<<< HEAD
-        )
-=======
         );
 
         await pubsub.publish(NEW_MESSAGE_EVENT, {
@@ -304,7 +298,6 @@ export class MessageResolver {
             teamId
         });
 
->>>>>>> upstream/master
         return true; 
     }
 }

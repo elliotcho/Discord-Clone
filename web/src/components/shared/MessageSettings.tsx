@@ -7,7 +7,6 @@ import {
     useDeleteDirectMessageMutation,
     useDeleteMessageMutation,
     useEditMessageMutation,
-    useEditDirectMessageMutation 
 } from '../../generated/graphql';
 import EditModal from './EditModal';
 
@@ -59,7 +58,6 @@ const MessageSettings: React.FC<MessageSettingsProps> = ({ messageId, channelId,
     const [isOpen, setIsOpen] = useState(false);
 
     const [editMessage] = useEditMessageMutation();
-    const [editDirectMessage] = useEditDirectMessageMutation();
     const [deleteMessage] = useDeleteMessageMutation();
     const [deleteDm] = useDeleteDirectMessageMutation();
     const [editDm] = useEditDirectMessageMutation();

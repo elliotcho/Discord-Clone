@@ -125,7 +125,6 @@ export type Channel = {
   name: Scalars['String'];
   isOriginal: Scalars['Boolean'];
   teamId: Scalars['Float'];
-  lastMessage: Message;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
 };
@@ -181,7 +180,6 @@ export type Mutation = {
   sendDirectMessage: Scalars['Boolean'];
   deleteDirectMessage: Scalars['Boolean'];
   sendDmFile: Scalars['Boolean'];
-  editDirectMessage: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
   updateRead: Scalars['Boolean'];
@@ -311,12 +309,6 @@ export type MutationSendDmFileArgs = {
 };
 
 
-export type MutationEditDirectMessageArgs = {
-  messageId: Scalars['Int'];
-  text: Scalars['String'];
-};
-
-
 export type MutationCreateChannelArgs = {
   teamId: Scalars['Int'];
   channelName: Scalars['String'];
@@ -382,10 +374,6 @@ export type Subscription = {
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
   & Pick<Channel, 'id' | 'name'>
-  & { lastMessage: (
-    { __typename?: 'Message' }
-    & RegularMessageFragment
-  ) }
 );
 
 export type RegularMessageFragment = (
@@ -980,8 +968,6 @@ export type UserQuery = (
   ) }
 );
 
-<<<<<<< HEAD
-=======
 export type NewDirectMessageSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1031,7 +1017,6 @@ export const RegularChannelFragmentDoc = gql`
   name
 }
     `;
->>>>>>> upstream/master
 export const RegularUserFragmentDoc = gql`
     fragment RegularUser on User {
   id
@@ -1058,15 +1043,6 @@ export const RegularMessageFragmentDoc = gql`
   }
 }
     ${RegularUserFragmentDoc}`;
-export const RegularChannelFragmentDoc = gql`
-    fragment RegularChannel on Channel {
-  id
-  name
-  lastMessage {
-    ...RegularMessage
-  }
-}
-    ${RegularMessageFragmentDoc}`;
 export const RegularTeamFragmentDoc = gql`
     fragment RegularTeam on Team {
   id

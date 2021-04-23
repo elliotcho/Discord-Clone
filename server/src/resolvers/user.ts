@@ -50,7 +50,7 @@ export class UserResolver {
             return `${process.env.SERVER_URL}/images/${user.profilePic}`;
         }
 
-        return `${process.env.SERVER_URL}/images/default.png`;
+        return `${process.env.SERVER_URL}/images/default.png`
     }
 
     @FieldResolver(() => Boolean)

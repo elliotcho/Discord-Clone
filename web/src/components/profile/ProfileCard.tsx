@@ -157,6 +157,8 @@ const ProfileCard: React.FC<{}> = () => {
                     })
                 }}
             />
+            
+            <br /> 
         </Container>
     )
 }

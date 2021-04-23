@@ -312,20 +312,6 @@ export class DirectMessageResolver {
         )
     }
 
-    @Mutation(() => Boolean)
-    async editDirectMessage(
-        @Arg('text') text: string, 
-        @Arg('messageId', () => Int) messageId: number
-    ) : Promise<Boolean> {
-        await getConnection().query(
-            `
-            update direct_message
-            set text = $1
-            where id = $2
-            `, 
-            [text, messageId]
-        )
-        return true; 
-    }
+    
 }
 
