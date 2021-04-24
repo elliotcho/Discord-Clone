@@ -18,9 +18,14 @@ const Text = styled.div`
     color: #404040;
 `;
 
+const ButtonWrapper = styled.div`
+    display: inline-block;
+`;
+
 interface MembersModalProps {
     isOpen: boolean;
     onClose(): void;
+    onSave(id: number): void;
     teamId: number;
     name: string;
 }
@@ -28,6 +33,7 @@ interface MembersModalProps {
 const MembersModal : React.FC<MembersModalProps> = ({ 
     children,
     isOpen, 
+    onSave,
     onClose, 
     teamId, 
     name
@@ -60,7 +66,15 @@ const MembersModal : React.FC<MembersModalProps> = ({
                             username = {u.username}
                             size = 'sm'
                         >
-                            {!u.isMe && children}
+                            {!u.isMe && (
+                                <ButtonWrapper
+                                    onClick = {() => {
+                                        onSave(u.id)
+                                    }}
+                                >
+                                    {children}
+                                </ButtonWrapper>
+                            )}
                         </FriendCard>
                     )}
 

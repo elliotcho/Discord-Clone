@@ -1,4 +1,2 @@
 Profile / Settings Page
-
 Channel Settings
-Team Settings

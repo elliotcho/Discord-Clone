@@ -16,7 +16,13 @@ const Title = styled.div`
 `;
 
 const Wrapper = styled.div`
+    display: flex;
     margin-top: 30px;
+    justify-content: center;
+    align-items: center;
+    background: #262626;
+    min-height: 100px;
+    padding: 12px;
 `;
 
 const ButtonStyles = `
@@ -90,13 +96,14 @@ const TeamSettingsFooter : React.FC<TeamSettingsFooterProps> = ({
     const [openConfirmKick, setOpenConfirmKick] = useState(false);
     const [openConfirmTransfer, setOpenConfirmTransfer] = useState(false);
     const [openTransfer, setIsOpenTransfer] = useState(false);
+    const [userId, setUserId] = useState(-1);
 
     const [changeOwner] = useChangeOwnerMutation();
     const [kickUser] = useKickUserMutation();
 
     return (    
         <Container>
-            <Title>Member Settings</Title>
+            <Title>Members</Title>
 
             <Wrapper>
                 <Success
@@ -121,6 +128,7 @@ const TeamSettingsFooter : React.FC<TeamSettingsFooterProps> = ({
             <MembersModal
                 isOpen = {openView}
                 onClose = {() => setIsOpenView(false)}
+                onSave = {(id) => setUserId(id)}
                 teamId = {teamId}
                 name = {name}
             >
@@ -138,6 +146,7 @@ const TeamSettingsFooter : React.FC<TeamSettingsFooterProps> = ({
             <MembersModal
                 isOpen = {openTransfer}
                 onClose = {() => setIsOpenTransfer(false)}
+                onSave = {(id) => setUserId(id)}
                 teamId = {teamId}
                 name = {name}
             >
@@ -157,7 +166,12 @@ const TeamSettingsFooter : React.FC<TeamSettingsFooterProps> = ({
                 title = 'Are you sure you want to kick this user?'
                 onClose = {() => setOpenConfirmKick(false)}
                 onSave = {async () => {
-                 
+                    await kickUser({
+                        variables: { teamId, userId },
+                        update: (cache) => {
+                            cache.evict({ fieldName: 'members' });
+                        }
+                    });
                 }}
             />
 
@@ -166,7 +180,13 @@ const TeamSettingsFooter : React.FC<TeamSettingsFooterProps> = ({
                 title = 'Are you sure you want to transfer ownership?'
                 onClose = {() => setOpenConfirmTransfer(false)}
                 onSave = {async () => {
-                    
+                    await changeOwner({
+                        variables: { teamId, userId },
+                        update: (cache) => {
+                            cache.evict({ fieldName: 'members' });
+                            cache.evict({ id: 'Team:' + teamId });
+                        }
+                    });
                 }}
             />
         </Container>
