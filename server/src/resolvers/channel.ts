@@ -107,4 +107,27 @@ export class ChannelResolver {
     ) : Promise<Channel | undefined> {
         return Channel.findOne(channelId)
     }
+
+    @Mutation(() => Boolean)
+    async addChannelMember(
+        @Arg('channelId', ()=> Int) channelId: number,
+        @Arg('teamId', ()=> Int) teamId: number,
+        @Arg('userId', ()=>Int) userId: number,
+        @Ctx() { req }: MyContext
+    ): Promise<boolean>{
+        const team = await Team.findOne(teamId);
+
+        if(team?.ownerId !== req.session.uid){
+            return false;
+        }
+
+        await getConnection().query(
+            `
+            insert into channel_member ("channelId","teamId","userId")
+            values ($1,$2,$3)
+            `,
+            [channelId, teamId, userId]
+        );
+        return true;
+    }
 }

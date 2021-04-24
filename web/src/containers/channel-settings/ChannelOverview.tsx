@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import ChannelName from '../../components/channel-settings/ChannelName';
+import DeleteChannel from '../../components/channel-settings/DeleteChannel';
+import InvitationModal from '../../components/shared/InvitationModal';
 
 const Container = styled.div`
     background: #4d4d4d;
@@ -40,6 +42,14 @@ const ChannelOverview: React.FC<ChannelOverviewProps> = ({
                     teamId = {teamId}
                     name = {name}
                 />
+
+                <DeleteChannel 
+                    isOwner = {isOwner}
+                    channelId = {channelId}
+                    teamId = {teamId}
+                    name = {name}
+                />
+
             </Wrapper>
         </Container>
     )

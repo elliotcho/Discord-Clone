@@ -206,6 +206,7 @@ export type Mutation = {
   editChannelName: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
+  addChannelMember: Scalars['Boolean'];
   removeFriend: Scalars['Boolean'];
   acceptFriendRequest: Scalars['Boolean'];
   cancelFriendRequest: Scalars['Boolean'];
@@ -404,6 +405,13 @@ export type MutationDeleteChannelArgs = {
 };
 
 
+export type MutationAddChannelMemberArgs = {
+  userId: Scalars['Int'];
+  teamId: Scalars['Int'];
+  channelId: Scalars['Int'];
+};
+
+
 export type MutationRemoveFriendArgs = {
   friendId: Scalars['Int'];
 };
@@ -497,6 +505,18 @@ export type RegularUserResponseFragment = (
     { __typename?: 'FieldError' }
     & RegularErrorFragment
   )>> }
+);
+
+export type AddChannelMemberMutationVariables = Exact<{
+  channelId: Scalars['Int'];
+  teamId: Scalars['Int'];
+  userId: Scalars['Int'];
+}>;
+
+
+export type AddChannelMemberMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'addChannelMember'>
 );
 
 export type CreateChannelMutationVariables = Exact<{
@@ -1310,6 +1330,38 @@ export const RegularUserResponseFragmentDoc = gql`
 }
     ${RegularUserFragmentDoc}
 ${RegularErrorFragmentDoc}`;
+export const AddChannelMemberDocument = gql`
+    mutation AddChannelMember($channelId: Int!, $teamId: Int!, $userId: Int!) {
+  addChannelMember(channelId: $channelId, teamId: $teamId, userId: $userId)
+}
+    `;
+export type AddChannelMemberMutationFn = Apollo.MutationFunction<AddChannelMemberMutation, AddChannelMemberMutationVariables>;
+
+/**
+ * __useAddChannelMemberMutation__
+ *
+ * To run a mutation, you first call `useAddChannelMemberMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddChannelMemberMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addChannelMemberMutation, { data, loading, error }] = useAddChannelMemberMutation({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *      teamId: // value for 'teamId'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useAddChannelMemberMutation(baseOptions?: Apollo.MutationHookOptions<AddChannelMemberMutation, AddChannelMemberMutationVariables>) {
+        return Apollo.useMutation<AddChannelMemberMutation, AddChannelMemberMutationVariables>(AddChannelMemberDocument, baseOptions);
+      }
+export type AddChannelMemberMutationHookResult = ReturnType<typeof useAddChannelMemberMutation>;
+export type AddChannelMemberMutationResult = Apollo.MutationResult<AddChannelMemberMutation>;
+export type AddChannelMemberMutationOptions = Apollo.BaseMutationOptions<AddChannelMemberMutation, AddChannelMemberMutationVariables>;
 export const CreateChannelDocument = gql`
     mutation CreateChannel($channelName: String!, $teamId: Int!) {
   createChannel(channelName: $channelName, teamId: $teamId)
