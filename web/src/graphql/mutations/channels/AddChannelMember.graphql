@@ -1,0 +1,3 @@
+mutation AddChannelMember($channelId: Int!, $teamId: Int!, $userId: Int!){
+    addChannelMember(channelId: $channelId, teamId: $teamId, userId: $userId)
+}
