@@ -97,6 +97,38 @@ export class TeamResolver {
     }
 
     @Mutation(() => Boolean)
+    async changeOwner(
+        @Arg('teamId', () => Int) teamId: number,
+        @Arg('userId', () => Int) userId: number
+    ) : Promise<boolean> {
+        await getConnection().query(
+            `
+                update team
+                set "ownerId" = $1
+                where id = $2
+            `, [userId, teamId]
+        );
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
+    async kickUser(
+        @Arg('teamId', () => Int) teamId: number,
+        @Arg('userId', () => Int) userId: number
+    ) : Promise<boolean> {
+        const user = await User.findOne(userId);
+        const team = await Team.findOne(teamId);
+
+        if(user?.id === team?.ownerId) {
+            return false;
+        }
+
+        await Member.delete({ teamId, userId });
+        return true;
+    }
+
+    @Mutation(() => Boolean)
     async leaveTeam(
         @Arg('teamId', () => Int) teamId: number,
         @Ctx() { req } : MyContext

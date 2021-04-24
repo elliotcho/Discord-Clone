@@ -179,6 +179,8 @@ export type Mutation = {
   forgotPassword: Scalars['Boolean'];
   changeUsername: Scalars['Boolean'];
   setStatus: Scalars['Boolean'];
+  changeOwner: Scalars['Boolean'];
+  kickUser: Scalars['Boolean'];
   leaveTeam: Scalars['Boolean'];
   removeTeamPhoto: Scalars['Boolean'];
   updateTeamPhoto: Scalars['Boolean'];
@@ -248,6 +250,18 @@ export type MutationChangeUsernameArgs = {
 
 export type MutationSetStatusArgs = {
   status: Scalars['Int'];
+};
+
+
+export type MutationChangeOwnerArgs = {
+  userId: Scalars['Int'];
+  teamId: Scalars['Int'];
+};
+
+
+export type MutationKickUserArgs = {
+  userId: Scalars['Int'];
+  teamId: Scalars['Int'];
 };
 
 
@@ -737,6 +751,17 @@ export type AddMemberMutation = (
   & Pick<Mutation, 'addMember'>
 );
 
+export type ChangeOwnerMutationVariables = Exact<{
+  teamId: Scalars['Int'];
+  userId: Scalars['Int'];
+}>;
+
+
+export type ChangeOwnerMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changeOwner'>
+);
+
 export type CreateTeamMutationVariables = Exact<{
   teamName: Scalars['String'];
 }>;
@@ -766,6 +791,17 @@ export type EditTeamNameMutationVariables = Exact<{
 export type EditTeamNameMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'editTeamName'>
+);
+
+export type KickUserMutationVariables = Exact<{
+  teamId: Scalars['Int'];
+  userId: Scalars['Int'];
+}>;
+
+
+export type KickUserMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'kickUser'>
 );
 
 export type LeaveTeamMutationVariables = Exact<{
@@ -2006,6 +2042,37 @@ export function useAddMemberMutation(baseOptions?: Apollo.MutationHookOptions<Ad
 export type AddMemberMutationHookResult = ReturnType<typeof useAddMemberMutation>;
 export type AddMemberMutationResult = Apollo.MutationResult<AddMemberMutation>;
 export type AddMemberMutationOptions = Apollo.BaseMutationOptions<AddMemberMutation, AddMemberMutationVariables>;
+export const ChangeOwnerDocument = gql`
+    mutation changeOwner($teamId: Int!, $userId: Int!) {
+  changeOwner(teamId: $teamId, userId: $userId)
+}
+    `;
+export type ChangeOwnerMutationFn = Apollo.MutationFunction<ChangeOwnerMutation, ChangeOwnerMutationVariables>;
+
+/**
+ * __useChangeOwnerMutation__
+ *
+ * To run a mutation, you first call `useChangeOwnerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeOwnerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeOwnerMutation, { data, loading, error }] = useChangeOwnerMutation({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useChangeOwnerMutation(baseOptions?: Apollo.MutationHookOptions<ChangeOwnerMutation, ChangeOwnerMutationVariables>) {
+        return Apollo.useMutation<ChangeOwnerMutation, ChangeOwnerMutationVariables>(ChangeOwnerDocument, baseOptions);
+      }
+export type ChangeOwnerMutationHookResult = ReturnType<typeof useChangeOwnerMutation>;
+export type ChangeOwnerMutationResult = Apollo.MutationResult<ChangeOwnerMutation>;
+export type ChangeOwnerMutationOptions = Apollo.BaseMutationOptions<ChangeOwnerMutation, ChangeOwnerMutationVariables>;
 export const CreateTeamDocument = gql`
     mutation CreateTeam($teamName: String!) {
   createTeam(teamName: $teamName)
@@ -2097,6 +2164,37 @@ export function useEditTeamNameMutation(baseOptions?: Apollo.MutationHookOptions
 export type EditTeamNameMutationHookResult = ReturnType<typeof useEditTeamNameMutation>;
 export type EditTeamNameMutationResult = Apollo.MutationResult<EditTeamNameMutation>;
 export type EditTeamNameMutationOptions = Apollo.BaseMutationOptions<EditTeamNameMutation, EditTeamNameMutationVariables>;
+export const KickUserDocument = gql`
+    mutation KickUser($teamId: Int!, $userId: Int!) {
+  kickUser(teamId: $teamId, userId: $userId)
+}
+    `;
+export type KickUserMutationFn = Apollo.MutationFunction<KickUserMutation, KickUserMutationVariables>;
+
+/**
+ * __useKickUserMutation__
+ *
+ * To run a mutation, you first call `useKickUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useKickUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [kickUserMutation, { data, loading, error }] = useKickUserMutation({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useKickUserMutation(baseOptions?: Apollo.MutationHookOptions<KickUserMutation, KickUserMutationVariables>) {
+        return Apollo.useMutation<KickUserMutation, KickUserMutationVariables>(KickUserDocument, baseOptions);
+      }
+export type KickUserMutationHookResult = ReturnType<typeof useKickUserMutation>;
+export type KickUserMutationResult = Apollo.MutationResult<KickUserMutation>;
+export type KickUserMutationOptions = Apollo.BaseMutationOptions<KickUserMutation, KickUserMutationVariables>;
 export const LeaveTeamDocument = gql`
     mutation LeaveTeam($teamId: Int!) {
   leaveTeam(teamId: $teamId)

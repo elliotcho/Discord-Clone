@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useKickUserMutation, useChangeOwnerMutation } from '../../generated/graphql';
 import ConfirmModal from '../shared/ConfirmModal';
 import MembersModal from './MembersModal';
 
@@ -75,6 +76,9 @@ const TeamSettingsFooter : React.FC<TeamSettingsFooterProps> = ({
     const [openConfirmKick, setOpenConfirmKick] = useState(false);
     const [openConfirmTransfer, setOpenConfirmTransfer] = useState(false);
     const [openTransfer, setIsOpenTransfer] = useState(false);
+
+    const [changeOwner] = useChangeOwnerMutation();
+    const [kickUser] = useKickUserMutation();
 
     return (    
         <Container>

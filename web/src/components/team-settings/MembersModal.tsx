@@ -53,7 +53,7 @@ const MembersModal : React.FC<MembersModalProps> = ({ isOpen, onClose, teamId, c
                             username = {u.username}
                             size = 'sm'
                         >
-                            {children}
+                            {!u.isMe && children}
                         </FriendCard>
                     )}
 

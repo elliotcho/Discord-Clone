@@ -1,0 +1,3 @@
+mutation KickUser($teamId: Int!, $userId: Int!) {
+    kickUser(teamId: $teamId, userId: $userId)
+}

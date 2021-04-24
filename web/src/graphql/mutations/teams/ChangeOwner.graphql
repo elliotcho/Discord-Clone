@@ -1,0 +1,3 @@
+mutation changeOwner($teamId: Int!, $userId: Int!) {
+    changeOwner(teamId: $teamId, userId: $userId)
+}
