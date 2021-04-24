@@ -22,9 +22,16 @@ interface MembersModalProps {
     isOpen: boolean;
     onClose(): void;
     teamId: number;
+    name: string;
 }
 
-const MembersModal : React.FC<MembersModalProps> = ({ isOpen, onClose, teamId, children }) => {
+const MembersModal : React.FC<MembersModalProps> = ({ 
+    children,
+    isOpen, 
+    onClose, 
+    teamId, 
+    name
+}) => {
     const { data } = useMembersQuery({
         variables: { teamId },
         skip: !teamId
@@ -43,7 +50,7 @@ const MembersModal : React.FC<MembersModalProps> = ({ isOpen, onClose, teamId, c
         >
                 <Container>
                     <Header>
-                        Members
+                        {name}
                     </Header>
 
                     {data?.members.map(u => 

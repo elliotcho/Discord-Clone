@@ -47,19 +47,33 @@ const Danger = styled.button`
     }
 `;
 
-const Kick = styled.button`
+const ModalButtonStyles = `
     color: #fff;
     padding: 5px 10px;
-    background: orangered;
-    font-size: 1.1rem;
+    font-size: 1.0rem;
     cursor: pointer;
     outline: none;
     border: none;
+`;
+
+const Transfer = styled.button`
+    ${ModalButtonStyles}
+    background: #33cc33;
+
+    &:hover {
+        background: #5cb85c;
+    }
+`;
+
+const Kick = styled.button`
+    ${ModalButtonStyles}
+    background: orangered;
 
     &:hover {
         background: #ff0000;
     }
 `;
+
 
 interface TeamSettingsFooterProps {
     isOwner: boolean;
@@ -94,7 +108,11 @@ const TeamSettingsFooter : React.FC<TeamSettingsFooterProps> = ({
                 </Success>
 
                 {isOwner && (
-                    <Danger>
+                    <Danger
+                        onClick = {() => {
+                            setIsOpenTransfer(true);
+                        }}
+                    >
                         Transfer Ownership
                     </Danger>
                 )}
@@ -104,9 +122,53 @@ const TeamSettingsFooter : React.FC<TeamSettingsFooterProps> = ({
                 isOpen = {openView}
                 onClose = {() => setIsOpenView(false)}
                 teamId = {teamId}
+                name = {name}
             >
-                <Kick>Kick</Kick>
+                {isOwner && (
+                    <Kick
+                        onClick = {() => {
+                            setOpenConfirmKick(true);
+                        }}
+                    >
+                        Kick
+                    </Kick>
+                )}
             </MembersModal>
+
+            <MembersModal
+                isOpen = {openTransfer}
+                onClose = {() => setIsOpenTransfer(false)}
+                teamId = {teamId}
+                name = {name}
+            >
+                {isOwner && (
+                     <Transfer
+                        onClick = {() => {
+                            setOpenConfirmTransfer(true);
+                        }}
+                     >
+                         Transfer
+                     </Transfer>
+                )}
+            </MembersModal>
+
+            <ConfirmModal
+                isOpen = {openConfirmKick}
+                title = 'Are you sure you want to kick this user?'
+                onClose = {() => setOpenConfirmKick(false)}
+                onSave = {async () => {
+                 
+                }}
+            />
+
+            <ConfirmModal
+                isOpen = {openConfirmTransfer}
+                title = 'Are you sure you want to transfer ownership?'
+                onClose = {() => setOpenConfirmTransfer(false)}
+                onSave = {async () => {
+                    
+                }}
+            />
         </Container>
     )
 }
