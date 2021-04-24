@@ -4,6 +4,11 @@ fragment RegularTeam on Team {
     unreadMessages
     isOwner
     photo
+
+    owner {
+        ...RegularUser
+    }
+
     channels {
         ...RegularChannel
     }

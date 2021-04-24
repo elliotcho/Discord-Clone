@@ -10,6 +10,7 @@ import {
 import { Field, ObjectType } from 'type-graphql';
 import { Channel } from './Channel';
 import { Seen } from './Seen';
+import { User } from "./User";
 
 @ObjectType()
 @Entity()
@@ -32,6 +33,9 @@ export class Team extends BaseEntity {
 
     @Field()
     unreadMessages: number;
+
+    @Field()
+    owner: User;
 
     @OneToMany(() => Channel, (channel) => channel.team)
     channels: Channel[];

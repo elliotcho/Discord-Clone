@@ -124,6 +124,7 @@ export type Team = {
   ownerId: Scalars['Float'];
   photo: Scalars['String'];
   unreadMessages: Scalars['Float'];
+  owner: User;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
   isOwner: Scalars['Boolean'];
@@ -454,7 +455,10 @@ export type RegularMessageFragment = (
 export type RegularTeamFragment = (
   { __typename?: 'Team' }
   & Pick<Team, 'id' | 'name' | 'unreadMessages' | 'isOwner' | 'photo'>
-  & { channels: Array<(
+  & { owner: (
+    { __typename?: 'User' }
+    & RegularUserFragment
+  ), channels: Array<(
     { __typename?: 'Channel' }
     & RegularChannelFragment
   )> }
@@ -1244,11 +1248,15 @@ export const RegularTeamFragmentDoc = gql`
   unreadMessages
   isOwner
   photo
+  owner {
+    ...RegularUser
+  }
   channels {
     ...RegularChannel
   }
 }
-    ${RegularChannelFragmentDoc}`;
+    ${RegularUserFragmentDoc}
+${RegularChannelFragmentDoc}`;
 export const RegularErrorFragmentDoc = gql`
     fragment RegularError on FieldError {
   field

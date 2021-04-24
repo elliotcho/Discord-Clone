@@ -26,6 +26,13 @@ import path from 'path';
 
 @Resolver(Team)
 export class TeamResolver {
+    @FieldResolver(() => User)
+    async owner(
+        @Root() { ownerId } : Team
+    ) : Promise<User | undefined> {
+        return User.findOne(ownerId);
+    }
+
     @FieldResolver(() => String)
     async photo (
         @Root() team: Team
