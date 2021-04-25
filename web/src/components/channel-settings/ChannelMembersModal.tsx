@@ -109,10 +109,10 @@ const ChannelMembersModal : React.FC<ChannelMembersModalProps> = ({
                             await removeMember({
                                 variables: { channelId, userId },
                                 update: (cache) => {
-                                    cache.evict({ fieldName: 'channelInvitees '});
-                                    cache.evict({ fieldName: 'channelMembers '});
+                                    cache.evict({ fieldName: 'channelInvitees' });
+                                    cache.evict({ fieldName: 'channelMembers' });
                                 }
-                            })
+                            });
                         }}
                     />
                 </Container>
