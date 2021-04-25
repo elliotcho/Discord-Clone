@@ -442,6 +442,29 @@ export class UserResolver {
     }
 
     @Mutation(() => Boolean)
+    async changeEmail(
+        @Arg('newEmail') newEmail: string,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const email = await User.findOne({ where: { email: newEmail }});
+
+        if(email){
+            return false;
+        }
+
+        await getConnection().query(
+            `
+                update "user"
+                set email = $1
+                where id = $2
+            `, 
+            [newEmail, req.session.uid]
+        ); 
+
+        return true;
+    }
+
+    @Mutation(() => Boolean)
     async setStatus(
         @PubSub() pubsub: PubSubEngine,
         @Arg('status', () => Int) status: number,

@@ -1,5 +1,7 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled, { isStyledComponent } from 'styled-components';
+import { useChangeEmailMutation } from '../../generated/graphql';
+import EditModal from '../shared/EditModal';
 
 const Title = styled.h3`
     font-weight: bold;
@@ -39,6 +41,9 @@ interface ChangeEmailProps {
 }
 
 const ChangeEmail : React.FC<ChangeEmailProps> = ({ email }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [changeEmail] = useChangeEmailMutation();
+
     return (
         <>
             <Title>email</Title>
@@ -47,9 +52,29 @@ const ChangeEmail : React.FC<ChangeEmailProps> = ({ email }) => {
                 <p>{email}</p>
                 
                 <Box>
-                    <Button>Edit</Button>
+                    <Button
+                        onClick={() => setIsOpen(true)}
+                    >
+                        Edit
+                    </Button>
                 </Box>
             </Flex>
+
+            <EditModal
+                size = 'sm'
+                isOpen = {isOpen}
+                content = {email}
+                title = 'Edit your email'
+                onClose = {() => setIsOpen(false)}
+                onSave = {async (newEmail: string) => {
+                    await changeEmail({
+                        variables : {newEmail},
+                        update: (cache) => {
+                            cache.evict({ fieldName: 'me' });
+                        }
+                    });
+                }}
+            />
         </>
     )
 }
