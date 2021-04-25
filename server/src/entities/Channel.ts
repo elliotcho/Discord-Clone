@@ -46,7 +46,7 @@ export class Channel extends BaseEntity {
     @OneToMany(() => Message, (message) => message.channel)
     messages: Message[];
 
-    @Field()
+    @Field(() => String)
     @CreateDateColumn()
     createdAt: Date;
 

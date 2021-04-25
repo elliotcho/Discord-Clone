@@ -70,6 +70,7 @@ const TogglePrivacy: React.FC<TogglePrivacyProps> = ({
         await togglePrivacy({
             variables: { channelId },
             update: (cache) => {
+                cache.evict({ fieldName: 'channelMembers'});
                 cache.evict({ id: 'Channel:' + channelId });
             }
         });

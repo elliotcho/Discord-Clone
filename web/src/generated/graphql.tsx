@@ -217,6 +217,7 @@ export type Mutation = {
   sendDirectMessage: Scalars['Boolean'];
   deleteDirectMessage: Scalars['Boolean'];
   sendDmFile: Scalars['Boolean'];
+  removeChannelMember: Scalars['Boolean'];
   togglePrivacy: Scalars['Boolean'];
   editChannelName: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
@@ -402,6 +403,12 @@ export type MutationSendDmFileArgs = {
 };
 
 
+export type MutationRemoveChannelMemberArgs = {
+  userId: Scalars['Int'];
+  channelId: Scalars['Int'];
+};
+
+
 export type MutationTogglePrivacyArgs = {
   channelId: Scalars['Int'];
 };
@@ -568,6 +575,17 @@ export type EditChannelNameMutationVariables = Exact<{
 export type EditChannelNameMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'editChannelName'>
+);
+
+export type RemoveChannelMemberMutationVariables = Exact<{
+  channelId: Scalars['Int'];
+  userId: Scalars['Int'];
+}>;
+
+
+export type RemoveChannelMemberMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'removeChannelMember'>
 );
 
 export type TogglePrivacyMutationVariables = Exact<{
@@ -1510,6 +1528,37 @@ export function useEditChannelNameMutation(baseOptions?: Apollo.MutationHookOpti
 export type EditChannelNameMutationHookResult = ReturnType<typeof useEditChannelNameMutation>;
 export type EditChannelNameMutationResult = Apollo.MutationResult<EditChannelNameMutation>;
 export type EditChannelNameMutationOptions = Apollo.BaseMutationOptions<EditChannelNameMutation, EditChannelNameMutationVariables>;
+export const RemoveChannelMemberDocument = gql`
+    mutation RemoveChannelMember($channelId: Int!, $userId: Int!) {
+  removeChannelMember(channelId: $channelId, userId: $userId)
+}
+    `;
+export type RemoveChannelMemberMutationFn = Apollo.MutationFunction<RemoveChannelMemberMutation, RemoveChannelMemberMutationVariables>;
+
+/**
+ * __useRemoveChannelMemberMutation__
+ *
+ * To run a mutation, you first call `useRemoveChannelMemberMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveChannelMemberMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeChannelMemberMutation, { data, loading, error }] = useRemoveChannelMemberMutation({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useRemoveChannelMemberMutation(baseOptions?: Apollo.MutationHookOptions<RemoveChannelMemberMutation, RemoveChannelMemberMutationVariables>) {
+        return Apollo.useMutation<RemoveChannelMemberMutation, RemoveChannelMemberMutationVariables>(RemoveChannelMemberDocument, baseOptions);
+      }
+export type RemoveChannelMemberMutationHookResult = ReturnType<typeof useRemoveChannelMemberMutation>;
+export type RemoveChannelMemberMutationResult = Apollo.MutationResult<RemoveChannelMemberMutation>;
+export type RemoveChannelMemberMutationOptions = Apollo.BaseMutationOptions<RemoveChannelMemberMutation, RemoveChannelMemberMutationVariables>;
 export const TogglePrivacyDocument = gql`
     mutation TogglePrivacy($channelId: Int!) {
   togglePrivacy(channelId: $channelId)

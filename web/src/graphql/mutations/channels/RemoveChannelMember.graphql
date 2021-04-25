@@ -1,0 +1,3 @@
+mutation RemoveChannelMember($channelId: Int!, $userId: Int!){
+    removeChannelMember(channelId: $channelId, userId: $userId)
+}

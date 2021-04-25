@@ -66,6 +66,22 @@ export class ChannelResolver {
         return req.session.uid === ownerId;
     }
 
+    @Mutation(() => Boolean)
+    async removeChannelMember(
+        @Arg('channelId', () => Int) channelId: number,
+        @Arg('userId', () => Int) userId: number
+    ) : Promise<boolean> {
+        await getConnection().query(
+            `
+                delete from channel_member as c
+                where c."channelId" = $1
+                and c."userId" = $2
+            `, [channelId, userId]
+        );
+
+        return true;
+    }
+
     @Query(() => [User])
     async channelMembers(
         @Arg('channelId', () => Int) channelId: number
@@ -101,7 +117,8 @@ export class ChannelResolver {
 
     @Query(() => [User])
     async channelInvitees(
-        @Arg('channelId', () => Int) channelId: number
+        @Arg('channelId', () => Int) channelId: number,
+        @Ctx() { req } : MyContext
     ) : Promise<User[]>{
         const result = [] as any;
 
@@ -112,8 +129,8 @@ export class ChannelResolver {
             `
                 select u.* from "user" as u
                 inner join member as m on m."userId" = u.id
-                where m."teamId" = $1
-            `, [teamId]
+                where u.id != $1 and m."teamId" = $2
+            `, [req.session.uid, teamId]
         );
 
         for(let i=0;i<users.length;i++) {

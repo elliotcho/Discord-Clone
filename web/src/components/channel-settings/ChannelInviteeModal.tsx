@@ -75,6 +75,7 @@ const ChannelInviteeModal : React.FC<ChannelInviteeModalProps> = ({ isOpen, onCl
                                         variables: { channelId, userId: u.id },
                                         update: (cache) => {
                                             cache.evict({ fieldName: 'channelInvitees '});
+                                            cache.evict({ fieldName: 'channelMembers '});
                                         }
                                     });
                                 }}
