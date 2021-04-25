@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import ChannelName from '../../components/channel-settings/ChannelName';
 import TogglePrivacy from '../../components/channel-settings/TogglePrivacy';
 import MemberSettings from '../../components/channel-settings/ChannelMemberSettings';
+import ChannelMetrics from '../../components/channel-settings/ChannelMetrics';
 
 const Container = styled.div`
     background: #4d4d4d;
@@ -59,6 +60,10 @@ const ChannelOverview: React.FC<ChannelOverviewProps> = ({
                     isPrivate = {isPrivate}
                     isOwner = {isOwner}
                     name = {name}
+                />
+
+                <ChannelMetrics
+                    channelId = {channelId}
                 />
             </Wrapper>
         </Container>
