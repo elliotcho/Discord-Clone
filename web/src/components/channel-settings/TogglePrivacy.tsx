@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useTogglePrivacyMutation } from '../../generated/graphql';
+import ChannelInviteeModal from './ChannelInviteeModal';
 
 const Button = styled.button`
     font-size: 1.3rem;
@@ -17,6 +18,7 @@ const TogglePrivacy: React.FC<TogglePrivacyProps> = ({
     isPrivate,
     isOwner
 }) => {
+    const [isOpen, setIsOpen] = useState(false);
     const [togglePrivacy] = useTogglePrivacyMutation();
 
     return (
@@ -33,6 +35,22 @@ const TogglePrivacy: React.FC<TogglePrivacyProps> = ({
                     {!isPrivate && 'Public'} 
                 </Button>
             )}
+
+            {isOwner && (
+                <Button
+                    onClick = {() => {
+                        setIsOpen(true)
+                    }}
+                >
+                    Invite
+                </Button>
+            )}
+
+            <ChannelInviteeModal
+                isOpen = {isOpen}
+                onClose = {() => setIsOpen(false)}
+                channelId = {channelId}
+            />
         </>
     )
 }

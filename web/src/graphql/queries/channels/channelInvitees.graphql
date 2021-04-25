@@ -1,0 +1,5 @@
+query ChannelInvitees($channelId: Int!) {
+    channelInvitees(channelId: $channelId) {
+        ...RegularUser
+    }
+}

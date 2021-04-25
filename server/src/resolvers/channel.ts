@@ -65,7 +65,38 @@ export class ChannelResolver {
 
         return req.session.uid === ownerId;
     }
-    
+
+    @Query(() => [User])
+    async channelInvitees(
+        @Arg('channelId', () => Int) channelId: number
+    ) : Promise<User[]>{
+        const result = [] as any;
+
+        const channel = await Channel.findOne(channelId);
+        const teamId = channel?.teamId;
+
+        const users = await getConnection().query(
+            `
+                select u.* from "user" as u
+                inner join member as m on m."userId" = u.id
+                where m."teamId" = $1
+            `, [teamId]
+        );
+
+        for(let i=0;i<users.length;i++) {
+            const isChannelMember = await ChannelMember.findOne({ where: {
+                 userId: users[i].id,
+                 channelId
+            }});    
+
+            if(!isChannelMember) {
+                result.push(users[i]);
+            }
+        }
+
+        return result;
+    }
+
     @Mutation(() => Boolean)
     async togglePrivacy(
         @Arg('channelId', () => Int) channelId: number,
