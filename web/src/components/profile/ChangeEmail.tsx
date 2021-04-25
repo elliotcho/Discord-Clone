@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import styled, { isStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 import { useChangeEmailMutation } from '../../generated/graphql';
 import EditModal from '../shared/EditModal';
+
+const Container = styled.div`
+    margin-top: 30px;
+`;
 
 const Title = styled.h3`
     font-weight: bold;
@@ -45,17 +49,17 @@ const ChangeEmail : React.FC<ChangeEmailProps> = ({ email }) => {
     const [changeEmail] = useChangeEmailMutation();
 
     return (
-        <>
-            <Title>email</Title>
+        <Container>
+            <Title>change email</Title>
             
             <Flex>
-                <p>{email}</p>
+                {email}
                 
                 <Box>
                     <Button
                         onClick={() => setIsOpen(true)}
                     >
-                        Edit
+                        Edit Email
                     </Button>
                 </Box>
             </Flex>
@@ -75,7 +79,7 @@ const ChangeEmail : React.FC<ChangeEmailProps> = ({ email }) => {
                     });
                 }}
             />
-        </>
+        </Container>
     )
 }
 

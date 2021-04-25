@@ -10,8 +10,9 @@ import { isServer } from '../../utils/isServer';
 const Container = styled.div`
     display: flex;
     position: relative;
+    align-items: center;
     background: #262626;
-    min-height: 160px;
+    min-height: 100px;
     padding: 12px;
 `;
 

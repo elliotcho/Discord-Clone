@@ -3,6 +3,10 @@ import styled from 'styled-components';
 import { useChangeUsernameMutation } from '../../generated/graphql';
 import EditModal from '../shared/EditModal';
 
+const Container = styled.div`
+    margin-top: 30px;
+`;
+
 const Title = styled.h3`
     font-weight: bold;
     text-transform: uppercase;
@@ -45,11 +49,11 @@ const ChangeUsername : React.FC<ChangeUsernameProps> = ({ username }) => {
     const [changeUsername] = useChangeUsernameMutation()
     
     return (
-        <>
-            <Title>username</Title> 
+        <Container>
+            <Title>change username</Title> 
             
             <Flex>
-                <p>{username}</p>
+                {username}
 
                 <Box>
                     <Button
@@ -57,7 +61,7 @@ const ChangeUsername : React.FC<ChangeUsernameProps> = ({ username }) => {
                             setIsOpen(true);
                         }}
                     >
-                        Edit
+                        Edit Username
                     </Button>
                 </Box>
             </Flex>
@@ -77,7 +81,7 @@ const ChangeUsername : React.FC<ChangeUsernameProps> = ({ username }) => {
                     });
                 }}
             />
-        </>
+        </Container>
     )
 }
 

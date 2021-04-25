@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import ProfileCard from '../../components/profile/ProfileCard';
 import ChangeUsername from '../../components/profile/ChangeUsername';
 import ChangeEmail from '../../components/profile/ChangeEmail';
+import ChangePassword from '../../components/profile/ChangePassword';
 
 const Container = styled.div`
     background: #4d4d4d;
@@ -30,11 +31,15 @@ const MyAccount: React.FC<MyAccountProps> = ({ username, email }) => {
             <Wrapper>
                 <Header>MY ACCOUNT</Header>
                 
-                <ProfileCard />
-               
-                <ChangeUsername username={username} />
+                <>
+                    <ProfileCard />
+                
+                    <ChangeUsername username={username} />
 
-                <ChangeEmail email={email}/>
+                    <ChangeEmail email={email}/>
+
+                    <ChangePassword />
+                </>
             </Wrapper>
         </Container>
     )
