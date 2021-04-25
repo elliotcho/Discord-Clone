@@ -46,6 +46,7 @@ const ChannelSettings : React.FC<{}> =() => {
                         isOwner = {isOwner}
                         channelId={channelId} 
                         isPrivate = {isPrivate}
+                        isOriginal = {isOriginal}
                         teamId={teamId}
                         name={name}
                     />

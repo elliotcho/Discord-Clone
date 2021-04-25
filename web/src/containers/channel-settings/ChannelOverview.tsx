@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import ChannelName from '../../components/channel-settings/ChannelName';
 import TogglePrivacy from '../../components/channel-settings/TogglePrivacy';
+import MemberSettings from '../../components/channel-settings/ChannelMemberSettings';
 
 const Container = styled.div`
     background: #4d4d4d;
@@ -20,6 +21,7 @@ const Header = styled.h3`
 interface ChannelOverviewProps {
     isOwner: boolean;
     channelId: number;
+    isOriginal: boolean;
     isPrivate: boolean;
     teamId: number;
     name: string;
@@ -27,7 +29,8 @@ interface ChannelOverviewProps {
 
 const ChannelOverview: React.FC<ChannelOverviewProps> = ({
     isOwner,
-    channelId, 
+    channelId,
+    isOriginal, 
     isPrivate,
     teamId,
     name
@@ -46,8 +49,16 @@ const ChannelOverview: React.FC<ChannelOverviewProps> = ({
 
                 <TogglePrivacy
                     channelId = {channelId}
+                    isOriginal = {isOriginal}
                     isPrivate = {isPrivate}
                     isOwner = {isOwner}
+                />
+
+                <MemberSettings
+                    channelId = {channelId}
+                    isPrivate = {isPrivate}
+                    isOwner = {isOwner}
+                    name = {name}
                 />
             </Wrapper>
         </Container>

@@ -15,7 +15,7 @@ const ChannelMemberWrapper : React.FC<ChannelMemberProps> = ({ children, channel
     });
 
     if(!loading) {
-        if(!data?.channel?.isMember) {
+        if(!data?.channel?.isMember && data?.channel?.isPrivate) {
             router.push('/friends');
         }
 

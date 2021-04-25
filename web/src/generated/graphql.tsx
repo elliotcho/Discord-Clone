@@ -34,6 +34,7 @@ export type Query = {
   userTypingDm?: Maybe<User>;
   recentChats: Array<User>;
   directMessages: Array<DirectMessage>;
+  channelMembers: Array<User>;
   channelInvitees: Array<User>;
   channels: Array<Channel>;
   channel: Channel;
@@ -90,6 +91,11 @@ export type QueryDmReadReceiptsArgs = {
 
 export type QueryDirectMessagesArgs = {
   receiverId: Scalars['Int'];
+};
+
+
+export type QueryChannelMembersArgs = {
+  channelId: Scalars['Int'];
 };
 
 
@@ -997,6 +1003,19 @@ export type ChannelInviteesQueryVariables = Exact<{
 export type ChannelInviteesQuery = (
   { __typename?: 'Query' }
   & { channelInvitees: Array<(
+    { __typename?: 'User' }
+    & RegularUserFragment
+  )> }
+);
+
+export type ChannelMembersQueryVariables = Exact<{
+  channelId: Scalars['Int'];
+}>;
+
+
+export type ChannelMembersQuery = (
+  { __typename?: 'Query' }
+  & { channelMembers: Array<(
     { __typename?: 'User' }
     & RegularUserFragment
   )> }
@@ -2748,6 +2767,39 @@ export function useChannelInviteesLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type ChannelInviteesQueryHookResult = ReturnType<typeof useChannelInviteesQuery>;
 export type ChannelInviteesLazyQueryHookResult = ReturnType<typeof useChannelInviteesLazyQuery>;
 export type ChannelInviteesQueryResult = Apollo.QueryResult<ChannelInviteesQuery, ChannelInviteesQueryVariables>;
+export const ChannelMembersDocument = gql`
+    query ChannelMembers($channelId: Int!) {
+  channelMembers(channelId: $channelId) {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+/**
+ * __useChannelMembersQuery__
+ *
+ * To run a query within a React component, call `useChannelMembersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useChannelMembersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useChannelMembersQuery({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useChannelMembersQuery(baseOptions: Apollo.QueryHookOptions<ChannelMembersQuery, ChannelMembersQueryVariables>) {
+        return Apollo.useQuery<ChannelMembersQuery, ChannelMembersQueryVariables>(ChannelMembersDocument, baseOptions);
+      }
+export function useChannelMembersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ChannelMembersQuery, ChannelMembersQueryVariables>) {
+          return Apollo.useLazyQuery<ChannelMembersQuery, ChannelMembersQueryVariables>(ChannelMembersDocument, baseOptions);
+        }
+export type ChannelMembersQueryHookResult = ReturnType<typeof useChannelMembersQuery>;
+export type ChannelMembersLazyQueryHookResult = ReturnType<typeof useChannelMembersLazyQuery>;
+export type ChannelMembersQueryResult = Apollo.QueryResult<ChannelMembersQuery, ChannelMembersQueryVariables>;
 export const ChannelsDocument = gql`
     query Channels($teamId: Int!) {
   channels(teamId: $teamId) {

@@ -67,6 +67,39 @@ export class ChannelResolver {
     }
 
     @Query(() => [User])
+    async channelMembers(
+        @Arg('channelId', () => Int) channelId: number
+    ) : Promise<User[]> {
+        let query = '';
+        let replacements = [] as any;
+
+        const channel = await Channel.findOne(channelId);
+        const isPrivate = channel?.isPrivate;
+        const teamId = channel?.teamId;
+
+        if(isPrivate) {
+            query = `
+                select u.* from "user" as u
+                inner join channel_member as c on c."userId" = u.id
+                where c."channelId" = $1
+            `;
+
+            replacements = [channelId];
+        } else {
+            query = `
+                select u.* from "user" as u
+                inner join member as m on m."userId" = u.id
+                where m."teamId" = $1
+            `;
+
+            replacements = [teamId];
+        }
+
+        const users = await getConnection().query(query, replacements);
+        return users;
+    }
+
+    @Query(() => [User])
     async channelInvitees(
         @Arg('channelId', () => Int) channelId: number
     ) : Promise<User[]>{

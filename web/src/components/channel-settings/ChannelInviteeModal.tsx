@@ -34,8 +34,8 @@ const Button = styled.button`
 
 interface ChannelInviteeModalProps {
     isOpen: boolean;
-    onClose(): void;
     channelId: number;
+    onClose(): void;
 }
 
 const ChannelInviteeModal : React.FC<ChannelInviteeModalProps> = ({ isOpen, onClose, channelId }) => {
