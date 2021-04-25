@@ -1,5 +1,8 @@
 fragment RegularChannel on Channel {
     id
+    createdAt
+    numMembers
+    numMessages
     isOriginal
     isPrivate
     isMember

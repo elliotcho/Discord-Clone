@@ -19,6 +19,30 @@ import { MyContext } from "../types";
 
 @Resolver(Channel)
 export class ChannelResolver {
+    @FieldResolver(() => Int)
+    async numMembers(
+        @Root() { id: channelId } : Channel
+    ) : Promise<number> {
+        const members = await this.channelMembers(channelId);
+        const numMembers = members.length;
+
+        return numMembers;
+    }
+
+    @FieldResolver(() => Int)
+    async numMessages(
+        @Root() { id: channelId } : Channel
+    ) : Promise<number> {
+        const messages = await getConnection().query(
+            `
+                select m.* from message as m
+                where m."channelId" = $1
+            `, [channelId]
+        );
+
+        return messages.length;
+    }
+
     @FieldResolver(() => Boolean)
     async isMember(
         @Root() { id: channelId, isPrivate } : Channel,

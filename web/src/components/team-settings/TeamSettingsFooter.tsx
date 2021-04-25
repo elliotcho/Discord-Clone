@@ -35,12 +35,12 @@ const ButtonStyles = `
     padding: 5px;
 `;  
 
-const Success = styled.button`
+const Primary = styled.button`
     ${ButtonStyles}
-    background: #5cb85c;
+    background: #0275d8;
 
     &:hover {
-        background: #33cc33;
+        background: #0388fc;
     }
 `;
 
@@ -80,7 +80,6 @@ const Kick = styled.button`
     }
 `;
 
-
 interface TeamSettingsFooterProps {
     isOwner: boolean;
     teamId: number;
@@ -106,13 +105,13 @@ const TeamSettingsFooter : React.FC<TeamSettingsFooterProps> = ({
             <Title>Members</Title>
 
             <Wrapper>
-                <Success
+                <Primary
                     onClick = {() => {
                         setIsOpenView(true);
                     }}
                 >
                     View Members
-                </Success>
+                </Primary>
 
                 {isOwner && (
                     <Danger

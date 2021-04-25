@@ -25,31 +25,13 @@ const ChannelSettings : React.FC<{}> =() => {
         skip: !channelId
     });
 
-    const isOwner = !!data?.channel?.isOwner;
-    const name = data?.channel?.name || 'Loading...';
-    const isOriginal = !!data?.channel?.isOriginal;
-    const isPrivate = !!data?.channel?.isPrivate;
-    const teamId = data?.channel?.teamId || -1;
-
     return (
         <AuthWrapper requiresAuth>
              <Container>
-                <Sidebar 
-                    isOwner = {isOwner}
-                    isOriginal={isOriginal}
-                    channelId={channelId} 
-                    teamId={teamId}
-                />
+                <Sidebar channelId={channelId} {...data?.channel}/>
                 
                 <>
-                    <Overview 
-                        isOwner = {isOwner}
-                        channelId={channelId} 
-                        isPrivate = {isPrivate}
-                        isOriginal = {isOriginal}
-                        teamId={teamId}
-                        name={name}
-                    />
+                    <Overview channelId={channelId} {...data?.channel}/>
                 </>
 
                 <EscapeColumn />

@@ -23,7 +23,10 @@ interface ChannelOverviewProps {
     isOwner: boolean;
     channelId: number;
     isOriginal: boolean;
+    numMessages: number;
+    numMembers: number;
     isPrivate: boolean;
+    createdAt: string;
     teamId: number;
     name: string;
 }
@@ -32,7 +35,10 @@ const ChannelOverview: React.FC<ChannelOverviewProps> = ({
     isOwner,
     channelId,
     isOriginal, 
+    numMessages,
+    numMembers,
     isPrivate,
+    createdAt,
     teamId,
     name
 }) => {
@@ -55,15 +61,17 @@ const ChannelOverview: React.FC<ChannelOverviewProps> = ({
                     isOwner = {isOwner}
                 />
 
+                <ChannelMetrics
+                    numMembers = {numMembers}
+                    numMessages = {numMessages}
+                    createdAt = {createdAt}
+                />
+
                 <MemberSettings
                     channelId = {channelId}
                     isPrivate = {isPrivate}
                     isOwner = {isOwner}
                     name = {name}
-                />
-
-                <ChannelMetrics
-                    channelId = {channelId}
                 />
             </Wrapper>
         </Container>
