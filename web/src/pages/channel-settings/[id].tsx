@@ -26,9 +26,10 @@ const ChannelSettings : React.FC<{}> =() => {
     });
 
     const isOwner = !!data?.channel?.isOwner;
-    const isOriginal = !!data?.channel?.isOriginal;
-    const teamId = data?.channel?.teamId || -1;
     const name = data?.channel?.name || 'Loading...';
+    const isOriginal = !!data?.channel?.isOriginal;
+    const isPrivate = !!data?.channel?.isPrivate;
+    const teamId = data?.channel?.teamId || -1;
 
     return (
         <AuthWrapper requiresAuth>
@@ -44,6 +45,7 @@ const ChannelSettings : React.FC<{}> =() => {
                     <Overview 
                         isOwner = {isOwner}
                         channelId={channelId} 
+                        isPrivate = {isPrivate}
                         teamId={teamId}
                         name={name}
                     />

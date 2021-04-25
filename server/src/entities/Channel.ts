@@ -28,6 +28,13 @@ export class Channel extends BaseEntity {
     isOriginal: boolean;
 
     @Field()
+    @Column({ default: false })
+    isPrivate: boolean;
+
+    @Field()
+    isMember: boolean;
+
+    @Field()
     @Column()
     teamId: number;
 

@@ -136,6 +136,8 @@ export type Channel = {
   id: Scalars['Float'];
   name: Scalars['String'];
   isOriginal: Scalars['Boolean'];
+  isPrivate: Scalars['Boolean'];
+  isMember: Scalars['Boolean'];
   teamId: Scalars['Float'];
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
@@ -203,6 +205,7 @@ export type Mutation = {
   sendDirectMessage: Scalars['Boolean'];
   deleteDirectMessage: Scalars['Boolean'];
   sendDmFile: Scalars['Boolean'];
+  togglePrivacy: Scalars['Boolean'];
   editChannelName: Scalars['Boolean'];
   createChannel: Scalars['Boolean'];
   deleteChannel: Scalars['Boolean'];
@@ -387,6 +390,11 @@ export type MutationSendDmFileArgs = {
 };
 
 
+export type MutationTogglePrivacyArgs = {
+  channelId: Scalars['Int'];
+};
+
+
 export type MutationEditChannelNameArgs = {
   newName: Scalars['String'];
   channelId: Scalars['Int'];
@@ -407,7 +415,6 @@ export type MutationDeleteChannelArgs = {
 
 export type MutationAddChannelMemberArgs = {
   userId: Scalars['Int'];
-  teamId: Scalars['Int'];
   channelId: Scalars['Int'];
 };
 
@@ -462,7 +469,7 @@ export type Subscription = {
 
 export type RegularChannelFragment = (
   { __typename?: 'Channel' }
-  & Pick<Channel, 'id' | 'isOriginal' | 'isRead' | 'teamId' | 'isOwner' | 'name'>
+  & Pick<Channel, 'id' | 'isOriginal' | 'isPrivate' | 'isMember' | 'isRead' | 'teamId' | 'isOwner' | 'name'>
 );
 
 export type RegularMessageFragment = (
@@ -509,7 +516,6 @@ export type RegularUserResponseFragment = (
 
 export type AddChannelMemberMutationVariables = Exact<{
   channelId: Scalars['Int'];
-  teamId: Scalars['Int'];
   userId: Scalars['Int'];
 }>;
 
@@ -550,6 +556,16 @@ export type EditChannelNameMutationVariables = Exact<{
 export type EditChannelNameMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'editChannelName'>
+);
+
+export type TogglePrivacyMutationVariables = Exact<{
+  channelId: Scalars['Int'];
+}>;
+
+
+export type TogglePrivacyMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'togglePrivacy'>
 );
 
 export type DeleteDirectMessageMutationVariables = Exact<{
@@ -1291,6 +1307,8 @@ export const RegularChannelFragmentDoc = gql`
     fragment RegularChannel on Channel {
   id
   isOriginal
+  isPrivate
+  isMember
   isRead
   teamId
   isOwner
@@ -1331,8 +1349,8 @@ export const RegularUserResponseFragmentDoc = gql`
     ${RegularUserFragmentDoc}
 ${RegularErrorFragmentDoc}`;
 export const AddChannelMemberDocument = gql`
-    mutation AddChannelMember($channelId: Int!, $teamId: Int!, $userId: Int!) {
-  addChannelMember(channelId: $channelId, teamId: $teamId, userId: $userId)
+    mutation AddChannelMember($channelId: Int!, $userId: Int!) {
+  addChannelMember(channelId: $channelId, userId: $userId)
 }
     `;
 export type AddChannelMemberMutationFn = Apollo.MutationFunction<AddChannelMemberMutation, AddChannelMemberMutationVariables>;
@@ -1351,7 +1369,6 @@ export type AddChannelMemberMutationFn = Apollo.MutationFunction<AddChannelMembe
  * const [addChannelMemberMutation, { data, loading, error }] = useAddChannelMemberMutation({
  *   variables: {
  *      channelId: // value for 'channelId'
- *      teamId: // value for 'teamId'
  *      userId: // value for 'userId'
  *   },
  * });
@@ -1455,6 +1472,36 @@ export function useEditChannelNameMutation(baseOptions?: Apollo.MutationHookOpti
 export type EditChannelNameMutationHookResult = ReturnType<typeof useEditChannelNameMutation>;
 export type EditChannelNameMutationResult = Apollo.MutationResult<EditChannelNameMutation>;
 export type EditChannelNameMutationOptions = Apollo.BaseMutationOptions<EditChannelNameMutation, EditChannelNameMutationVariables>;
+export const TogglePrivacyDocument = gql`
+    mutation TogglePrivacy($channelId: Int!) {
+  togglePrivacy(channelId: $channelId)
+}
+    `;
+export type TogglePrivacyMutationFn = Apollo.MutationFunction<TogglePrivacyMutation, TogglePrivacyMutationVariables>;
+
+/**
+ * __useTogglePrivacyMutation__
+ *
+ * To run a mutation, you first call `useTogglePrivacyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTogglePrivacyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [togglePrivacyMutation, { data, loading, error }] = useTogglePrivacyMutation({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useTogglePrivacyMutation(baseOptions?: Apollo.MutationHookOptions<TogglePrivacyMutation, TogglePrivacyMutationVariables>) {
+        return Apollo.useMutation<TogglePrivacyMutation, TogglePrivacyMutationVariables>(TogglePrivacyDocument, baseOptions);
+      }
+export type TogglePrivacyMutationHookResult = ReturnType<typeof useTogglePrivacyMutation>;
+export type TogglePrivacyMutationResult = Apollo.MutationResult<TogglePrivacyMutation>;
+export type TogglePrivacyMutationOptions = Apollo.BaseMutationOptions<TogglePrivacyMutation, TogglePrivacyMutationVariables>;
 export const DeleteDirectMessageDocument = gql`
     mutation DeleteDirectMessage($messageId: Int!) {
   deleteDirectMessage(messageId: $messageId)

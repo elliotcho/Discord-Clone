@@ -5,7 +5,7 @@ import {
     PrimaryColumn,
     UpdateDateColumn
 } from "typeorm";
-import {Field, ObjectType} from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Entity()
@@ -16,17 +16,13 @@ export class ChannelMember extends BaseEntity{
 
     @Field()
     @PrimaryColumn()
-    teamId: number;
-
-    @Field()
-    @PrimaryColumn()
     channelId: number;
 
-    @Field()
+    @Field(() => String)
     @CreateDateColumn()
     createdAt: Date;
 
-    @Field()
+    @Field(() => String)
     @UpdateDateColumn()
     updatedAt: Date;
 }

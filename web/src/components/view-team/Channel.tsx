@@ -1,14 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faLock } from '@fortawesome/free-solid-svg-icons';
 import NextLink from 'next/link';
 
 const Box = styled.div`
     margin-left: auto;
 `;  
 
-const Icon = styled.div`
+const PublicIcon = styled.div`
     color: #f2f2f2;
 
     ${Box}:hover & {
@@ -16,17 +16,29 @@ const Icon = styled.div`
     }
 `;
 
-const Container = styled.div`
+const PrivateIcon = styled.div`
+    color: #f2f2f2;
+`;
+
+const ContainerStyles = `
     padding: 5px;
     position: relative;
     padding-left: 10px;
     display: flex;
-    cursor: pointer;
     color: white;
+`;
+
+const PublicContainer = styled.div`
+    ${ContainerStyles}
+    cursor: pointer;
 
     &:hover {
         background: #808080;
     }
+`;
+
+const PrivateContainer = styled.div`
+    ${ContainerStyles}
 `;
 
 const Marker = styled.div`
@@ -43,6 +55,7 @@ interface ChannelProps {
     name: string;
     teamId: number;
     channelId: number;
+    isMember: boolean;
     isRead: boolean;
     active: boolean;
 }
@@ -51,6 +64,7 @@ const Channel: React.FC<ChannelProps> = ({
     name,
     teamId,
     channelId,
+    isMember,
     isRead,
     active
 }) => {
@@ -63,23 +77,37 @@ const Channel: React.FC<ChannelProps> = ({
     const channelRoute = `/view-team/${teamId}/${channelId}`;
     const settingsRoute = `/channel-settings/${channelId}`;
 
-    return (
-        <NextLink href={channelRoute}>
-            <Container style={style}>
+    if(!isMember) {
+        return (
+            <PrivateContainer>
                 # {name}
 
-               <NextLink href={settingsRoute}>
+                <Box>
+                    <PrivateIcon>
+                        <FontAwesomeIcon icon = {faLock} />
+                    </PrivateIcon>
+                </Box>
+            </PrivateContainer>
+        )
+    }
+
+    return (
+        <NextLink href={channelRoute}>
+            <PublicContainer style={style}>
+                # {name}
+                
+                <NextLink href={settingsRoute}>
                     <Box>
-                        <Icon>
+                        <PublicIcon>
                             <FontAwesomeIcon icon = {faCog} />
-                        </Icon>
+                        </PublicIcon>
                     </Box>
                 </NextLink>
 
                 {!active && !isRead && (
                     <Marker />
                 )}
-            </Container> 
+            </PublicContainer> 
         </NextLink>
     )
 }

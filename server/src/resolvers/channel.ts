@@ -11,12 +11,31 @@ import {
 import { getConnection } from "typeorm";
 import { Message } from '../entities/Message';
 import { Channel } from "../entities/Channel";
+import { ChannelMember } from '../entities/ChannelMember';
 import { Team } from '../entities/Team';
 import { Read } from '../entities/Read';
+import { User } from '../entities/User';
 import { MyContext } from "../types";
 
 @Resolver(Channel)
 export class ChannelResolver {
+    @FieldResolver(() => Boolean)
+    async isMember(
+        @Root() { id: channelId, isPrivate } : Channel,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        if(!isPrivate) {
+            return true;
+        }
+
+        const isMember = await ChannelMember.findOne({ where: { 
+            userId: req.session.uid,
+            channelId
+        }});
+
+        return !!isMember;
+    }
+
     @FieldResolver(() => Boolean) 
     async isRead(
         @Root() { id: channelId } : Channel,
@@ -45,6 +64,33 @@ export class ChannelResolver {
         const ownerId = team?.ownerId;
 
         return req.session.uid === ownerId;
+    }
+    
+    @Mutation(() => Boolean)
+    async togglePrivacy(
+        @Arg('channelId', () => Int) channelId: number,
+        @Ctx() { req } : MyContext
+    ) : Promise<boolean> {
+        const channel = await Channel.findOne(channelId);
+        const isPrivate = !!channel?.isPrivate;
+
+        if(!isPrivate) { //becoming private
+            await this.addChannelMember(channelId, req.session.uid!);
+        } 
+        
+        else { //becoming public
+            await getConnection().query(
+                `
+                    delete from channel_member as c
+                    where c."channelId" = $1
+                `, 
+                [channelId]
+            );
+        }
+
+        await Channel.update({ id: channelId }, { isPrivate: !isPrivate });
+
+        return true;
     }
 
     @Mutation(() => Boolean)
@@ -110,24 +156,17 @@ export class ChannelResolver {
 
     @Mutation(() => Boolean)
     async addChannelMember(
-        @Arg('channelId', ()=> Int) channelId: number,
-        @Arg('teamId', ()=> Int) teamId: number,
-        @Arg('userId', ()=>Int) userId: number,
-        @Ctx() { req }: MyContext
-    ): Promise<boolean>{
-        const team = await Team.findOne(teamId);
-
-        if(team?.ownerId !== req.session.uid){
-            return false;
-        }
-
+        @Arg('channelId', () => Int) channelId: number,
+        @Arg('userId', () =>Int) userId: number,
+    ): Promise<boolean> {
         await getConnection().query(
             `
-            insert into channel_member ("channelId","teamId","userId")
-            values ($1,$2,$3)
+                insert into channel_member ("userId", "channelId")
+                values ($1, $2)
             `,
-            [channelId, teamId, userId]
+            [userId, channelId]
         );
+        
         return true;
     }
 }

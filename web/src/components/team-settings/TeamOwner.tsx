@@ -41,7 +41,6 @@ interface TeamOwnerProps {
 }
 
 const TeamOwner: React.FC<TeamOwnerProps> = ({ 
-    teamId,
     profileURL,
     username
 }) => {

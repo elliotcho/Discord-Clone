@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Modal } from 'react-responsive-modal';
 import { useInviteesQuery, useAddMemberMutation } from '../../generated/graphql';
 import FriendCard from '../../containers/shared/FriendCard';
-import InvitationModal from '../../components/shared/InvitationModal';
 
 const Container = styled.div`
-    width: 800px;
+    width: 400px;
 `;
 
 const Header = styled.h2`
@@ -28,13 +27,10 @@ const Button = styled.button`
     cursor: pointer;
     outline: none;
     border: none;
-
     &:hover {
         background: green;
     }
 `;
-
-
 
 interface InvitePeopleModalProps {
     isOpen: boolean;
@@ -49,9 +45,6 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
         variables: { teamId },
         skip: !teamId
     });
-
-    const [isInviteOpen, setInviteIsOpen] = useState(false);
-    let user;
 
     return(
         <Modal
@@ -78,18 +71,17 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
                         >
                             <Button
                                 onClick = {async () => {
-                                    
-                                    
-                                    setInviteIsOpen(true);
-                                    user = u.id
-
+                                    await addMember({
+                                        variables: { teamId, userId: u.id },
+                                        update: (cache) => {
+                                            cache.evict({ fieldName: 'invitees' });
+                                            cache.evict({ fieldName: 'members' });
+                                        }
+                                    });
                                 }}
                             >
                                 +
                             </Button>
-
-                            
-                            
                         </FriendCard>
                     )}
 
@@ -98,14 +90,6 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
                             No users available
                         </Text>
                     )}
-
-                    <InvitationModal
-                        isOpen = {isInviteOpen}
-                        title = 'Invite User to Channel(s)'
-                        onClose = {() => setInviteIsOpen(false)}
-                        teamId = {teamId}
-                        userId = {user}
-                        />
                 </Container>
         </Modal>
     )

@@ -106,7 +106,8 @@ export class TeamResolver {
                 update team
                 set "ownerId" = $1
                 where id = $2
-            `, [userId, teamId]
+            `, 
+            [userId, teamId]
         );
 
         return true;
@@ -133,6 +134,12 @@ export class TeamResolver {
         @Arg('teamId', () => Int) teamId: number,
         @Ctx() { req } : MyContext
     ) : Promise<boolean> {
+        const team = await Team.findOne(teamId);
+
+        if(team?.ownerId === req.session.uid) {
+             return false;
+        }
+
         await getConnection().query(
             `
                 delete from member as m

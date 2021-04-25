@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import ChannelName from '../../components/channel-settings/ChannelName';
-import DeleteChannel from '../../components/channel-settings/DeleteChannel';
-import InvitationModal from '../../components/shared/InvitationModal';
+import TogglePrivacy from '../../components/channel-settings/TogglePrivacy';
 
 const Container = styled.div`
     background: #4d4d4d;
@@ -21,6 +20,7 @@ const Header = styled.h3`
 interface ChannelOverviewProps {
     isOwner: boolean;
     channelId: number;
+    isPrivate: boolean;
     teamId: number;
     name: string;
 }
@@ -28,6 +28,7 @@ interface ChannelOverviewProps {
 const ChannelOverview: React.FC<ChannelOverviewProps> = ({
     isOwner,
     channelId, 
+    isPrivate,
     teamId,
     name
 }) => {
@@ -43,13 +44,11 @@ const ChannelOverview: React.FC<ChannelOverviewProps> = ({
                     name = {name}
                 />
 
-                <DeleteChannel 
-                    isOwner = {isOwner}
+                <TogglePrivacy
                     channelId = {channelId}
-                    teamId = {teamId}
-                    name = {name}
+                    isPrivate = {isPrivate}
+                    isOwner = {isOwner}
                 />
-
             </Wrapper>
         </Container>
     )
