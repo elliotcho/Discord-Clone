@@ -144,7 +144,15 @@ export class ChannelResolver {
     async channels(
         @Arg('teamId', () => Int) teamId: number
     ) : Promise<Channel[]> {
-        return Channel.find({ teamId });
+        const channels = await getConnection().query(
+            `
+                select c.* from channel as c
+                where c."teamId" = $1
+                order by c."createdAt"
+            `, [teamId]
+        );
+
+        return channels;
     }
 
     @Mutation(() => Boolean)

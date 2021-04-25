@@ -141,7 +141,7 @@ const Channels: React.FC<ChannelsProps> = ({
 
                 if((i === 0 && channelId === -1) || (channelId === c.id)) {
                     active = true;
-                } 
+                }
 
                 return (
                     <Channel 

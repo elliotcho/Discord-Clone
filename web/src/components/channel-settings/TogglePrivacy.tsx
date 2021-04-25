@@ -27,7 +27,10 @@ const TogglePrivacy: React.FC<TogglePrivacyProps> = ({
                 <Button
                     onClick = {async () => {
                         await togglePrivacy({
-                            variables: { channelId }
+                            variables: { channelId },
+                            update: (cache) => {
+                                cache.evict({ id: 'Channel:' + channelId });
+                            }
                         });
                     }}
                 >

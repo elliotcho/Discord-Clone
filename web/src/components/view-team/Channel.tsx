@@ -69,7 +69,7 @@ const Channel: React.FC<ChannelProps> = ({
     active
 }) => {
     let style = {};
-   
+
     if(active) {
         style = { background: '#808080' };
     }

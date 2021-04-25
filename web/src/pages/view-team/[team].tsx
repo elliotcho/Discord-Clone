@@ -8,6 +8,7 @@ import ChatHeader from '../../components/view-team/ChatHeader';
 import ChatContainer from '../../containers/view-team/ChatContainer';
 import SendMessage from '../../components/view-team/SendMessage';
 import Members from '../../containers/view-team/Members';
+import ChannelMemberWrapper from '../../containers/view-team/ChannelMemberWrapper';
 import AuthWrapper from '../../containers/shared/AuthWrapper';
 import { useRouter } from 'next/router';
 
@@ -46,25 +47,27 @@ const ViewTeams: React.FC<{}> = () => {
 
     return (
         <AuthWrapper requiresAuth>
-            <Container>
-                <Teams />
+            <ChannelMemberWrapper channelId={channelId}>
+                <Container>
+                    <Teams />
 
-                <Channels 
-                    isOwner = {!!data?.team?.isOwner}
-                    channelId = {channelId} 
-                    teamId = {teamId}
-                />
+                    <Channels 
+                        isOwner = {!!data?.team?.isOwner}
+                        channelId = {channelId} 
+                        teamId = {teamId}
+                    />
 
-                <Chat>
-                    <ChatHeader channelId={channelId}/>
+                    <Chat>
+                        <ChatHeader channelId={channelId}/>
 
-                    <ChatContainer channelId={channelId} />
+                        <ChatContainer channelId={channelId} />
 
-                    <SendMessage channelId={channelId}/>
-                </Chat>
+                        <SendMessage channelId={channelId}/>
+                    </Chat>
 
-                <Members teamId={teamId} />
-            </Container>
+                    <Members teamId={teamId} />
+                </Container>
+            </ChannelMemberWrapper>
         </AuthWrapper>
     )
 }

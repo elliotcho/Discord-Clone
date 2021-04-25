@@ -54,9 +54,17 @@ export class TeamResolver {
 
     @FieldResolver(() => [Channel])
     async channels(
-        @Root() team: Team
+        @Root() { id: teamId }: Team
     ) : Promise<Channel[]> {
-        return Channel.find({ teamId: team.id });
+        const channels = await getConnection().query(
+            `
+                select c.* from channel as c
+                where c."teamId" = $1
+                order by c."createdAt"
+            `, [teamId]
+        );
+
+        return channels;
     }
 
     @FieldResolver(() => Int)
