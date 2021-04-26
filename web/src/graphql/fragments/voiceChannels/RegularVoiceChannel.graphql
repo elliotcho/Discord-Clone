@@ -1,0 +1,4 @@
+fragment RegularVoiceChannel on VoiceChannel {
+    id
+    name
+}

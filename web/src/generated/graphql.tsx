@@ -34,6 +34,7 @@ export type Query = {
   userTypingDm?: Maybe<User>;
   recentChats: Array<User>;
   directMessages: Array<DirectMessage>;
+  voiceChannels: Array<VoiceChannel>;
   channelMembers: Array<User>;
   channelInvitees: Array<User>;
   channels: Array<Channel>;
@@ -91,6 +92,11 @@ export type QueryDmReadReceiptsArgs = {
 
 export type QueryDirectMessagesArgs = {
   receiverId: Scalars['Int'];
+};
+
+
+export type QueryVoiceChannelsArgs = {
+  teamId: Scalars['Int'];
 };
 
 
@@ -182,6 +188,16 @@ export type DirectMessage = {
   user: User;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
+};
+
+export type VoiceChannel = {
+  __typename?: 'VoiceChannel';
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  isOriginal: Scalars['Boolean'];
+  teamId: Scalars['Float'];
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
 };
 
 export type Mutation = {
@@ -539,6 +555,11 @@ export type RegularUserResponseFragment = (
     { __typename?: 'FieldError' }
     & RegularErrorFragment
   )>> }
+);
+
+export type RegularVoiceChannelFragment = (
+  { __typename?: 'VoiceChannel' }
+  & Pick<VoiceChannel, 'id' | 'name'>
 );
 
 export type AddChannelMemberMutationVariables = Exact<{
@@ -1292,6 +1313,19 @@ export type UserQuery = (
   ) }
 );
 
+export type VoiceChannelsQueryVariables = Exact<{
+  teamId: Scalars['Int'];
+}>;
+
+
+export type VoiceChannelsQuery = (
+  { __typename?: 'Query' }
+  & { voiceChannels: Array<(
+    { __typename?: 'VoiceChannel' }
+    & RegularVoiceChannelFragment
+  )> }
+);
+
 export type NewDirectMessageSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1425,6 +1459,12 @@ export const RegularUserResponseFragmentDoc = gql`
 }
     ${RegularUserFragmentDoc}
 ${RegularErrorFragmentDoc}`;
+export const RegularVoiceChannelFragmentDoc = gql`
+    fragment RegularVoiceChannel on VoiceChannel {
+  id
+  name
+}
+    `;
 export const AddChannelMemberDocument = gql`
     mutation AddChannelMember($channelId: Int!, $userId: Int!) {
   addChannelMember(channelId: $channelId, userId: $userId)
@@ -3526,6 +3566,39 @@ export function useUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserQ
 export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
 export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
 export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;
+export const VoiceChannelsDocument = gql`
+    query VoiceChannels($teamId: Int!) {
+  voiceChannels(teamId: $teamId) {
+    ...RegularVoiceChannel
+  }
+}
+    ${RegularVoiceChannelFragmentDoc}`;
+
+/**
+ * __useVoiceChannelsQuery__
+ *
+ * To run a query within a React component, call `useVoiceChannelsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useVoiceChannelsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useVoiceChannelsQuery({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useVoiceChannelsQuery(baseOptions: Apollo.QueryHookOptions<VoiceChannelsQuery, VoiceChannelsQueryVariables>) {
+        return Apollo.useQuery<VoiceChannelsQuery, VoiceChannelsQueryVariables>(VoiceChannelsDocument, baseOptions);
+      }
+export function useVoiceChannelsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<VoiceChannelsQuery, VoiceChannelsQueryVariables>) {
+          return Apollo.useLazyQuery<VoiceChannelsQuery, VoiceChannelsQueryVariables>(VoiceChannelsDocument, baseOptions);
+        }
+export type VoiceChannelsQueryHookResult = ReturnType<typeof useVoiceChannelsQuery>;
+export type VoiceChannelsLazyQueryHookResult = ReturnType<typeof useVoiceChannelsLazyQuery>;
+export type VoiceChannelsQueryResult = Apollo.QueryResult<VoiceChannelsQuery, VoiceChannelsQueryVariables>;
 export const NewDirectMessageDocument = gql`
     subscription NewDirectMessage {
   newDirectMessage

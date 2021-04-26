@@ -361,6 +361,14 @@ export class TeamResolver {
                 `, 
                 ["general", teamId, true]
             );
+
+            await tm.query(
+                `
+                    insert into voice_channel (name, "teamId", "isOriginal")
+                    values  ($1, $2, $3)
+                `, 
+                ["general", teamId, true]
+            );
         });
 
         return true;

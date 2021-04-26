@@ -1,0 +1,5 @@
+query VoiceChannels($teamId: Int!) {
+    voiceChannels(teamId: $teamId) {
+        ...RegularVoiceChannel
+    }
+}
