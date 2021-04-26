@@ -1,7 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faLock } from '@fortawesome/free-solid-svg-icons';
+import { 
+    faCog,
+    faVolumeUp,
+    faLock
+ } from '@fortawesome/free-solid-svg-icons';
 import NextLink from 'next/link';
 
 const Box = styled.div`
@@ -17,6 +21,7 @@ const PublicIcon = styled.div`
 `;
 
 const PrivateIcon = styled.div`
+    margin-right: 15px;
     color: #f2f2f2;
 `;
 
@@ -70,7 +75,11 @@ const VoiceChannel: React.FC<VoiceChannelProps> = ({
 
     return (
         <PublicContainer>
-                # {name}
+                <PrivateIcon>
+                    <FontAwesomeIcon icon={faVolumeUp}/>
+                </PrivateIcon> 
+                
+                {name}
                 
                 <NextLink href={settingsRoute}>
                     <Box>
