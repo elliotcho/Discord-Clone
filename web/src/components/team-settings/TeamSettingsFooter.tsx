@@ -168,6 +168,7 @@ const TeamSettingsFooter : React.FC<TeamSettingsFooterProps> = ({
                     await kickUser({
                         variables: { teamId, userId },
                         update: (cache) => {
+                            cache.evict({ fieldName: 'invitees' });
                             cache.evict({ fieldName: 'members' });
                         }
                     });

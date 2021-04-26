@@ -51,7 +51,7 @@ const Marker = styled.div`
     left: 0px;
 `;
 
-interface ChannelProps {
+interface TextChannelProps {
     name: string;
     teamId: number;
     channelId: number;
@@ -60,7 +60,7 @@ interface ChannelProps {
     active: boolean;
 }
 
-const Channel: React.FC<ChannelProps> = ({
+const TextChannel: React.FC<TextChannelProps> = ({
     name,
     teamId,
     channelId,
@@ -112,4 +112,4 @@ const Channel: React.FC<ChannelProps> = ({
     )
 }
 
-export default Channel;
+export default TextChannel;

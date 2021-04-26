@@ -74,6 +74,8 @@ const InvitePeopleModal : React.FC<InvitePeopleModalProps> = ({ isOpen, onClose,
                                     await addMember({
                                         variables: { teamId, userId: u.id },
                                         update: (cache) => {
+                                            cache.evict({ fieldName: 'channelInvitees' });
+                                            cache.evict({ fieldName: 'channelMembers' });
                                             cache.evict({ fieldName: 'invitees' });
                                             cache.evict({ fieldName: 'members' });
                                         }

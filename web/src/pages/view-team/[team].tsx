@@ -2,14 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { withApollo } from '../../utils/withApollo';
 import { useTeamQuery } from '../../generated/graphql';
-import Teams from '../../components/shared/Teams';
-import Channels from '../../containers/view-team/Channels';
+import AuthWrapper from '../../containers/shared/AuthWrapper';
+import ChannelMemberWrapper from '../../containers/view-team/ChannelMemberWrapper';
 import ChatHeader from '../../components/view-team/ChatHeader';
 import ChatContainer from '../../containers/view-team/ChatContainer';
 import SendMessage from '../../components/view-team/SendMessage';
 import Members from '../../containers/view-team/Members';
-import ChannelMemberWrapper from '../../containers/view-team/ChannelMemberWrapper';
-import AuthWrapper from '../../containers/shared/AuthWrapper';
+import Sidebar from '../../containers/view-team/ViewTeamSidebar';
+import Teams from '../../components/shared/Teams';
 import { useRouter } from 'next/router';
 
 const Container = styled.div`
@@ -51,8 +51,9 @@ const ViewTeams: React.FC<{}> = () => {
                 <Container>
                     <Teams />
 
-                    <Channels 
+                    <Sidebar
                         isOwner = {!!data?.team?.isOwner}
+                        teamName = {data?.team?.name}
                         channelId = {channelId} 
                         teamId = {teamId}
                     />
