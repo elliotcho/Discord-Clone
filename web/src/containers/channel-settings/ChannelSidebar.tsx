@@ -73,6 +73,7 @@ const ChannelSidebar: React.FC<ChannelSidebarProps> = ({
                     await deleteChannel({
                         variables: { channelId },
                         update: (cache) => {
+                            cache.evict({ fieldName: 'voiceChannels' });
                             cache.evict({ fieldName: 'channels' });
                         }
                     });

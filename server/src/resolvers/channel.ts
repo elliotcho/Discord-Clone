@@ -221,7 +221,7 @@ export class ChannelResolver {
         const voiceChannels = await getConnection().query(
             `
                 select c.* from channel as c
-                where c."teamId" = $1 nad c."isVoice" = true
+                where c."teamId" = $1 and c."isVoice" = true
                 order by c."createdAt"
             `, [teamId]
         );

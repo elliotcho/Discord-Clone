@@ -85,24 +85,22 @@ const TogglePrivacy: React.FC<TogglePrivacyProps> = ({
                 {!isPrivate && 'Public'} 
 
                 <Box>
+                    {isOwner && !isOriginal &&  (
+                        <>
+                            {isPrivate && (
+                                <PrivateButton onClick={handleClick}>
+                                    Private
+                                </PrivateButton>
+                            )}
 
+                            {!isPrivate && (
+                                <PublicButton onClick={handleClick}>
+                                    Public
+                                </PublicButton>
+                            )}
+                        </>
+                    )}
                 </Box>
-
-                {isOwner && !isOriginal &&  (
-                    <>
-                         {isPrivate && (
-                            <PrivateButton onClick={handleClick}>
-                                Private
-                            </PrivateButton>
-                        )}
-
-                        {!isPrivate && (
-                            <PublicButton onClick={handleClick}>
-                                Public
-                            </PublicButton>
-                        )}
-                    </>
-                )}
             </Flex>
         </Container>
     )

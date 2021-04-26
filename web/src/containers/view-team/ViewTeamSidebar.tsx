@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { isServer } from '../../utils/isServer';
 import TextChannels from './TextChannels';
+import VoiceChannels from './VoiceChannels';
 import InvitePeopleModal from '../../components/view-team/InvitePeopleModal';
 import UserNav from '../../components/shared/UserNav';
 import NextLink from 'next/link';
@@ -113,6 +114,8 @@ const ViewTeamSidebar: React.FC<ViewTeamSidebarProps> = ({
                 channelId = {channelId}
                 teamId = {teamId}
             />
+
+            <VoiceChannels isOwner={isOwner} teamId={teamId} />
        
             <InvitePeopleModal
                 isOpen = {invitePeople}
