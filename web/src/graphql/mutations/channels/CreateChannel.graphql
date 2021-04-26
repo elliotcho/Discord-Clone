@@ -1,3 +1,7 @@
-mutation CreateChannel($channelName: String!, $teamId: Int!) {
-    createChannel(channelName: $channelName, teamId: $teamId)
+mutation CreateChannel($channelName: String!, $teamId: Int!, $isVoice: Boolean) {
+    createChannel(
+        channelName: $channelName, 
+        isVoice: $isVoice,
+        teamId: $teamId
+    )
 }

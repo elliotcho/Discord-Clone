@@ -59,7 +59,7 @@ export class TeamResolver {
         const channels = await getConnection().query(
             `
                 select c.* from channel as c
-                where c."teamId" = $1
+                where c."teamId" = $1 and c."isVoice" = false
                 order by c."createdAt"
             `, [teamId]
         );
@@ -364,8 +364,8 @@ export class TeamResolver {
 
             await tm.query(
                 `
-                    insert into voice_channel (name, "teamId", "isOriginal")
-                    values  ($1, $2, $3)
+                    insert into channel (name, "teamId", "isOriginal", "isVoice")
+                    values  ($1, $2, $3, $3)
                 `, 
                 ["general", teamId, true]
             );

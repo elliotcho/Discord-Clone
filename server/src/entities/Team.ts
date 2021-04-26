@@ -8,7 +8,6 @@ import {
     UpdateDateColumn
 } from "typeorm";
 import { Field, ObjectType } from 'type-graphql';
-import { VoiceChannel } from './VoiceChannel';
 import { Channel } from './Channel';
 import { Seen } from './Seen';
 import { User } from "./User";
@@ -37,9 +36,6 @@ export class Team extends BaseEntity {
 
     @Field()
     owner: User;
-
-    @OneToMany(() => VoiceChannel, (voiceChannel) => voiceChannel.team)
-    voiceChannels: VoiceChannel[];
 
     @OneToMany(() => Channel, (channel) => channel.team)
     channels: Channel[];

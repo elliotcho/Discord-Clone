@@ -29,6 +29,10 @@ export class Channel extends BaseEntity {
 
     @Field()
     @Column({ default: false })
+    isVoice: boolean;
+
+    @Field()
+    @Column({ default: false })
     isPrivate: boolean;
 
     @Field()

@@ -215,13 +215,28 @@ export class ChannelResolver {
     }
 
     @Query(() => [Channel])
+    async voiceChannels(
+        @Arg('teamId', () => Int) teamId: number
+    ) : Promise<Channel[]> {
+        const voiceChannels = await getConnection().query(
+            `
+                select c.* from channel as c
+                where c."teamId" = $1 nad c."isVoice" = true
+                order by c."createdAt"
+            `, [teamId]
+        );
+
+        return voiceChannels;
+    }
+
+    @Query(() => [Channel])
     async channels(
         @Arg('teamId', () => Int) teamId: number
     ) : Promise<Channel[]> {
         const channels = await getConnection().query(
             `
                 select c.* from channel as c
-                where c."teamId" = $1
+                where c."teamId" = $1 and c."isVoice" = false
                 order by c."createdAt"
             `, [teamId]
         );
@@ -232,14 +247,15 @@ export class ChannelResolver {
     @Mutation(() => Boolean)
     async createChannel(
         @Arg('channelName') channelName: string,
+        @Arg('isVoice', { nullable: true }) isVoice: boolean,
         @Arg('teamId', () => Int) teamId: number
     ): Promise<Boolean> {
         await getConnection().query(
             `
-                insert into channel (name, "teamId", "isOriginal")
-                values ($1, $2, $3)
+                insert into channel (name, "teamId", "isVoice", "isOriginal")
+                values ($1, $2, $3, $4)
             `,
-            [channelName, teamId, false] 
+            [channelName, teamId, !!isVoice, false] 
         );
         
         return true;
