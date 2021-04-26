@@ -53,7 +53,12 @@ interface ConfirmModalProps {
     title: string;
 }
 
-const ConfirmModal : React.FC<ConfirmModalProps> = ({ title, onSave , isOpen, onClose }) => {
+const ConfirmModal : React.FC<ConfirmModalProps> = ({
+     title, 
+     onSave,
+     onClose,  
+     isOpen
+}) => {
     const onSubmit = () => {
         onSave();
         onClose();

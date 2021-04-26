@@ -23,35 +23,52 @@ const Wrapper = styled.div`
     padding: 12px;
 `;
 
-const Button = styled.button`
+const ButtonStyles = `
     border: none;
     font-size: 1.2rem;
     margin-right: 30px;
-    background: #6c757d;
     cursor: pointer;
     color: #f2f2f2;
     outline: none;
     padding: 5px;
+`;
+
+const Secondary = styled.button`
+    ${ButtonStyles}
+    background: #6c757d;
 
     &:hover {
         background: #999;
     }
 `;  
 
-const ChangePassword: React.FC<{}> = () => {
+const Danger = styled.button`
+    ${ButtonStyles}
+    background: #d9534f;
+
+    &:hover {
+        background: #ff0000;
+    }
+`;
+
+const MyAccountFooter: React.FC<{}> = () => {
     return (
         <Container>
-            <Title>change password</Title>
+            <Title>manage account</Title>
 
             <Wrapper>
                 <NextLink href='/forgot-password'>
-                    <Button>
+                    <Secondary>
                         Change password
-                    </Button>
+                    </Secondary>
                 </NextLink>
+
+                <Danger>
+                    Delete Account
+                </Danger>
             </Wrapper>  
         </Container>    
     )
 }
 
-export default ChangePassword;
+export default MyAccountFooter;

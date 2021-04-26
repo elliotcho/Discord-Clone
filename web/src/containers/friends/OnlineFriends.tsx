@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { gql } from '@apollo/client';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import { useOnlineFriendsQuery, useRemoveFriendMutation } from '../../generated/graphql';
+import ConfirmModal from '../../components/shared/ConfirmModal';
 import FriendCard from '../shared/FriendCard';
 import NextLink from 'next/link';
 
@@ -59,8 +60,10 @@ const Option = styled.div`
 `;
 
 const Friends: React.FC<{}> =() => {
-    const { data } = useOnlineFriendsQuery();
+    const [userId, setUserId] = useState(-1);
+    const [isOpen, setIsOpen] = useState(false);
     const [removeFriend] = useRemoveFriendMutation();
+    const { data } = useOnlineFriendsQuery();
 
     return (
         <>
@@ -82,21 +85,9 @@ const Friends: React.FC<{}> =() => {
                             <FontAwesomeIcon icon={faEllipsisV}/>
     
                             <Dropdown
-                                onClick = {async () => {
-                                    await removeFriend({
-                                        variables: { friendId: u.id },
-                                        update: (cache) => {
-                                            cache.writeFragment({
-                                                id: 'User:' + u.id,
-                                                data: { friendStatus: 0 },
-                                                fragment: gql`
-                                                    fragment _ on User {
-                                                        friendStatus
-                                                    }
-                                                `
-                                            });
-                                        }
-                                    })
+                                onClick = {() => {
+                                    setUserId(u.id);
+                                    setIsOpen(true);
                                 }}
                             >
                                 <Option>Remove Friend</Option>
@@ -105,6 +96,28 @@ const Friends: React.FC<{}> =() => {
                     </FriendCard>
                )
             )}
+
+            <ConfirmModal
+                isOpen = {isOpen}
+                title = 'Are you sure you want to remove friend?'
+                onClose = {() => setIsOpen(false)}
+                onSave = {async () => {
+                    await removeFriend({
+                        variables: { friendId: userId },
+                        update: (cache) => {
+                            cache.writeFragment({
+                                id: 'User:' + userId,
+                                data: { friendStatus: 0 },
+                                fragment: gql`
+                                    fragment _ on User {
+                                        friendStatus
+                                    }
+                                `
+                            });
+                        }
+                    })
+                }}
+            />
         </> 
     )
 }
