@@ -29,8 +29,12 @@ const ChannelCall: React.FC<{}> = () => {
     const [streaming, setStreaming] = useState(false);
 
     useEffect(() => {
-        startConnection();
-        console.log(socketInstance.current)
+        const fetchConnection = async () => {
+            await startConnection();
+        }
+
+        fetchConnection();
+        console.log(socketInstance)
 
         return () => {
             socketInstance?.current?.destoryConnection();
@@ -42,10 +46,9 @@ const ChannelCall: React.FC<{}> = () => {
         if (key === 'streaming') setStreaming(value);
     }
 
-    const startConnection = () => {
-        socketInstance.current = createSocketInstance({
-            updateInstance: updateFromInstance,
-            userData: {}
+    const startConnection = async () => {
+        socketInstance.current = await createSocketInstance({
+            updateInstance: updateFromInstance
         });
     }
 

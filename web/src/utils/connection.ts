@@ -1,12 +1,12 @@
 import openSocket from 'socket.io-client';
 
 const WEB_SOCKET_ENDPOINT = 'ws://localhost:4001/socket.io';
-const PEER_ENDPOINT = 'http://localhost:9000';
 
 const initializePeerConnection = (Peer: any) => {
     return new Peer('', {
-        host: PEER_ENDPOINT,
-        secure: true
+        host: 'localhost',
+        secure: false,
+        port: 9000,
     });
 }
 
@@ -34,12 +34,12 @@ class SocketConnection {
 
     constructor(settings:any, Peer: any) {
         this.settings = settings;
-        this.myPeer = initializePeerConnection(Peer);
         this.socket = initializeSocketConnection();
+        this.myPeer = initializePeerConnection(Peer);
         if (this.socket) this.isSocketConnected = true; 
         if (this.myPeer) this.isPeersConnected = true;
-        // this.initializeSocketEvents();
-        // this.initializePeersEvents();
+        this.initializeSocketEvents();
+        this.initializePeersEvents();
     }
 
     initializeSocketEvents = () => {
@@ -164,12 +164,13 @@ class SocketConnection {
             video.srcObject = this.videoContainer[createObj.id].stream;
             video.id = createObj.id;
             video.autoplay = true;
+            video.style.transform =  'rotateY(180deg)';
             if (this.myID === createObj.id) video.muted = true;
-            videoContainer.appendChild(video)
-            roomContainer.append(videoContainer);
+            videoContainer?.appendChild(video)
+            roomContainer?.append(videoContainer);
         } else {
             // @ts-ignore
-            //document.getElementById(createObj.id)?.srcObject = createObj.stream;
+            document.getElementById(createObj.id).srcObject = createObj.stream;
         }
     }
 
@@ -273,10 +274,11 @@ const checkAndAddClass = (video?:any, type:string='userMedia') => {
         video?.classList?.remove('display-media');
 }
 
-export const createSocketInstance = (settings={}) => {
-    import('peerjs').then(({ default: Peer }) => {
-        return new SocketConnection(settings, Peer);
-    });
+export const createSocketInstance = async (settings={}) => {
+    const { default: peer }= await import('peerjs');
+    const connection = new SocketConnection(settings, peer);
+
+    return connection;
 };
 
 interface CreateVideo {
