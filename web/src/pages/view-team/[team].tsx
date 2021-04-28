@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { withApollo } from '../../utils/withApollo';
 import { useTeamQuery } from '../../generated/graphql';
 import AuthWrapper from '../../containers/shared/AuthWrapper';
-import ChannelMemberWrapper from '../../containers/view-team/ChannelMemberWrapper';
+import ChannelMemberWrapper from '../../containers/shared/ChannelMemberWrapper';
 import ChatHeader from '../../components/view-team/ChatHeader';
 import ChatContainer from '../../containers/view-team/ChatContainer';
 import SendMessage from '../../components/view-team/SendMessage';

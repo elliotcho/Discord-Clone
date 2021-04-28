@@ -8,6 +8,10 @@ import {
  } from '@fortawesome/free-solid-svg-icons';
 import NextLink from 'next/link';
 
+const Link = styled.a`
+    text-decoration: none;
+`;
+
 const Box = styled.div`
     margin-left: auto;
 `;  
@@ -57,6 +61,7 @@ const VoiceChannel: React.FC<VoiceChannelProps> = ({
     channelId,
     isMember
 }) => {
+    const channelRoute = `/channel-call/${channelId}`;
     const settingsRoute = `/channel-settings/${channelId}`;
 
     if(!isMember) {
@@ -74,21 +79,23 @@ const VoiceChannel: React.FC<VoiceChannelProps> = ({
     }
 
     return (
-        <PublicContainer>
-                <PrivateIcon>
-                    <FontAwesomeIcon icon={faVolumeUp}/>
-                </PrivateIcon> 
-                
-                {name}
-                
-                <NextLink href={settingsRoute}>
-                    <Box>
-                        <PublicIcon>
-                            <FontAwesomeIcon icon = {faCog} />
-                        </PublicIcon>
-                    </Box>
-                </NextLink>
-        </PublicContainer> 
+        <Link href={channelRoute} target='_blank'> 
+            <PublicContainer>
+                    <PrivateIcon>
+                        <FontAwesomeIcon icon={faVolumeUp}/>
+                    </PrivateIcon> 
+                    
+                    {name}
+                    
+                    <NextLink href={settingsRoute}>
+                        <Box>
+                            <PublicIcon>
+                                <FontAwesomeIcon icon = {faCog} />
+                            </PublicIcon>
+                        </Box>
+                    </NextLink>
+            </PublicContainer> 
+        </Link>
     )
 }
 
