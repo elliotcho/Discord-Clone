@@ -165,6 +165,7 @@ class SocketConnection {
             video.id = createObj.id;
             video.autoplay = true;
             video.style.transform =  'rotateY(180deg)';
+            video.style.maxWidth = '600px';
             if (this.myID === createObj.id) video.muted = true;
             videoContainer?.appendChild(video)
             roomContainer?.append(videoContainer);

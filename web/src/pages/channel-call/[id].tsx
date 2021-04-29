@@ -1,5 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+    faVideo,
+    faMicrophone,
+    faMicrophoneSlash,
+    faVideoSlash,
+    faPhoneSquareAlt
+} from '@fortawesome/free-solid-svg-icons';
+import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import AuthWrapper from '../../containers/shared/AuthWrapper';
 import ChannelMemberWrapper from '../../containers/shared/ChannelMemberWrapper';
 import { withApollo } from '../../utils/withApollo';
@@ -8,8 +17,34 @@ import { useRouter } from 'next/router';
 
 const Container = styled.div`
     height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
     background: #333;
-    overflow: auto;
+    color: #f2f2f2;
+`;
+
+const Room = styled.div`
+    display: flex;
+`;
+
+const Footer = styled.div`
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    background: #000;
+    padding: 12px;
+    bottom: 0px;
+`;
+
+const Flex = styled.div`
+
+`;
+
+const Icon = styled.div`
+    margin-right: 25px;
+    font-size: 5rem;
     color: #f2f2f2;
 `;
 
@@ -95,36 +130,51 @@ const ChannelCall: React.FC<{}> = () => {
                         </div>
                     }
 
-                    <div id="room-container"></div>
+                    <Room id='room-container'/>
 
-                    <footer>
-                        <div>HELLO</div>
-                        <div>
-                            {streaming && <div onClick={handleMyMic}>
-                                {micStatus ? 
-                                    'mic on'
-                                    :
-                                    'micoff'
-                                }
-                            </div>}
-                            <div onClick={handleDisconnect}>
-                                Hang up
-                            </div>
-                            
-                            {streaming && <div onClick={handleMyCam}>
-                                {camStatus ? 
-                                    'videon'
-                                    :
-                                    'videoff'
-                                }
-                            </div>}
-                        </div>
+                    <Footer>
+                        <Icon>
+                            <FontAwesomeIcon icon={faDiscord}/>
+                        </Icon>
+
+                        {streaming && <div onClick={handleMyMic}>
+                                {micStatus && (
+                                     <Icon>
+                                         <FontAwesomeIcon icon={faMicrophone}/>
+                                     </Icon>
+                                )}
+                                
+                                {!micStatus && (
+                                    <Icon>
+                                        <FontAwesomeIcon icon={faMicrophoneSlash}/>
+                                    </Icon>
+                                )}
+                        </div>}
+
+                        <Icon onClick={handleDisconnect}>
+                            <FontAwesomeIcon icon={faPhoneSquareAlt}/>
+                        </Icon>
+
+                        {streaming && <div onClick={handleMyCam}>
+                                {micStatus && (
+                                     <Icon>
+                                         <FontAwesomeIcon icon={faVideo}/>
+                                     </Icon>
+                                )}
+                                
+                                {!micStatus && (
+                                    <Icon>
+                                        <FontAwesomeIcon icon={faVideoSlash}/>
+                                    </Icon>
+                                )}
+                        </div>}
+
                         <div>
                             <div onClick={toggleScreenShare}>
                                 <h4>{displayStream ? 'Stop Screen Share' : 'Share Screen'}</h4>
                             </div>
                         </div>
-                    </footer>
+                    </Footer>
                 </Container>
             </ChannelMemberWrapper>
         </AuthWrapper>
