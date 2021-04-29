@@ -19,7 +19,6 @@ const initializeSocketConnection = () => {
     });
 }
 
-let socketInstance: any = null;
 let peers: any = {};
 
 class SocketConnection {
@@ -70,7 +69,7 @@ class SocketConnection {
         this.myPeer.on('open', (id) => {
             const { userDetails } = this.settings;
             this.myID = id;
-            const roomID = window.location.pathname.split('/')[2];
+            const roomID = window.location.pathname.split('/')[2]; 
             const userData = {
                 userID: id, roomID, ...userDetails
             }
@@ -206,7 +205,7 @@ class SocketConnection {
         myMediaTracks?.forEach((track:any) => {
             track.stop();
         })
-        socketInstance?.socket.disconnect();
+        this.socket?.disconnect();
         this.myPeer?.destroy();
     }
 
@@ -278,7 +277,7 @@ const checkAndAddClass = (video?:any, type:string='userMedia') => {
 export const createSocketInstance = async (settings={}) => {
     const { default: peer }= await import('peerjs');
     const connection = new SocketConnection(settings, peer);
-
+    
     return connection;
 };
 

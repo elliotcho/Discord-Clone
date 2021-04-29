@@ -9,10 +9,12 @@ import {
     faPhoneSquareAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
+import { useMeQuery } from '../../generated/graphql';
 import AuthWrapper from '../../containers/shared/AuthWrapper';
 import ChannelMemberWrapper from '../../containers/shared/ChannelMemberWrapper';
 import { withApollo } from '../../utils/withApollo';
 import { createSocketInstance } from '../../utils/connection';
+import { isServer } from '../../utils/isServer';
 import { useRouter } from 'next/router';
 
 const Container = styled.div`
@@ -39,13 +41,27 @@ const Footer = styled.div`
 `;
 
 const Flex = styled.div`
-
+    display: flex;
+    margin: auto;
 `;
 
 const Icon = styled.div`
+    cursor: pointer;
     margin-right: 25px;
     font-size: 5rem;
-    color: #f2f2f2;
+`;
+
+const Box = styled.div`
+    margin-right: 30px;
+    margin-left: auto;
+`;
+
+const Header = styled.h4`
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
 `;
 
 const ChannelCall: React.FC<{}> = () => {
@@ -63,18 +79,23 @@ const ChannelCall: React.FC<{}> = () => {
     const [displayStream, setDisplayStream] = useState(false);
     const [streaming, setStreaming] = useState(false);
 
+    const { data } = useMeQuery({
+        skip: isServer()
+    });
+
     useEffect(() => {
         const fetchConnection = async () => {
             await startConnection();
         }
 
-        fetchConnection();
-        console.log(socketInstance)
+        if(data?.me?.id) {
+            fetchConnection();
+        }
 
         return () => {
             socketInstance?.current?.destoryConnection();
         }
-    }, []);
+    }, [data]);
 
     const updateFromInstance = (key: string, value: any) => {
         if (key === 'displayStream') setDisplayStream(value);
@@ -83,7 +104,8 @@ const ChannelCall: React.FC<{}> = () => {
 
     const startConnection = async () => {
         socketInstance.current = await createSocketInstance({
-            updateInstance: updateFromInstance
+            updateInstance: updateFromInstance,
+            userDetails: { name: data.me.id }
         });
     }
 
@@ -124,12 +146,6 @@ const ChannelCall: React.FC<{}> = () => {
         <AuthWrapper requiresAuth>
             <ChannelMemberWrapper channelId={channelId}>
                 <Container>
-                    {!streaming && 
-                        <div>
-                            loading...
-                        </div>
-                    }
-
                     <Room id='room-container'/>
 
                     <Footer>
@@ -137,43 +153,46 @@ const ChannelCall: React.FC<{}> = () => {
                             <FontAwesomeIcon icon={faDiscord}/>
                         </Icon>
 
-                        {streaming && <div onClick={handleMyMic}>
-                                {micStatus && (
-                                     <Icon>
-                                         <FontAwesomeIcon icon={faMicrophone}/>
-                                     </Icon>
-                                )}
-                                
-                                {!micStatus && (
-                                    <Icon>
-                                        <FontAwesomeIcon icon={faMicrophoneSlash}/>
-                                    </Icon>
-                                )}
-                        </div>}
+                        <Flex>
+                            {streaming && <div onClick={handleMyMic}>
+                                    {micStatus && (
+                                        <Icon>
+                                            <FontAwesomeIcon icon={faMicrophone}/>
+                                        </Icon>
+                                    )}
+                                    
+                                    {!micStatus && (
+                                        <Icon>
+                                            <FontAwesomeIcon icon={faMicrophoneSlash}/>
+                                        </Icon>
+                                    )}
+                            </div>}
 
-                        <Icon onClick={handleDisconnect}>
-                            <FontAwesomeIcon icon={faPhoneSquareAlt}/>
-                        </Icon>
+                            <Icon onClick={handleDisconnect}>
+                                <FontAwesomeIcon icon={faPhoneSquareAlt}/>
+                            </Icon>
 
-                        {streaming && <div onClick={handleMyCam}>
-                                {micStatus && (
-                                     <Icon>
-                                         <FontAwesomeIcon icon={faVideo}/>
-                                     </Icon>
-                                )}
-                                
-                                {!micStatus && (
-                                    <Icon>
-                                        <FontAwesomeIcon icon={faVideoSlash}/>
-                                    </Icon>
-                                )}
-                        </div>}
+                            {streaming && <div onClick={handleMyCam}>
+                                    {camStatus && (
+                                        <Icon>
+                                            <FontAwesomeIcon icon={faVideo}/>
+                                        </Icon>
+                                    )}
+                                    
+                                    {!camStatus && (
+                                        <Icon>
+                                            <FontAwesomeIcon icon={faVideoSlash}/>
+                                        </Icon>
+                                    )}
+                            </div>}
+                        </Flex>
 
-                        <div>
-                            <div onClick={toggleScreenShare}>
-                                <h4>{displayStream ? 'Stop Screen Share' : 'Share Screen'}</h4>
-                            </div>
-                        </div>
+                        <Box>
+                            <Header onClick={toggleScreenShare}>
+                                {!displayStream && 'Start screen share'}
+                                {displayStream && 'Stop screen share'}
+                            </Header>
+                        </Box>
                     </Footer>
                 </Container>
             </ChannelMemberWrapper>
