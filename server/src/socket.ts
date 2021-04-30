@@ -1,7 +1,6 @@
-import express from 'express';
-
 //@ts-ignore
 import socket from 'socket.io';
+import express from 'express';
 import http from 'http';
 
 const main = async () => {
@@ -19,7 +18,7 @@ const main = async () => {
             socket.join(roomID);
             
             socket.to(roomID).broadcast.emit('new-user-connect', userData);
-            
+        
             socket.on('disconnect', () => {
                 socket.to(roomID).broadcast.emit('user-disconnected', userID);
             });

@@ -94,13 +94,11 @@ class SocketConnection {
     }
 
     getVideoAudioStream = (video:boolean=true, audio:boolean=true) => {
-        let quality = this.settings.params?.quality;
-        if (quality) quality = parseInt(quality);
         // @ts-ignore
         const myNavigator = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia || navigator.mediaDevices.msGetUserMedia;
         return myNavigator({
             video: video ? {
-                frameRate: quality ? quality : 12,
+                frameRate: 12,
                 noiseSuppression: true,
                 width: {min: 640, ideal: 1280, max: 1920},
                 height: {min: 480, ideal: 720, max: 1080}
@@ -148,7 +146,8 @@ class SocketConnection {
             console.log('peer error ------')
             this.removeVideo(userID);
         })
-        peers[userID] = call;
+                    
+        peers[userID] = call; 
     }
 
     createVideo = (createObj:CreateVideo) => {
@@ -162,6 +161,7 @@ class SocketConnection {
             video.srcObject = this.videoContainer[createObj.id].stream;
             video.id = createObj.id;
             video.autoplay = true;
+            video.style.margin = '50px';
             video.style.transform =  'rotateY(180deg)';
             video.style.maxWidth = '600px';
             if (this.myID === createObj.id) video.muted = true;

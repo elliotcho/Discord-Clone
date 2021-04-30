@@ -28,14 +28,18 @@ const Container = styled.div`
 
 const Room = styled.div`
     display: flex;
+    align-items: center;
+    margin: 100px auto 150px auto;
+    justify-content: center;
+    flex-wrap: wrap;
 `;
 
 const Footer = styled.div`
     width: 100vw;
     display: flex;
     align-items: center;
-    position: absolute;
     background: #000;
+    position: fixed;
     padding: 12px;
     bottom: 0px;
 `;
