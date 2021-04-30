@@ -2,13 +2,11 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import { createSchema } from './utils/createSchema';
 import { createDbConnection } from './utils/createDbConnection';
-import { createSocketConnection } from './utils/createSocketConnection';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import Redis from 'ioredis';
 import connectRedis from 'connect-redis';
 import session from 'express-session';
-import { Server } from 'socket.io';
 import http from 'http';
 import path from 'path';
 import cors from 'cors';
@@ -68,16 +66,6 @@ const main = async () => {
 
     apolloServer.applyMiddleware({ app, cors: false });
     const httpServer = http.createServer(app);
-
-    createSocketConnection(
-        new Server(httpServer, {
-            cors: {
-                origin: 'http://localhost:3000',
-                credentials: true
-            }
-        })
-        .listen(4001)
-    );
 
     apolloServer.installSubscriptionHandlers(httpServer);
     const port = process.env.PORT;

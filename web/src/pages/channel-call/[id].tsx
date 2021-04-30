@@ -6,7 +6,7 @@ import {
     faMicrophone,
     faMicrophoneSlash,
     faVideoSlash,
-    faPhoneSquareAlt
+    faPhone
 } from '@fortawesome/free-solid-svg-icons';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { useMeQuery } from '../../generated/graphql';
@@ -42,13 +42,31 @@ const Footer = styled.div`
 
 const Flex = styled.div`
     display: flex;
-    margin: auto;
+    margin-left: 35%;
 `;
 
 const Icon = styled.div`
-    cursor: pointer;
-    margin-right: 25px;
     font-size: 5rem;
+`;
+
+const WhiteIcon = styled.div`
+    cursor: pointer;
+    font-size: 2.5rem;
+
+    &:hover {
+       color: #ccc;
+    }
+`;
+
+const RedIcon = styled.div`
+    color: red;
+    margin: auto 75px;
+    font-size: 3.5rem;
+    cursor: pointer;
+
+    &:hover {
+        color: orangered;
+    }
 `;
 
 const Box = styled.div`
@@ -156,33 +174,33 @@ const ChannelCall: React.FC<{}> = () => {
                         <Flex>
                             {streaming && <div onClick={handleMyMic}>
                                     {micStatus && (
-                                        <Icon>
+                                        <WhiteIcon>
                                             <FontAwesomeIcon icon={faMicrophone}/>
-                                        </Icon>
+                                        </WhiteIcon>
                                     )}
                                     
                                     {!micStatus && (
-                                        <Icon>
+                                        <WhiteIcon>
                                             <FontAwesomeIcon icon={faMicrophoneSlash}/>
-                                        </Icon>
+                                        </WhiteIcon>
                                     )}
                             </div>}
 
-                            <Icon onClick={handleDisconnect}>
-                                <FontAwesomeIcon icon={faPhoneSquareAlt}/>
-                            </Icon>
+                            <RedIcon onClick={handleDisconnect}>
+                                <FontAwesomeIcon icon={faPhone}/>
+                            </RedIcon>
 
                             {streaming && <div onClick={handleMyCam}>
                                     {camStatus && (
-                                        <Icon>
+                                        <WhiteIcon>
                                             <FontAwesomeIcon icon={faVideo}/>
-                                        </Icon>
+                                        </WhiteIcon>
                                     )}
                                     
                                     {!camStatus && (
-                                        <Icon>
+                                        <WhiteIcon>
                                             <FontAwesomeIcon icon={faVideoSlash}/>
-                                        </Icon>
+                                        </WhiteIcon>
                                     )}
                             </div>}
                         </Flex>

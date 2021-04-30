@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "watch": "tsc -w",
-    "dev": "nodemon dist/index.js"
+    "dev": "nodemon dist/index.js",
+    "socket": "nodemon dist/socket.js"
   },
   "keywords": [],
   "author": "",
@@ -40,7 +41,7 @@
     "pg": "^8.5.1",
     "reflect-metadata": "^0.1.13",
     "remove": "^0.1.5",
-    "socket.io": "^4.0.1",
+    "socket.io": "3.0.4",
     "type-graphql": "^1.1.1",
     "typeorm": "^0.2.31",
     "uuid": "^8.3.2"

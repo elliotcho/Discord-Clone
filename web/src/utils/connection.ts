@@ -1,12 +1,12 @@
 import openSocket from 'socket.io-client';
 
-const WEB_SOCKET_ENDPOINT = 'ws://localhost:4001/socket.io';
+const WEB_SOCKET_ENDPOINT = 'ws://localhost:4001';
 
 const initializePeerConnection = (Peer: any) => {
     return new Peer('', {
         host: 'localhost',
         secure: false,
-        port: 9000,
+        port: 9000
     });
 }
 
@@ -15,26 +15,27 @@ const initializeSocketConnection = () => {
         rejectUnauthorized: false,
         reconnectionAttempts: 10,
         reconnection: true, 
-        secure: true
+        secure: false
     });
 }
 
 let peers: any = {};
+let socketInstance:any = null;
 
 class SocketConnection {
-    videoContainer: any = {};
-    settings: any;
-    streaming = false;
-    socket: any;
+    videoContainer:any = {};
+    settings:any;
+    streaming:Boolean = false;
     myPeer: any;
-    isSocketConnected = false;
-    isPeersConnected = false;
-    myID = '';
+    socket: any;
+    isSocketConnected:boolean = false;
+    isPeersConnected:boolean = false;
+    myID:string = '';
 
-    constructor(settings:any, Peer: any) {
+    constructor(settings:any, peer: any) {
         this.settings = settings;
+        this.myPeer = initializePeerConnection(peer);
         this.socket = initializeSocketConnection();
-        this.myPeer = initializePeerConnection(Peer);
         if (this.socket) this.isSocketConnected = true; 
         if (this.myPeer) this.isPeersConnected = true;
         this.initializeSocketEvents();
@@ -45,21 +46,18 @@ class SocketConnection {
         this.socket.on('connect', () => {
             console.log('socket connected');
         });
-
         this.socket.on('user-disconnected', (userID:string) => {
             console.log('user disconnected-- closing peers', userID);
             peers[userID] && peers[userID].close();
             this.removeVideo(userID);
         });
-
         this.socket.on('disconnect', () => {
             console.log('socket disconnected --');
         });
-        this.socket.on('error', (err: Error) => {
+        this.socket.on('error', (err:Error) => {
             console.log('socket error --', err);
         });
-    
-        this.socket.on('display-media', (data: any) => {
+        this.socket.on('display-media', (data:any) => {
             if (data.value) checkAndAddClass(this.getMyVideo(data.userID), 'displayMedia');
             else checkAndAddClass(this.getMyVideo(data.userID), 'userMedia');
         });
@@ -69,15 +67,14 @@ class SocketConnection {
         this.myPeer.on('open', (id) => {
             const { userDetails } = this.settings;
             this.myID = id;
-            const roomID = window.location.pathname.split('/')[2]; 
+            const roomID = window.location.pathname.split('/')[2];
             const userData = {
                 userID: id, roomID, ...userDetails
             }
             console.log('peers established and joined room', userData);
-            this.socket?.emit('join-room', userData);
+            this.socket.emit('join-room', userData);
             this.setNavigatorToStream();
         });
-
         this.myPeer.on('error', (err:Error) => {
             console.log('peer connection error', err);
             this.myPeer.reconnect();
@@ -97,11 +94,13 @@ class SocketConnection {
     }
 
     getVideoAudioStream = (video:boolean=true, audio:boolean=true) => {
-        const myNavigator =  navigator.mediaDevices.getUserMedia;
-        
+        let quality = this.settings.params?.quality;
+        if (quality) quality = parseInt(quality);
+        // @ts-ignore
+        const myNavigator = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia || navigator.mediaDevices.msGetUserMedia;
         return myNavigator({
             video: video ? {
-                frameRate: 12,
+                frameRate: quality ? quality : 12,
                 noiseSuppression: true,
                 width: {min: 640, ideal: 1280, max: 1920},
                 height: {min: 480, ideal: 720, max: 1080}
@@ -152,7 +151,7 @@ class SocketConnection {
         peers[userID] = call;
     }
 
-    createVideo = (createObj: CreateVideo) => {
+    createVideo = (createObj:CreateVideo) => {
         if (!this.videoContainer[createObj.id]) {
             this.videoContainer[createObj.id] = {
                 ...createObj,
@@ -166,8 +165,8 @@ class SocketConnection {
             video.style.transform =  'rotateY(180deg)';
             video.style.maxWidth = '600px';
             if (this.myID === createObj.id) video.muted = true;
-            videoContainer?.appendChild(video)
-            roomContainer?.append(videoContainer);
+            videoContainer.appendChild(video)
+            roomContainer.append(videoContainer);
         } else {
             // @ts-ignore
             document.getElementById(createObj.id).srcObject = createObj.stream;
@@ -176,7 +175,7 @@ class SocketConnection {
 
     reInitializeStream = (video?:boolean, audio?:boolean, type:string='userMedia') => {
         // @ts-ignore
-        const media = type === 'userMedia' ? this.getVideoAudioStream(video, audio) : navigator?.mediaDevices?.getDisplayMedia();
+        const media = type === 'userMedia' ? this.getVideoAudioStream(video, audio) : navigator.mediaDevices.getDisplayMedia();
         return new Promise((resolve) => {
             media.then((stream:MediaStream) => {
                 // @ts-ignore
@@ -184,7 +183,7 @@ class SocketConnection {
                 if (type === 'displayMedia') {
                     this.toggleVideoTrack({audio, video});
                     this.listenToEndStream(stream, {video, audio});
-                    this.socket?.emit('display-media', true);
+                    this.socket.emit('display-media', true);
                 }
                 checkAndAddClass(myVideo, type);
                 this.createVideo({ id: this.myID, stream });
@@ -205,8 +204,8 @@ class SocketConnection {
         myMediaTracks?.forEach((track:any) => {
             track.stop();
         })
-        this.socket?.disconnect();
-        this.myPeer?.destroy();
+        socketInstance?.socket.disconnect();
+        this.myPeer.destroy();
     }
 
     getMyVideo = (id:string=this.myID) => {
@@ -217,9 +216,9 @@ class SocketConnection {
         const videoTrack = stream.getVideoTracks();
         if (videoTrack[0]) {
             videoTrack[0].onended = () => {
-                this.socket?.emit('display-media', false);
+                this.socket.emit('display-media', false);
                 this.reInitializeStream(status.video, status.audio, 'userMedia');
-                this.settings?.updateInstance('displayStream', false);
+                this.settings.updateInstance('displayStream', false);
                 this.toggleVideoTrack(status);
             }
         }
@@ -230,10 +229,15 @@ class SocketConnection {
         // @ts-ignore
         if (myVideo && !status.video) myVideo.srcObject?.getVideoTracks().forEach((track:any) => {
             if (track.kind === 'video') {
+                // track.enabled = status.video;
+                // this.socket.emit('user-video-off', {id: this.myID, status: true});
+                // changeMediaView(this.myID, true);
                 !status.video && track.stop();
             }
         });
         else if (myVideo) {
+            // this.socket.emit('user-video-off', {id: this.myID, status: false});
+            // changeMediaView(this.myID, false);
             this.reInitializeStream(status.video, status.audio);
         }
     }
@@ -269,9 +273,9 @@ const replaceStream = (mediaStream:MediaStream) => {
 
 const checkAndAddClass = (video?:any, type:string='userMedia') => {
     if (video?.classList?.length === 0 && type === 'displayMedia')  
-        video?.classList?.add('display-media');
+        video.classList.add('display-media');
     else 
-        video?.classList?.remove('display-media');
+        video.classList.remove('display-media');
 }
 
 export const createSocketInstance = async (settings={}) => {
